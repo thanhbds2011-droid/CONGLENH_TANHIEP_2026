@@ -1,30 +1,95 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
-
-<title>Công lệnh</title>
-
-<link rel="stylesheet"
-href="css/style.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Công lệnh</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
+  <div class="app">
+    <header class="hero">
+      <h1>Công lệnh</h1>
+      <p>Trung tâm Bảo trợ xã hội Tân Hiệp</p>
+      <h2 id="pageTitle">Trang chủ</h2>
+    </header>
 
-<div id="app">
+    <main class="main">
+      <section id="home" class="screen active">
+        <div class="card">
+          <h3>📊 Dashboard</h3>
+          <div class="grid">
+            <div><span>Số cuối</span><b id="soCuoi">-</b></div>
+            <div><span>Số tiếp theo</span><b id="soTiepTheo">-</b></div>
+            <div><span>Tổng đã cấp</span><b id="tongCongLenh">-</b></div>
+          </div>
+        </div>
 
-...
+        <div class="card">
+          <h3>⚡ Chức năng</h3>
+          <button onclick="showScreen('cap')">➕ Cấp công lệnh</button>
+          <button onclick="taiDashboard()">🔄 Cập nhật Dashboard</button>
+          <button onclick="showScreen('nhatky'); taiNhatKy();">📒 Nhật ký gần nhất</button>
+        </div>
+      </section>
 
-</div>
+      <section id="cap" class="screen">
+        <div class="card">
+          <h3>➕ Cấp công lệnh</h3>
 
-<script src="js/app.js"></script>
+          <label>Đồng chí</label>
+          <input id="dongChi" placeholder="Nhập họ tên">
 
+          <label>Tuổi</label>
+          <input id="tuoi" placeholder="Nhập tuổi">
+
+          <label>Chức vụ</label>
+          <input id="chucVu" placeholder="Ví dụ: Viên chức">
+
+          <label>Đi từ</label>
+          <input id="diTu" value="TTBTXH Tân Hiệp">
+
+          <label>Đến</label>
+          <input id="den" placeholder="Nhập nơi đến">
+
+          <label>Nội dung công tác</label>
+          <textarea id="noiDung" placeholder="Nhập nội dung"></textarea>
+
+          <label>Ngày đi</label>
+          <input id="ngayDi" type="date">
+
+          <label>Ngày về</label>
+          <input id="ngayVe" type="date">
+
+          <label>Phương tiện</label>
+          <input id="phuongTien" placeholder="Ví dụ: Tự túc">
+
+          <label>Giấy tờ kèm theo</label>
+          <input id="giayTo" placeholder="Nếu có">
+
+          <button class="primary" onclick="xuatCongLenh()">📄 Xuất công lệnh PDF</button>
+
+          <div id="ketqua"></div>
+        </div>
+      </section>
+
+      <section id="nhatky" class="screen">
+        <div class="card">
+          <h3>📒 Nhật ký gần nhất</h3>
+          <div id="nhatKyList">Đang tải...</div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button onclick="showScreen('home')">🏠<br>Trang chủ</button>
+      <button onclick="showScreen('cap')">➕<br>Cấp</button>
+      <button onclick="showScreen('nhatky'); taiNhatKy();">📒<br>Nhật ký</button>
+    </nav>
+  </div>
+
+  <script src="js/app.js"></script>
 </body>
-
 </html>
