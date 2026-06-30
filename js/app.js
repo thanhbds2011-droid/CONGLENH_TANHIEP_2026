@@ -22,7 +22,7 @@ function goiApi(action, params, callback) {
     callback({ ok: false, message: "Quá thời gian kết nối Apps Script." });
     delete window[cbName];
     script.remove();
-  }, 60000);
+  }, 180000);
 
   window[cbName] = function(res) {
     clearTimeout(timer);
