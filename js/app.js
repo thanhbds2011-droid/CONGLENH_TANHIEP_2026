@@ -33,7 +33,7 @@ function goiApi(action, params, callback) {
 
   script.onerror = function() {
     clearTimeout(timer);
-    callback({ ok: false, message: "Không kết nối được Apps Script." });
+    callback({ ok: false, message: "Apps Script đang xử lý lâu hoặc mạng yếu. Vui lòng kiểm tra Sheet/Drive." });
     delete window[cbName];
     script.remove();
   };
