@@ -29,9 +29,8 @@
 
         <div class="card">
           <h3>⚡ Chức năng</h3>
-          <button class="nav-btn active" onclick="showScreen('home', this)">🏠<span>Trang chủ</span></button>
-<button class="nav-btn" onclick="showScreen('cap', this)">➕<span>Cấp</span></button>
-<button class="nav-btn" onclick="showScreen('nhatky', this)">📒<span>Nhật ký</span></button>
+          <button class="menu-btn" onclick="showScreen('cap')">➕ Cấp công lệnh</button>
+          <button class="menu-btn" onclick="showScreen('nhatky')">📒 Nhật ký / Báo cáo</button>
         </div>
       </section>
 
@@ -39,37 +38,49 @@
         <div class="card">
           <h3>➕ Cấp công lệnh</h3>
 
-          <label>Đồng chí</label>
+          <label for="dongChi">Đồng chí</label>
           <input id="dongChi" placeholder="Nhập họ tên">
 
-          <label>Tuổi</label>
+          <label for="tuoi">Tuổi</label>
           <input id="tuoi" placeholder="Nhập tuổi">
 
-          <label>Chức vụ</label>
+          <label for="chucVu">Chức vụ</label>
           <input id="chucVu" placeholder="Ví dụ: Viên chức">
 
-          <label>Đi từ</label>
+          <label for="diTu">Đi từ</label>
           <input id="diTu" value="TTBTXH Tân Hiệp">
 
-          <label>Đến</label>
+          <label for="den">Đến</label>
           <input id="den" placeholder="Nhập nơi đến">
 
-          <label>Nội dung công tác</label>
+          <label for="noiDung">Nội dung công tác</label>
           <textarea id="noiDung" placeholder="Nhập nội dung"></textarea>
 
-          <label>Ngày đi</label>
+          <label for="ngayDi">Ngày đi</label>
           <input id="ngayDi" type="date">
 
-          <label>Ngày về</label>
+          <label for="ngayVe">Ngày về</label>
           <input id="ngayVe" type="date">
 
-          <label>Phương tiện</label>
+          <label for="phuongTien">Phương tiện</label>
           <input id="phuongTien" placeholder="Ví dụ: Tự túc">
 
-          <label>Giấy tờ kèm theo</label>
+          <label for="giayTo">Giấy tờ kèm theo</label>
           <input id="giayTo" placeholder="Nếu có">
 
-          <button class="primary" onclick="xuatCongLenh()">📄 Xuất công lệnh PDF</button>
+          <label for="phongKhu">Phòng/Khu</label>
+          <select id="phongKhu">
+            <option value="Mobile">Mobile</option>
+            <option value="Phòng Tổ chức - Hành chính">Phòng Tổ chức - Hành chính</option>
+            <option value="Phòng Công tác xã hội">Phòng Công tác xã hội</option>
+            <option value="Phòng Y tế">Phòng Y tế</option>
+            <option value="Phòng Kế hoạch - Tài chính">Phòng Kế hoạch - Tài chính</option>
+            <option value="Khu I">Khu I</option>
+            <option value="Khu II">Khu II</option>
+            <option value="Khu III">Khu III</option>
+          </select>
+
+          <button class="primary" onclick="capCongLenh()">📄 Xuất công lệnh PDF</button>
 
           <div id="ketqua"></div>
         </div>
@@ -77,30 +88,19 @@
 
       <section id="nhatky" class="screen">
         <div class="card">
-          <h3>📒 Nhật ký gần nhất</h3>
-         <div id="baoCaoList"></div>
+          <h3>📒 Nhật ký / Báo cáo theo Phòng, Khu</h3>
+          <div id="baoCaoList"></div>
         </div>
       </section>
     </main>
 
     <nav class="bottom-nav">
-      <button onclick="showScreen('home')">🏠<br>Trang chủ</button>
-      <button onclick="showScreen('cap')">➕<br>Cấp</button>
-      <button onclick="showScreen('nhatky'); taiNhatKy();">📒<br>Nhật ký</button>
+      <button class="nav-btn active" onclick="showScreen('home', this)">🏠<br>Trang chủ</button>
+      <button class="nav-btn" onclick="showScreen('cap', this)">➕<br>Cấp</button>
+      <button class="nav-btn" onclick="showScreen('nhatky', this)">📒<br>Nhật ký</button>
     </nav>
   </div>
 
   <script src="js/app.js"></script>
 </body>
 </html>
-<label>Phòng/Khu</label>
-<select id="phongKhu">
-  <option value="Mobile">Mobile</option>
-  <option value="Phòng Tổ chức - Hành chính">Phòng Tổ chức - Hành chính</option>
-  <option value="Phòng Công tác xã hội">Phòng Công tác xã hội</option>
-  <option value="Phòng Y tế">Phòng Y tế</option>
-  <option value="Phòng Kế hoạch - Tài chính">Phòng Kế hoạch - Tài chính</option>
-  <option value="Khu I">Khu I</option>
-  <option value="Khu II">Khu II</option>
-  <option value="Khu III">Khu III</option>
-</select>
