@@ -100,8 +100,9 @@ function xuatCongLenh() {
     }
 
     ketqua.innerHTML =
-      "✅ " + res.message +
-      "<br><br><a href='" + res.data.linkFile + "' target='_blank'>Mở file PDF</a>";
+  "✅ " + res.message +
+  "<br><br><a href='" + res.data.linkFile + "' target='_blank'>Mở file PDF</a>" +
+  "<br><br><button onclick=\"inCongLenh('" + res.data.fileId + "')\">🖨️ In công lệnh</button>";
 
     taiDashboard();
   });
@@ -141,3 +142,16 @@ function taiNhatKy() {
 window.addEventListener("load", function() {
   taiDashboard();
 });
+function inCongLenh(fileId) {
+  const ketqua = document.getElementById("ketqua");
+  ketqua.innerHTML += "<br><br>⏳ Đang gửi lệnh in...";
+
+  goiApi("in", { fileId: fileId }, function(res) {
+    if (!res.ok) {
+      ketqua.innerHTML += "<br>❌ " + res.message;
+      return;
+    }
+
+    ketqua.innerHTML += "<br>🖨️ " + res.message;
+  });
+}
