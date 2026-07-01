@@ -1,3 +1,53 @@
+const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
+const API_TOKEN = "CONGLENH_TANHIEP_2026";
+
+function goiApi(action, params, callback) {
+  const cbName = "cb_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
+
+  params = params || {};
+  params.action = action;
+  params.token = API_TOKEN;
+  params.callback = cbName;
+
+  const query = Object.keys(params)
+    .map(function(key) {
+      return encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+    })
+    .join("&");
+
+  const script = document.createElement("script");
+  script.src = API_URL + "?" + query;
+
+  const timeout = setTimeout(function() {
+    callback({
+      ok: false,
+      message: "Apps Script xử lý quá lâu hoặc chưa phản hồi."
+    });
+
+    delete window[cbName];
+    script.remove();
+  }, 300000);
+
+  window[cbName] = function(response) {
+    clearTimeout(timeout);
+    callback(response);
+    delete window[cbName];
+    script.remove();
+  };
+
+  script.onerror = function() {
+    clearTimeout(timeout);
+    callback({
+      ok: false,
+      message: "Không kết nối được Apps Script."
+    });
+
+    delete window[cbName];
+    script.remove();
+  };
+
+  document.body.appendChild(script);
+}
 function capCongLenh() {
   const ketqua = document.getElementById("ketqua");
 
