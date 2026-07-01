@@ -305,3 +305,30 @@ select option {
   color: white;
   background: linear-gradient(135deg, #2563eb, #0ea5e9);
 }
+.update-box {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 9999;
+  background: #fff7ed;
+  color: #9a3412;
+  border: 1px solid #fdba74;
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+  font-weight: 800;
+}
+
+.update-box button {
+  border: none;
+  border-radius: 14px;
+  padding: 10px 14px;
+  background: #f97316;
+  color: white;
+  font-weight: 800;
+}
