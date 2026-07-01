@@ -86,7 +86,7 @@ function capCongLenh() {
     tuoi: document.getElementById("tuoi").value.trim(),
     chucVu: document.getElementById("chucVu").value.trim(),
     diTu: document.getElementById("diTu").value.trim(),
-    den: document.getElementById("den").value.trim(),
+    den: layNoiDen(),
     noiDung: document.getElementById("noiDung").value.trim(),
     ngayDi: document.getElementById("ngayDi").value,
     ngayVe: document.getElementById("ngayVe").value,
@@ -126,7 +126,9 @@ function resetForm() {
   document.getElementById("tuoi").value = "";
   document.getElementById("chucVu").value = "";
   document.getElementById("diTu").value = "TTBTXH Tân Hiệp";
-  document.getElementById("den").value = "";
+  document.getElementById("denSelect").selectedIndex = 0;
+document.getElementById("denKhac").value = "";
+document.getElementById("denKhac").style.display = "none";
   document.getElementById("noiDung").value = "";
   document.getElementById("ngayDi").value = "";
   document.getElementById("ngayVe").value = "";
@@ -238,11 +240,25 @@ window.addEventListener("load", function () {
   taiDashboard();
 
   setInterval(function () {
-    taiDashboard();
-
-    const nhatky = document.getElementById("nhatky");
-    if (nhatky && nhatky.classList.contains("active")) {
-      taiBaoCao();
-    }
-  }, 15000);
+  taiDashboard();
+}, 15000);
 });
+function xuLyNoiDenKhac() {
+  const denSelect = document.getElementById("denSelect");
+  const denKhac = document.getElementById("denKhac");
+
+  if (denSelect.value === "Khác") {
+    denKhac.style.display = "block";
+    denKhac.focus();
+  } else {
+    denKhac.style.display = "none";
+    denKhac.value = "";
+  }
+}
+
+function layNoiDen() {
+  const denSelect = document.getElementById("denSelect").value;
+  const denKhac = document.getElementById("denKhac").value.trim();
+
+  return denSelect === "Khác" ? denKhac : denSelect;
+}
