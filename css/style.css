@@ -173,3 +173,69 @@ button {
   color: #475569;
   font-size: 12px;
 }
+.report-group {
+  background: #ffffff;
+  border-radius: 18px;
+  margin-bottom: 14px;
+  padding: 14px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.report-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.report-title span {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.report-body {
+  margin-top: 12px;
+}
+
+.person-item {
+  background: #f3f6fb;
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.person-item b {
+  display: block;
+  font-size: 16px;
+}
+
+.person-item small {
+  color: #64748b;
+}
+
+.person-detail {
+  background: #ffffff;
+  border-left: 4px solid #2563eb;
+  padding: 10px 14px;
+  margin: -6px 0 12px 0;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.person-detail p {
+  margin: 6px 0;
+}
+
+.print-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+}
