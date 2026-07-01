@@ -52,20 +52,29 @@ function capCongLenh() {
   const ketqua = document.getElementById("ketqua");
 
   const params = {
-    dongChi: document.getElementById("dongChi")?.value || "",
-    tuoi: document.getElementById("tuoi")?.value || "",
-    chucVu: document.getElementById("chucVu")?.value || "",
-    diTu: document.getElementById("diTu")?.value || "",
-    den: document.getElementById("den")?.value || "",
-    noiDung: document.getElementById("noiDung")?.value || "",
-    ngayDi: document.getElementById("ngayDi")?.value || "",
-    ngayVe: document.getElementById("ngayVe")?.value || "",
-    phuongTien: document.getElementById("phuongTien")?.value || "",
-    giayTo: document.getElementById("giayTo")?.value || "",
-    phongKhu: document.getElementById("phongKhu")?.value || "Mobile"
+    dongChi: document.getElementById("dongChi").value.trim(),
+    tuoi: document.getElementById("tuoi").value.trim(),
+    chucVu: document.getElementById("chucVu").value.trim(),
+    diTu: document.getElementById("diTu").value.trim(),
+    den: document.getElementById("den").value.trim(),
+    noiDung: document.getElementById("noiDung").value.trim(),
+    ngayDi: document.getElementById("ngayDi").value,
+    ngayVe: document.getElementById("ngayVe").value,
+    phuongTien: document.getElementById("phuongTien").value.trim(),
+    giayTo: document.getElementById("giayTo").value.trim(),
+    phongKhu: document.getElementById("phongKhu").value
   };
 
-  if (!params.dongChi || !params.chucVu || !params.diTu || !params.den || !params.noiDung || !params.ngayDi || !params.ngayVe || !params.phuongTien) {
+  if (
+    !params.dongChi ||
+    !params.chucVu ||
+    !params.diTu ||
+    !params.den ||
+    !params.noiDung ||
+    !params.ngayDi ||
+    !params.ngayVe ||
+    !params.phuongTien
+  ) {
     ketqua.style.display = "block";
     ketqua.innerHTML = "❌ Vui lòng nhập đầy đủ thông tin bắt buộc.";
     return;
@@ -80,37 +89,14 @@ function capCongLenh() {
       return;
     }
 
-    const fileId = res.data?.fileId || "";
-    const linkFile = res.data?.linkFile || "#";
-
     ketqua.innerHTML =
       "✅ " + res.message +
-      "<br><br><a href='" + linkFile + "' target='_blank'>📄 Mở file PDF</a>" +
-      "<br><br><button class='print-btn' onclick=\"inCongLenh('" + fileId + "')\">🖨️ In công lệnh</button>";
+      "<br><br><a class='link-btn' href='" + res.data.linkFile + "' target='_blank'>📄 Mở file PDF</a>" +
+      "<br><button class='share-btn' onclick=\"chiaSePdf('" + res.data.linkFile + "', '" + res.data.tenFile + "')\">📲 Chia sẻ qua Zalo</button>";
 
-    if (typeof taiDashboard === "function") {
-      taiDashboard();
-    }
-  });
-}
-
-function inCongLenh(fileId) {
-  const ketqua = document.getElementById("ketqua");
-
-  if (!fileId) {
-    ketqua.innerHTML += "<br>❌ Không tìm thấy File ID để gửi in.";
-    return;
-  }
-
-  ketqua.innerHTML += "<br><br>⏳ Đang gửi lệnh in...";
-
-  goiApi("in", { fileId: fileId }, function(res) {
-    if (!res || !res.ok) {
-      ketqua.innerHTML += "<br>❌ " + ((res && res.message) ? res.message : "Gửi lệnh in thất bại.");
-      return;
-    }
-
-    ketqua.innerHTML += "<br>🖨️ " + res.message;
+    resetForm();
+    taiDashboard();
+    taiBaoCao();
   });
 }
 
@@ -229,4 +215,16 @@ function showScreen(id, btn) {
     top: 0,
     behavior: "smooth"
   });
+}
+function chiaSePdf(link, tenFile) {
+  if (navigator.share) {
+    navigator.share({
+      title: tenFile || "Công lệnh",
+      text: "File công lệnh PDF",
+      url: link
+    });
+  } else {
+    navigator.clipboard.writeText(link);
+    alert("Đã sao chép link PDF. Anh có thể dán vào Zalo.");
+  }
 }
