@@ -10,44 +10,74 @@ function goiApi(action, params, callback) {
   params.callback = cbName;
 
   const query = Object.keys(params)
-    .map(function(key) {
-      return encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
-    })
+    .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(params[k]))
     .join("&");
 
   const script = document.createElement("script");
   script.src = API_URL + "?" + query;
 
-  const timeout = setTimeout(function() {
-    callback({
-      ok: false,
-      message: "Apps Script xử lý quá lâu hoặc chưa phản hồi."
-    });
-
+  const timeout = setTimeout(function () {
+    callback({ ok: false, message: "Apps Script xử lý quá lâu hoặc chưa phản hồi." });
     delete window[cbName];
     script.remove();
-  }, 300000);
+  }, 60000);
 
-  window[cbName] = function(response) {
+  window[cbName] = function (response) {
     clearTimeout(timeout);
     callback(response);
     delete window[cbName];
     script.remove();
   };
 
-  script.onerror = function() {
+  script.onerror = function () {
     clearTimeout(timeout);
-    callback({
-      ok: false,
-      message: "Không kết nối được Apps Script."
-    });
-
+    callback({ ok: false, message: "Không kết nối được Apps Script." });
     delete window[cbName];
     script.remove();
   };
 
   document.body.appendChild(script);
 }
+
+function showScreen(id, btn) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+
+  const screen = document.getElementById(id);
+  if (screen) screen.classList.add("active");
+
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+
+  const titles = {
+    home: "Trang chủ",
+    cap: "Cấp công lệnh",
+    nhatky: "Nhật ký"
+  };
+
+  const pageTitle = document.getElementById("pageTitle");
+  if (pageTitle) pageTitle.innerText = titles[id] || "Công lệnh";
+
+  if (id === "home") taiDashboard();
+  if (id === "nhatky") taiBaoCao();
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function taiDashboard() {
+  goiApi("dashboard", {}, function (res) {
+    if (!res || !res.ok) {
+      document.getElementById("soCuoi").innerText = "Lỗi";
+      document.getElementById("soTiepTheo").innerText = "Lỗi";
+      document.getElementById("tongCongLenh").innerText = "Lỗi";
+      return;
+    }
+
+    document.getElementById("soCuoi").innerText = res.data.soCuoi || 0;
+    document.getElementById("soTiepTheo").innerText = res.data.soTiepTheo || 1;
+    document.getElementById("tongCongLenh").innerText = res.data.tongCongLenh || 0;
+  });
+}
+
 function capCongLenh() {
   const ketqua = document.getElementById("ketqua");
 
@@ -74,7 +104,7 @@ function capCongLenh() {
   ketqua.style.display = "block";
   ketqua.innerHTML = "⏳ Đang xuất công lệnh PDF...";
 
-  goiApi("xuat", params, function(res) {
+  goiApi("xuat", params, function (res) {
     if (!res || !res.ok) {
       ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Xuất công lệnh thất bại.");
       return;
@@ -91,8 +121,32 @@ function capCongLenh() {
   });
 }
 
-function xuatCongLenh() {
-  capCongLenh();
+function resetForm() {
+  document.getElementById("dongChi").value = "";
+  document.getElementById("tuoi").value = "";
+  document.getElementById("chucVu").value = "";
+  document.getElementById("diTu").value = "TTBTXH Tân Hiệp";
+  document.getElementById("den").value = "";
+  document.getElementById("noiDung").value = "";
+  document.getElementById("ngayDi").value = "";
+  document.getElementById("ngayVe").value = "";
+  document.getElementById("phuongTien").value = "";
+  document.getElementById("giayTo").value = "";
+  document.getElementById("phongKhu").selectedIndex = 0;
+  document.getElementById("dongChi").focus();
+}
+
+function chiaSePdf(link, tenFile) {
+  if (navigator.share) {
+    navigator.share({
+      title: tenFile || "Công lệnh",
+      text: "File công lệnh PDF",
+      url: link
+    });
+  } else {
+    navigator.clipboard.writeText(link);
+    alert("Đã sao chép link PDF. Anh dán vào Zalo để gửi.");
+  }
 }
 
 function taiBaoCao() {
@@ -101,20 +155,20 @@ function taiBaoCao() {
 
   box.innerHTML = "⏳ Đang tải báo cáo...";
 
-  goiApi("baocao", {}, function(res) {
+  goiApi("baocao", {}, function (res) {
     if (!res || !res.ok) {
       box.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không tải được báo cáo.");
       return;
     }
 
     if (!res.data || res.data.length === 0) {
-      box.innerHTML = "<div class='empty'>Chưa có dữ liệu.</div>";
+      box.innerHTML = "<div class='empty'>Chưa có dữ liệu công lệnh.</div>";
       return;
     }
 
     let html = "";
 
-    res.data.forEach(function(phong, i) {
+    res.data.forEach(function (phong, i) {
       const phongId = "phong_" + i;
 
       html += `
@@ -123,10 +177,11 @@ function taiBaoCao() {
             <b>📁 ${phong.phongKhu}</b>
             <span>${phong.tong} công lệnh</span>
           </div>
+
           <div id="${phongId}" class="report-body" style="display:none;">
       `;
 
-      phong.nhanSu.forEach(function(ns, j) {
+      phong.nhanSu.forEach(function (ns, j) {
         const nsId = "ns_" + i + "_" + j;
 
         html += `
@@ -134,10 +189,11 @@ function taiBaoCao() {
             <b>👤 ${ns.dongChi}</b>
             <span>${ns.tong} công lệnh</span>
           </div>
+
           <div id="${nsId}" class="person-detail" style="display:none;">
         `;
 
-        ns.danhSach.forEach(function(cl, k) {
+        ns.danhSach.forEach(function (cl, k) {
           const clId = "cl_" + i + "_" + j + "_" + k;
 
           html += `
@@ -153,6 +209,7 @@ function taiBaoCao() {
               <p><b>Ngày đi:</b> ${cl.ngayDi || ""}</p>
               <p><b>Ngày về:</b> ${cl.ngayVe || ""}</p>
               <p><b>Phương tiện:</b> ${cl.phuongTien || ""}</p>
+              <p><b>Giấy tờ:</b> ${cl.giayTo || ""}</p>
               <p><a href="${cl.linkFile || "#"}" target="_blank">📄 Mở PDF</a></p>
             </div>
           `;
@@ -161,7 +218,10 @@ function taiBaoCao() {
         html += `</div>`;
       });
 
-      html += `</div></div>`;
+      html += `
+          </div>
+        </div>
+      `;
     });
 
     box.innerHTML = html;
@@ -174,86 +234,10 @@ function toggleBox(id) {
   el.style.display = el.style.display === "none" ? "block" : "none";
 }
 
-function toggleBox(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-
-  el.style.display = el.style.display === "none" ? "block" : "none";
-}
-function showScreen(id, btn) {
-  document.querySelectorAll(".screen").forEach(function(screen) {
-    screen.classList.remove("active");
-  });
-
-  const screen = document.getElementById(id);
-  if (screen) {
-    screen.classList.add("active");
-  }
-
-  document.querySelectorAll(".nav-btn").forEach(function(button) {
-    button.classList.remove("active");
-  });
-
-  if (btn) {
-    btn.classList.add("active");
-  }
-
-  const titles = {
-    home: "Trang chủ",
-    cap: "Cấp công lệnh",
-    nhatky: "Nhật ký",
-    thongke: "Thống kê"
-  };
-
-  const pageTitle = document.getElementById("pageTitle");
-  if (pageTitle) {
-    pageTitle.innerText = titles[id] || "Công lệnh";
-  }
-
-  if (id === "nhatky") {
-    taiBaoCaoPhongKhu();
-  }
-
-  if (id === "thongke" && typeof taiThongKe === "function") {
-    taiThongKe();
-  }
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
-}
-function chiaSePdf(link, tenFile) {
-  if (navigator.share) {
-    navigator.share({
-      title: tenFile || "Công lệnh",
-      text: "File công lệnh PDF",
-      url: link
-    });
-  } else {
-    navigator.clipboard.writeText(link);
-    alert("Đã sao chép link PDF. Anh có thể dán vào Zalo.");
-  }
-}
-function resetForm() {
-  document.getElementById("dongChi").value = "";
-  document.getElementById("tuoi").value = "";
-  document.getElementById("chucVu").value = "";
-  document.getElementById("diTu").value = "TTBTXH Tân Hiệp";
-  document.getElementById("den").value = "";
-  document.getElementById("noiDung").value = "";
-  document.getElementById("ngayDi").value = "";
-  document.getElementById("ngayVe").value = "";
-  document.getElementById("phuongTien").value = "";
-  document.getElementById("giayTo").value = "";
-  document.getElementById("phongKhu").selectedIndex = 0;
-
-  document.getElementById("dongChi").focus();
-}
-window.addEventListener("load", function() {
+window.addEventListener("load", function () {
   taiDashboard();
 
-  setInterval(function() {
+  setInterval(function () {
     taiDashboard();
 
     const nhatky = document.getElementById("nhatky");
