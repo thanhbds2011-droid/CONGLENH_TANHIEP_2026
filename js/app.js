@@ -238,10 +238,12 @@ function toggleBox(id) {
 
 window.addEventListener("load", function () {
   taiDashboard();
+  kiemTraPhienBan();
 
   setInterval(function () {
-  taiDashboard();
-}, 15000);
+    taiDashboard();
+    kiemTraPhienBan();
+  }, 15000);
 });
 function xuLyNoiDenKhac() {
   const denSelect = document.getElementById("denSelect");
@@ -261,4 +263,30 @@ function layNoiDen() {
   const denKhac = document.getElementById("denKhac").value.trim();
 
   return denSelect === "Khác" ? denKhac : denSelect;
+}
+const LOCAL_APP_VERSION = "2.0.0";
+
+function kiemTraPhienBan() {
+  goiApi("version", {}, function(res) {
+    if (!res || !res.ok || !res.data) return;
+
+    const serverVersion = res.data.version;
+    const updateBox = document.getElementById("updateBox");
+    const updateText = document.getElementById("updateText");
+
+    if (serverVersion && serverVersion !== LOCAL_APP_VERSION) {
+      if (updateText) {
+        updateText.innerText = "Phiên bản mới: " + serverVersion;
+      }
+
+      if (updateBox) {
+        updateBox.style.display = "flex";
+      }
+    }
+  });
+}
+
+function capNhatUngDung() {
+  const url = window.location.origin + window.location.pathname + "?v=" + Date.now();
+  window.location.replace(url);
 }
