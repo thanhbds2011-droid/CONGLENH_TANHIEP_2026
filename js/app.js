@@ -65,16 +65,7 @@ function capCongLenh() {
     phongKhu: document.getElementById("phongKhu").value
   };
 
-  if (
-    !params.dongChi ||
-    !params.chucVu ||
-    !params.diTu ||
-    !params.den ||
-    !params.noiDung ||
-    !params.ngayDi ||
-    !params.ngayVe ||
-    !params.phuongTien
-  ) {
+  if (!params.dongChi || !params.chucVu || !params.diTu || !params.den || !params.noiDung || !params.ngayDi || !params.ngayVe || !params.phuongTien) {
     ketqua.style.display = "block";
     ketqua.innerHTML = "❌ Vui lòng nhập đầy đủ thông tin bắt buộc.";
     return;
@@ -100,9 +91,12 @@ function capCongLenh() {
   });
 }
 
-function taiBaoCaoPhongKhu() {
-  const box = document.getElementById("baoCaoList");
+function xuatCongLenh() {
+  capCongLenh();
+}
 
+function taiBaoCao() {
+  const box = document.getElementById("baoCaoList");
   if (!box) return;
 
   box.innerHTML = "⏳ Đang tải báo cáo...";
@@ -114,57 +108,70 @@ function taiBaoCaoPhongKhu() {
     }
 
     if (!res.data || res.data.length === 0) {
-      box.innerHTML = "<div class='log-item'>Chưa có dữ liệu báo cáo.</div>";
+      box.innerHTML = "<div class='empty'>Chưa có dữ liệu.</div>";
       return;
     }
 
     let html = "";
 
-    res.data.forEach(function(group, groupIndex) {
-      const groupId = "group_" + groupIndex;
+    res.data.forEach(function(phong, i) {
+      const phongId = "phong_" + i;
 
       html += `
         <div class="report-group">
-          <div class="report-title" onclick="toggleBox('${groupId}')">
-            <b>${group.phongKhu || "Chưa phân loại"}</b>
-            <span>${group.tong || 0} công lệnh</span>
+          <div class="report-title" onclick="toggleBox('${phongId}')">
+            <b>📁 ${phong.phongKhu}</b>
+            <span>${phong.tong} công lệnh</span>
           </div>
-
-          <div id="${groupId}" class="report-body" style="display:none;">
+          <div id="${phongId}" class="report-body" style="display:none;">
       `;
 
-      group.danhSach.forEach(function(item, itemIndex) {
-        const detailId = "detail_" + groupIndex + "_" + itemIndex;
+      phong.nhanSu.forEach(function(ns, j) {
+        const nsId = "ns_" + i + "_" + j;
 
         html += `
-          <div class="person-item" onclick="toggleBox('${detailId}')">
-            <b>CL ${item.soCongLenh || ""} - ${item.dongChi || ""}</b>
-            <small>${item.den || ""}</small>
+          <div class="person-row" onclick="toggleBox('${nsId}')">
+            <b>👤 ${ns.dongChi}</b>
+            <span>${ns.tong} công lệnh</span>
           </div>
-
-          <div id="${detailId}" class="person-detail" style="display:none;">
-            <p><b>Chức vụ:</b> ${item.chucVu || ""}</p>
-            <p><b>Đi từ:</b> ${item.diTu || ""}</p>
-            <p><b>Đến:</b> ${item.den || ""}</p>
-            <p><b>Nội dung:</b> ${item.noiDung || ""}</p>
-            <p><b>Ngày đi:</b> ${item.ngayDi || ""}</p>
-            <p><b>Ngày về:</b> ${item.ngayVe || ""}</p>
-            <p><b>Phương tiện:</b> ${item.phuongTien || ""}</p>
-            <p><b>Giấy tờ:</b> ${item.giayTo || ""}</p>
-            <p><b>Trạng thái:</b> ${item.trangThai || ""}</p>
-            <p><b>Trạng thái in:</b> ${item.trangThaiIn || ""}</p>
-          </div>
+          <div id="${nsId}" class="person-detail" style="display:none;">
         `;
+
+        ns.danhSach.forEach(function(cl, k) {
+          const clId = "cl_" + i + "_" + j + "_" + k;
+
+          html += `
+            <div class="cl-row" onclick="toggleBox('${clId}')">
+              <b>CL ${cl.soCongLenh}</b>
+              <small>${cl.den || ""} | ${cl.ngayDi || ""} - ${cl.ngayVe || ""}</small>
+            </div>
+
+            <div id="${clId}" class="cl-detail" style="display:none;">
+              <p><b>Đi từ:</b> ${cl.diTu || ""}</p>
+              <p><b>Đến:</b> ${cl.den || ""}</p>
+              <p><b>Nội dung:</b> ${cl.noiDung || ""}</p>
+              <p><b>Ngày đi:</b> ${cl.ngayDi || ""}</p>
+              <p><b>Ngày về:</b> ${cl.ngayVe || ""}</p>
+              <p><b>Phương tiện:</b> ${cl.phuongTien || ""}</p>
+              <p><a href="${cl.linkFile || "#"}" target="_blank">📄 Mở PDF</a></p>
+            </div>
+          `;
+        });
+
+        html += `</div>`;
       });
 
-      html += `
-          </div>
-        </div>
-      `;
+      html += `</div></div>`;
     });
 
     box.innerHTML = html;
   });
+}
+
+function toggleBox(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = el.style.display === "none" ? "block" : "none";
 }
 
 function toggleBox(id) {
@@ -228,3 +235,30 @@ function chiaSePdf(link, tenFile) {
     alert("Đã sao chép link PDF. Anh có thể dán vào Zalo.");
   }
 }
+function resetForm() {
+  document.getElementById("dongChi").value = "";
+  document.getElementById("tuoi").value = "";
+  document.getElementById("chucVu").value = "";
+  document.getElementById("diTu").value = "TTBTXH Tân Hiệp";
+  document.getElementById("den").value = "";
+  document.getElementById("noiDung").value = "";
+  document.getElementById("ngayDi").value = "";
+  document.getElementById("ngayVe").value = "";
+  document.getElementById("phuongTien").value = "";
+  document.getElementById("giayTo").value = "";
+  document.getElementById("phongKhu").selectedIndex = 0;
+
+  document.getElementById("dongChi").focus();
+}
+window.addEventListener("load", function() {
+  taiDashboard();
+
+  setInterval(function() {
+    taiDashboard();
+
+    const nhatky = document.getElementById("nhatky");
+    if (nhatky && nhatky.classList.contains("active")) {
+      taiBaoCao();
+    }
+  }, 15000);
+});
