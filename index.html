@@ -51,7 +51,14 @@
           <input id="diTu" value="TTBTXH Tân Hiệp">
 
           <label for="den">Đến</label>
-          <input id="den" placeholder="Nhập nơi đến">
+          <select id="denSelect" onchange="xuLyNoiDenKhac()">
+  <option value="TTYT KV Bình Long">TTYT KV Bình Long</option>
+  <option value="Bệnh viện ĐK Bình Phước">Bệnh viện ĐK Bình Phước</option>
+  <option value="Bệnh viện Chợ Rẫy">Bệnh viện Chợ Rẫy</option>
+  <option value="Khác">Khác</option>
+</select>
+
+<input id="denKhac" placeholder="Nhập nơi đến khác" style="display:none; margin-top:10px;">
 
           <label for="noiDung">Nội dung công tác</label>
           <textarea id="noiDung" placeholder="Nhập nội dung"></textarea>
@@ -70,7 +77,7 @@
 
           <label for="phongKhu">Phòng/Khu</label>
           <select id="phongKhu">
-            <option value="Mobile">Mobile</option>
+            <option value="Ban Giám đốc">Ban Giám đốc</option>
             <option value="Phòng Tổ chức - Hành chính">Phòng Tổ chức - Hành chính</option>
             <option value="Phòng Công tác xã hội">Phòng Công tác xã hội</option>
             <option value="Phòng Y tế">Phòng Y tế</option>
