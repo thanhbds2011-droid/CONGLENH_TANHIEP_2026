@@ -1,446 +1,175 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-<meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
+  <title>Công lệnh</title>
 
-<title>Công lệnh</title>
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Công lệnh">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-<link rel="stylesheet" href="css/style.css">
-
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="css/style.css?v=101">
 </head>
 
 <body>
-
-<header class="header">
-
-<h1>Công lệnh</h1>
-
-<p>Trung tâm BTXH Tân Hiệp</p>
-
-<h2 id="pageTitle">
-
-Trang chủ
-
-</h2>
-
-</header>
-
-
-<!-- ========================= -->
-<!-- HOME -->
-<!-- ========================= -->
-
-<section id="home" class="screen active">
-
-<div class="card">
-
-<h3>
-
-📊 Dashboard
-
-</h3>
-
-<div class="dashboard">
-
-<div>
-
-<span>Số tiếp CL</span>
-
-<h2 id="soTiepTheoCL">-</h2>
-
-</div>
-
-<div>
-
-<span>Tổng CL</span>
-
-<h2 id="tongCL">-</h2>
-
-</div>
-
-<div>
-
-<span>Số tiếp GGT</span>
-
-<h2 id="soTiepTheoGGT">-</h2>
-
-</div>
-
-<div>
-
-<span>Tổng GGT</span>
-
-<h2 id="tongGGT">-</h2>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<button onclick="showScreen('cap',this)">
-
-➕ Cấp văn bản
-
-</button>
-
-<button onclick="showScreen('nhatky',this)">
-
-📒 Nhật ký
-
-</button>
-
-</div>
-
-</section>
-
-
-
-
-
-<!-- ========================= -->
-<!-- CẤP -->
-<!-- ========================= -->
-
-<section id="cap" class="screen">
-
-<div class="card">
-
-<h3>
-
-📄 Cấp văn bản
-
-</h3>
-
-<label>
-
-Loại giấy
-
-</label>
-
-<select id="loaiGiay" onchange="doiLoaiGiay()">
-
-<option value="CONG_LENH">
-
-Công lệnh
-
-</option>
-
-<option value="GIAY_GIOI_THIEU">
-
-Giấy giới thiệu
-
-</option>
-
-</select>
-
-<hr>
-
-<label>Đồng chí</label>
-
-<input id="dongChi">
-
-<label>Tuổi</label>
-
-<input id="tuoi">
-
-<label>Chức vụ</label>
-
-<input id="chucVu">
-
-<!-- ================= -->
-<!-- FORM CÔNG LỆNH -->
-<!-- ================= -->
-
-<div id="formCL">
-
-<label>Đi từ</label>
-
-<input id="diTu" value="TTBTXH Tân Hiệp">
-
-<label>Đến</label>
-
-<select id="den" onchange="chonNoiDen()">
-
-<option>
-
-TTYT KV Bình Long
-
-</option>
-
-<option>
-
-BV ĐK Bình Phước
-
-</option>
-
-<option>
-
-BV Chợ Rẫy
-
-</option>
-
-<option>
-
-Khác...
-
-</option>
-
-</select>
-
-<input
-id="denKhac"
-style="display:none"
-placeholder="Nhập nơi đến">
-
-<label>Nội dung</label>
-
-<textarea id="noiDung"></textarea>
-
-<label>Ngày đi</label>
-
-<input type="date" id="ngayDi">
-
-<label>Ngày về</label>
-
-<input type="date" id="ngayVe">
-
-<label>Phương tiện</label>
-
-<input id="phuongTien">
-
-<label>Giấy tờ</label>
-
-<input id="giayTo">
-
-</div>
-
-<!-- ================= -->
-<!-- FORM GGT -->
-<!-- ================= -->
-
-<div id="formGGT"
-style="display:none">
-
-<label>Kính gửi</label>
-
-<input id="kinhGui">
-
-<label>Nơi đến</label>
-
-<select id="noiDen">
-
-<option>
-
-TTYT KV Bình Long
-
-</option>
-
-<option>
-
-BV ĐK Bình Phước
-
-</option>
-
-<option>
-
-BV Chợ Rẫy
-
-</option>
-
-<option>
-
-Khác...
-
-</option>
-
-</select>
-
-<input
-id="noiDenKhac"
-style="display:none">
-
-<label>Về việc</label>
-
-<textarea id="noiDungGGT">
-
-</textarea>
-
-<label>
-
-Có giá trị đến hết ngày
-
-</label>
-
-<input
-type="date"
-id="ngayHetHan">
-
-</div>
-<label>Ngày cấp trên giấy</label>
-<input type="date" id="ngayCapGiay">
-<label>
-
-Phòng/Khu
-
-</label>
-
-<select id="phongKhu">
-
-<option>
-
-Ban Giám đốc
-
-</option>
-
-<option>
-
-Phòng Tổ chức - Hành chính
-
-</option>
-
-<option>
-
-Phòng Công tác xã hội
-
-</option>
-
-<option>
-
-Phòng Y tế
-
-</option>
-
-<option>
-
-Phòng Kế hoạch - Tài chính
-
-</option>
-
-<option>
-
-Khu I
-
-</option>
-
-<option>
-
-Khu II
-
-</option>
-
-<option>
-
-Khu III
-
-</option>
-
-</select>
-
-<br><br>
-
-<button
-onclick="capCongLenh()">
-
-📄 Xuất PDF
-
-</button>
-
-<div id="ketqua">
-
-</div>
-
-</div>
-
-</section>
-
-
-
-
-
-<!-- ========================= -->
-<!-- NHẬT KÝ -->
-<!-- ========================= -->
-
-<section id="nhatky"
-class="screen">
-
-<div class="card">
-
-<h3>
-
-📒 Nhật ký
-
-</h3>
-
-<div id="baoCaoList">
-
-Đang tải...
-
-</div>
-
-</div>
-
-</section>
-
-
-
-
-
-
-
-<nav>
-
-<button
-class="nav-btn active"
-
-onclick="showScreen('home',this)">
-
-🏠
-
-<br>
-
-Trang chủ
-
-</button>
-
-<button
-class="nav-btn"
-
-onclick="showScreen('cap',this)">
-
-➕
-
-<br>
-
-Cấp
-
-</button>
-
-<button
-class="nav-btn"
-
-onclick="showScreen('nhatky',this)">
-
-📒
-
-<br>
-
-Nhật ký
-
-</button>
-
-</nav>
-
-
-<script src="js/app.js?v=101"></script>
-
+  <header class="header">
+    <h1>Công lệnh</h1>
+    <p>Trung tâm BTXH Tân Hiệp</p>
+    <h2 id="pageTitle">Trang chủ</h2>
+  </header>
+
+  <section id="home" class="screen active">
+    <div class="card">
+      <h3>📊 Dashboard</h3>
+
+      <div class="dashboard">
+        <div>
+          <span>Số tiếp CL</span>
+          <h2 id="soTiepTheoCL">-</h2>
+        </div>
+
+        <div>
+          <span>Tổng CL</span>
+          <h2 id="tongCL">-</h2>
+        </div>
+
+        <div>
+          <span>Số tiếp GGT</span>
+          <h2 id="soTiepTheoGGT">-</h2>
+        </div>
+
+        <div>
+          <span>Tổng GGT</span>
+          <h2 id="tongGGT">-</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <button onclick="showScreen('cap', this)">➕ Cấp văn bản</button>
+      <button onclick="showScreen('nhatky', this)">📒 Nhật ký</button>
+    </div>
+  </section>
+
+  <section id="cap" class="screen">
+    <div class="card">
+      <h3>📄 Cấp văn bản</h3>
+
+      <label>Loại giấy</label>
+      <select id="loaiGiay" onchange="doiLoaiGiay()">
+        <option value="CONG_LENH">Công lệnh</option>
+        <option value="GIAY_GIOI_THIEU">Giấy giới thiệu</option>
+      </select>
+
+      <hr>
+
+      <label>Đồng chí</label>
+      <input id="dongChi" placeholder="Nhập họ tên">
+
+      <label>Tuổi</label>
+      <input id="tuoi" placeholder="Nhập tuổi nếu có">
+
+      <label>Chức vụ</label>
+      <input id="chucVu" placeholder="Ví dụ: Nhân viên">
+
+      <div id="formCL">
+        <label>Đi từ</label>
+        <input id="diTu" value="TTBTXH Tân Hiệp">
+
+        <label>Đến</label>
+        <select id="den" onchange="chonNoiDen()">
+          <option>TTYT KV Bình Long</option>
+          <option>BV ĐK Bình Phước</option>
+          <option>BV Chợ Rẫy</option>
+          <option>Khác...</option>
+        </select>
+
+        <input id="denKhac" style="display:none" placeholder="Nhập nơi đến khác">
+
+        <label>Nội dung công tác</label>
+        <textarea id="noiDung" placeholder="Nhập nội dung công tác"></textarea>
+
+        <label>Ngày đi</label>
+        <input type="date" id="ngayDi">
+
+        <label>Ngày về</label>
+        <input type="date" id="ngayVe">
+
+        <label>Phương tiện</label>
+        <input id="phuongTien" placeholder="Ví dụ: Tự túc">
+
+        <label>Giấy tờ kèm theo</label>
+        <input id="giayTo" placeholder="Nếu có">
+      </div>
+
+      <div id="formGGT" style="display:none">
+        <label>Kính gửi</label>
+        <input id="kinhGui" placeholder="Nhập cơ quan kính gửi">
+
+        <label>Nơi đến</label>
+        <select id="noiDen">
+          <option>TTYT KV Bình Long</option>
+          <option>BV ĐK Bình Phước</option>
+          <option>BV Chợ Rẫy</option>
+          <option>Khác...</option>
+        </select>
+
+        <input id="noiDenKhac" style="display:none" placeholder="Nhập nơi đến khác">
+
+        <label>Về việc</label>
+        <textarea id="noiDungGGT" placeholder="Nhập nội dung / về việc"></textarea>
+
+        <label>Có giá trị đến hết ngày</label>
+        <input type="date" id="ngayHetHan">
+      </div>
+
+      <label>Ngày cấp trên giấy</label>
+      <input type="date" id="ngayCapGiay">
+
+      <label>Phòng/Khu</label>
+      <select id="phongKhu">
+        <option>Ban Giám đốc</option>
+        <option>Phòng Tổ chức - Hành chính</option>
+        <option>Phòng Công tác xã hội</option>
+        <option>Phòng Y tế</option>
+        <option>Phòng Kế hoạch - Tài chính</option>
+        <option>Khu I</option>
+        <option>Khu II</option>
+        <option>Khu III</option>
+      </select>
+
+      <button onclick="capCongLenh()">📄 Xuất PDF</button>
+
+      <div id="ketqua"></div>
+    </div>
+  </section>
+
+  <section id="nhatky" class="screen">
+    <div class="card">
+      <h3>📒 Nhật ký</h3>
+      <div id="baoCaoList">Đang tải...</div>
+    </div>
+  </section>
+
+  <nav>
+    <button class="nav-btn active" onclick="showScreen('home', this)">
+      🏠<br>Trang chủ
+    </button>
+
+    <button class="nav-btn" onclick="showScreen('cap', this)">
+      ➕<br>Cấp
+    </button>
+
+    <button class="nav-btn" onclick="showScreen('nhatky', this)">
+      📒<br>Nhật ký
+    </button>
+  </nav>
+
+  <script src="js/app.js?v=101"></script>
 </body>
-
 </html>
