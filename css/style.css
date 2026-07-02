@@ -201,15 +201,21 @@ button:active {
   font-weight: 700;
 }
 
+/* Ô tìm kiếm Nhật ký */
 .search-box {
-  margin-bottom: 14px;
+  margin: 0 0 14px 0;
 }
 
 .search-box input {
+  width: 100%;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 18px;
+  padding: 13px 15px;
+  font-size: 14px;
   background: #f8fafc;
-  font-size: 15px;
 }
 
+/* Nhật ký */
 .report-group {
   background: white;
   border-radius: 20px;
@@ -218,107 +224,151 @@ button:active {
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
 }
 
-.report-title,
+/* Cấp 1: Phòng/Khu */
+.report-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  background: #eaf2ff;
+  padding: 15px 16px;
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.report-title .left {
+  flex: 1;
+  text-align: left;
+}
+
+.report-title .left b {
+  display: block;
+  font-size: 16px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.report-title .left small {
+  display: block;
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+.report-title .right {
+  min-width: 72px;
+  text-align: right;
+}
+
+.report-title .right span {
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+  color: #2563eb;
+  margin: 1px 0;
+}
+
+/* Cấp 2: Người */
 .person-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
+  align-items: flex-start;
+  gap: 10px;
+  background: #f3f6fb;
+  margin: 8px 0 6px 12px;
+  padding: 11px 13px;
   border-radius: 14px;
+  cursor: pointer;
 }
 
-.report-title {
-  background: #eff6ff;
-  padding: 12px;
+.person-row .left {
+  flex: 1;
+  text-align: left;
 }
 
-.person-row {
-  background: #f1f5f9;
-  padding: 10px 12px;
-  margin: 8px 0;
-}
-
-.report-title b,
-.person-row b {
-  font-size: 15px;
-}
-
-.report-title div,
-.person-row div {
-  text-align: right;
-  min-width: 105px;
-}
-
-.report-title span,
-.person-row span {
+.person-row .left b {
   display: block;
-  color: #2563eb;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 900;
-  margin: 2px 0;
+  color: #0f172a;
 }
 
-.report-body {
-  margin-top: 10px;
+.person-row .left small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  color: #64748b;
 }
 
+.person-row .right {
+  min-width: 60px;
+  text-align: right;
+}
+
+.person-row .right span {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 900;
+  color: #2563eb;
+}
+
+/* Cấp 3: Văn bản */
 .person-detail {
-  padding-left: 4px;
+  padding-left: 0;
 }
 
 .vb-mini-row {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 10px;
   background: white;
   border-left: 4px solid #2563eb;
-  border-radius: 12px;
-  padding: 9px 12px;
-  margin: 7px 0;
-  min-height: 54px;
+  border-radius: 11px;
+  padding: 8px 10px;
+  margin: 7px 0 7px 26px;
+  min-height: 44px;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
   cursor: pointer;
 }
 
 .vb-mini-row b {
   display: block;
-  font-size: 14px;
+  font-size: 13px;
   color: #0f172a;
   margin-bottom: 2px;
 }
 
 .vb-mini-row small {
   display: block;
-  font-size: 12px;
+  font-size: 11.5px;
   color: #64748b;
   line-height: 1.25;
-  max-width: 210px;
+  max-width: 180px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .vb-mini-row span {
-  min-width: 64px;
+  min-width: 58px;
   text-align: right;
-  font-size: 12px;
+  font-size: 11.5px;
   color: #2563eb;
   font-weight: 900;
 }
 
 .cl-detail {
   background: #f8fafc;
-  border-radius: 12px;
-  padding: 10px 12px;
-  margin-bottom: 10px;
+  border-radius: 11px;
+  padding: 9px 11px;
+  margin: 0 0 10px 26px;
   border: 1px solid #e2e8f0;
-  font-size: 13px;
+  font-size: 12.5px;
 }
 
 .cl-detail p {
-  margin: 5px 0;
+  margin: 4px 0;
   line-height: 1.35;
 }
 
@@ -340,6 +390,7 @@ button:active {
   font-weight: 700;
 }
 
+/* Thanh điều hướng */
 nav {
   position: fixed;
   left: 14px;
@@ -379,105 +430,4 @@ nav button.active {
     left: calc(50% - 246px);
     right: calc(50% - 246px);
   }
-}
-/* ===== Ô TÌM KIẾM NHẬT KÝ ===== */
-.search-box {
-  margin: 0 0 14px 0;
-}
-
-.search-box input {
-  width: 100%;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 18px;
-  padding: 13px 15px;
-  font-size: 14px;
-  background: #f8fafc;
-}
-
-/* ===== PHÂN CẤP NHẬT KÝ ===== */
-
-/* Cấp 1: Phòng/Khu - to nhất */
-.cap-phong {
-  background: #eaf2ff;
-  padding: 13px 14px;
-  border-radius: 16px;
-}
-
-.cap-phong b {
-  font-size: 15.5px;
-}
-
-.cap-phong small {
-  display: block;
-  margin-top: 3px;
-  font-size: 11.5px;
-  color: #64748b;
-}
-
-/* Cấp 2: Người - nhỏ hơn phòng */
-.cap-nguoi {
-  background: #f3f6fb;
-  margin: 8px 0 6px 12px;
-  padding: 10px 12px;
-  border-radius: 14px;
-}
-
-.cap-nguoi b {
-  font-size: 14px;
-}
-
-.cap-nguoi small {
-  display: block;
-  margin-top: 2px;
-  font-size: 11px;
-  color: #64748b;
-}
-
-/* Cấp 3: Văn bản - nhỏ nhất */
-.cap-vanban {
-  margin-left: 26px;
-  min-height: 44px;
-  padding: 7px 10px;
-  border-radius: 11px;
-  border-left: 4px solid #2563eb;
-}
-
-.cap-vanban b {
-  font-size: 13px;
-}
-
-.cap-vanban small {
-  font-size: 11.5px;
-  max-width: 180px;
-}
-
-/* Ô số lượng bên phải */
-.count-box {
-  min-width: 72px;
-  text-align: right;
-}
-
-.count-box span {
-  display: block;
-  font-size: 12px;
-  font-weight: 900;
-  color: #2563eb;
-  margin: 1px 0;
-}
-
-.small-count span {
-  font-size: 11.5px;
-}
-
-/* Chi tiết xổ xuống nhỏ lại */
-.mini-detail {
-  margin-left: 26px;
-  padding: 9px 11px;
-  font-size: 12.5px;
-  border-radius: 11px;
-}
-
-.mini-detail p {
-  margin: 4px 0;
-  line-height: 1.35;
 }
