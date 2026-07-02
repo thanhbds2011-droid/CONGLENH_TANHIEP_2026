@@ -319,21 +319,21 @@ function hienThiNhatKy(data) {
     const phongId = "phong_" + i;
 
     html += `
-      <div class="report-group">
-        <div class="report-title" onclick="toggleBox('${phongId}')">
-          <div class="left">
-            <b>📁 ${phong.phongKhu}</b>
-            <small>Nhấn để xem danh sách viên chức</small>
-          </div>
+  <div class="report-group">
+    <div class="report-title" onclick="toggleBox('${phongId}')">
+      <div class="phong-left">
+        <b>📁 ${phong.phongKhu}</b>
+        <small>Nhấn để xem danh sách viên chức</small>
+      </div>
 
-          <div class="right">
-            <span>${phong.tongCL || 0} CL</span>
-            <span>${phong.tongGGT || 0} GGT</span>
-          </div>
-        </div>
+      <div class="phong-right">
+        <span>${phong.tongCL || 0} CL</span>
+        <span>${phong.tongGGT || 0} GGT</span>
+      </div>
+    </div>
 
-        <div id="${phongId}" class="report-body" style="display:none;">
-    `;
+    <div id="${phongId}" class="report-body" style="display:none;">
+`;
 
     phong.nhanSu.forEach(function (ns, j) {
       const nsId = "ns_" + i + "_" + j;
