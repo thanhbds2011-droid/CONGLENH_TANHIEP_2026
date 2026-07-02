@@ -416,7 +416,7 @@ window.addEventListener("load", function () {
     taiDashboard();
   }, 10000);
 });
-const CURRENT_VERSION = "103";
+const CURRENT_VERSION = "104";
 
 function kiemTraCapNhat() {
   fetch("version.json?v=" + Date.now())
