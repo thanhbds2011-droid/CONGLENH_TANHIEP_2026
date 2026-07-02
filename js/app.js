@@ -320,12 +320,13 @@ function hienThiNhatKy(data) {
 
     html += `
       <div class="report-group">
-        <div class="report-title cap-phong" onclick="toggleBox('${phongId}')">
-          <div>
+        <div class="report-title" onclick="toggleBox('${phongId}')">
+          <div class="left">
             <b>📁 ${phong.phongKhu}</b>
             <small>Nhấn để xem danh sách viên chức</small>
           </div>
-          <div class="count-box">
+
+          <div class="right">
             <span>${phong.tongCL || 0} CL</span>
             <span>${phong.tongGGT || 0} GGT</span>
           </div>
@@ -338,12 +339,13 @@ function hienThiNhatKy(data) {
       const nsId = "ns_" + i + "_" + j;
 
       html += `
-        <div class="person-row cap-nguoi" onclick="toggleBox('${nsId}')">
-          <div>
+        <div class="person-row" onclick="toggleBox('${nsId}')">
+          <div class="left">
             <b>👤 ${ns.dongChi}</b>
             <small>Nhấn để xem văn bản đã cấp</small>
           </div>
-          <div class="count-box small-count">
+
+          <div class="right">
             <span>${ns.tongCL || 0} CL</span>
             <span>${ns.tongGGT || 0} GGT</span>
           </div>
@@ -357,15 +359,16 @@ function hienThiNhatKy(data) {
         const badge = vb.loaiGiay === "GIAY_GIOI_THIEU" ? "GGT" : "CL";
 
         html += `
-          <div class="vb-mini-row cap-vanban" onclick="toggleBox('${vbId}')">
+          <div class="vb-mini-row" onclick="toggleBox('${vbId}')">
             <div>
               <b>${badge} ${vb.so}</b>
               <small>${vb.noiDung || ""}</small>
             </div>
+
             <span>${vb.cotJ || ""}</span>
           </div>
 
-          <div id="${vbId}" class="cl-detail mini-detail" style="display:none;">
+          <div id="${vbId}" class="cl-detail" style="display:none;">
             <p><b>Loại:</b> ${vb.loaiTen || ""}</p>
             <p><b>Người được cấp:</b> ${vb.dongChi || ""}</p>
             <p><b>Chức vụ:</b> ${vb.chucVu || ""}</p>
@@ -378,6 +381,7 @@ function hienThiNhatKy(data) {
             ${vb.phuongTien ? `<p><b>Phương tiện:</b> ${vb.phuongTien}</p>` : ""}
             ${vb.giayTo ? `<p><b>Giấy tờ:</b> ${vb.giayTo}</p>` : ""}
             ${vb.trangThai ? `<p><b>Trạng thái:</b> ${vb.trangThai}</p>` : ""}
+
             <p><a href="${vb.linkFile || "#"}" target="_blank">📄 Mở PDF</a></p>
 
             <button class="danger-btn" onclick="huyVanBan('${vb.loaiGiay}', '${vb.so}')">
