@@ -124,8 +124,6 @@ hr {
 }
 
 button,
-.primary,
-.secondary,
 .link-btn,
 .share-btn {
   display: block;
@@ -150,16 +148,6 @@ button:active {
   transform: scale(0.98);
 }
 
-.primary {
-  background: linear-gradient(135deg, #2563eb, #0ea5e9);
-  color: white;
-}
-
-.secondary {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
-
 .link-btn {
   background: #eff6ff;
   color: #1d4ed8;
@@ -168,6 +156,16 @@ button:active {
 .share-btn {
   background: linear-gradient(135deg, #16a34a, #22c55e);
   color: white;
+}
+
+.danger-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  margin-top: 10px;
+  font-weight: 900;
 }
 
 #ketqua {
@@ -190,7 +188,7 @@ button:active {
 }
 
 .report-group {
-  background: #ffffff;
+  background: white;
   border-radius: 20px;
   padding: 14px;
   margin-bottom: 14px;
@@ -210,6 +208,11 @@ button:active {
 
 .report-title {
   background: #eff6ff;
+}
+
+.person-row {
+  background: #f1f5f9;
+  margin: 10px 0;
 }
 
 .report-title b,
@@ -236,17 +239,12 @@ button:active {
   margin-top: 12px;
 }
 
-.person-row {
-  background: #f1f5f9;
-  margin: 10px 0;
-}
-
 .person-detail {
   padding-left: 8px;
 }
 
 .cl-row {
-  background: #ffffff;
+  background: white;
   border-left: 5px solid #2563eb;
   border-radius: 14px;
   padding: 13px;
@@ -323,13 +321,4 @@ nav button.active {
     left: calc(50% - 246px);
     right: calc(50% - 246px);
   }
-}
-.danger-btn {
-  background: #fee2e2;
-  color: #b91c1c;
-  border: none;
-  border-radius: 14px;
-  padding: 12px;
-  margin-top: 10px;
-  font-weight: 900;
 }
