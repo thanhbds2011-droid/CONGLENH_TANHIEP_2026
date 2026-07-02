@@ -320,11 +320,14 @@ function hienThiNhatKy(data) {
 
     html += `
       <div class="report-group">
-        <div class="report-title" onclick="toggleBox('${phongId}')">
-          <b>📁 ${phong.phongKhu}</b>
+        <div class="report-title cap-phong" onclick="toggleBox('${phongId}')">
           <div>
-            <span>${phong.tongCL || 0} công lệnh</span>
-            <span>${phong.tongGGT || 0} giấy giới thiệu</span>
+            <b>📁 ${phong.phongKhu}</b>
+            <small>Nhấn để xem danh sách viên chức</small>
+          </div>
+          <div class="count-box">
+            <span>${phong.tongCL || 0} CL</span>
+            <span>${phong.tongGGT || 0} GGT</span>
           </div>
         </div>
 
@@ -335,9 +338,12 @@ function hienThiNhatKy(data) {
       const nsId = "ns_" + i + "_" + j;
 
       html += `
-        <div class="person-row" onclick="toggleBox('${nsId}')">
-          <b>👤 ${ns.dongChi}</b>
+        <div class="person-row cap-nguoi" onclick="toggleBox('${nsId}')">
           <div>
+            <b>👤 ${ns.dongChi}</b>
+            <small>Nhấn để xem văn bản đã cấp</small>
+          </div>
+          <div class="count-box small-count">
             <span>${ns.tongCL || 0} CL</span>
             <span>${ns.tongGGT || 0} GGT</span>
           </div>
@@ -351,7 +357,7 @@ function hienThiNhatKy(data) {
         const badge = vb.loaiGiay === "GIAY_GIOI_THIEU" ? "GGT" : "CL";
 
         html += `
-          <div class="vb-mini-row" onclick="toggleBox('${vbId}')">
+          <div class="vb-mini-row cap-vanban" onclick="toggleBox('${vbId}')">
             <div>
               <b>${badge} ${vb.so}</b>
               <small>${vb.noiDung || ""}</small>
