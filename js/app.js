@@ -1,5 +1,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
+let DU_LIEU_NHAT_KY = [];
 
 function goiApi(action, params, callback) {
   const cbName = "cb_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
@@ -230,83 +231,156 @@ function taiBaoCao() {
       return;
     }
 
-    if (!res.data || res.data.length === 0) {
-      box.innerHTML = "<div class='empty'>Chưa có dữ liệu.</div>";
-      return;
-    }
+    DU_LIEU_NHAT_KY = res.data || [];
+    hienThiNhatKy(DU_LIEU_NHAT_KY);
+  });
+}
+function locNhatKy() {
+  const keyword = document.getElementById("timKiemNhatKy").value
+    .toLowerCase()
+    .trim();
 
-    let html = "";
+  if (!keyword) {
+    hienThiNhatKy(DU_LIEU_NHAT_KY);
+    return;
+  }
 
-    res.data.forEach(function (phong, i) {
-      const phongId = "phong_" + i;
+  const ketQua = DU_LIEU_NHAT_KY.map(function (phong) {
+    const nhanSuLoc = phong.nhanSu.map(function (ns) {
+      const danhSachLoc = ns.danhSach.filter(function (vb) {
+        const text = [
+          phong.phongKhu,
+          ns.dongChi,
+          vb.loaiTen,
+          vb.so,
+          vb.dongChi,
+          vb.noiDung,
+          vb.cotG,
+          vb.cotH,
+          vb.cotJ,
+          vb.ngayVe,
+          vb.ngayCapGiay,
+          vb.tenFile
+        ].join(" ").toLowerCase();
 
-      html += `
-        <div class="report-group">
-          <div class="report-title" onclick="toggleBox('${phongId}')">
-            <b>📁 ${phong.phongKhu}</b>
-            <div>
-              <span>${phong.tongCL || 0} công lệnh</span>
-              <span>${phong.tongGGT || 0} giấy giới thiệu</span>
-            </div>
-          </div>
-
-          <div id="${phongId}" class="report-body" style="display:none;">
-      `;
-
-      phong.nhanSu.forEach(function (ns, j) {
-        const nsId = "ns_" + i + "_" + j;
-
-        html += `
-          <div class="person-row" onclick="toggleBox('${nsId}')">
-            <b>👤 ${ns.dongChi}</b>
-            <div>
-              <span>${ns.tongCL || 0} CL</span>
-              <span>${ns.tongGGT || 0} GGT</span>
-            </div>
-          </div>
-
-          <div id="${nsId}" class="person-detail" style="display:none;">
-        `;
-
-        ns.danhSach.forEach(function (vb, k) {
-          const vbId = "vb_" + i + "_" + j + "_" + k;
-          const badge = vb.loaiGiay === "GIAY_GIOI_THIEU" ? "GGT" : "CL";
-
-          html += `
-            <div class="cl-row" onclick="toggleBox('${vbId}')">
-              <b>${badge} ${vb.so} - ${vb.dongChi}</b>
-              <small>${vb.noiDung || ""}</small>
-            </div>
-
-            <div id="${vbId}" class="cl-detail" style="display:none;">
-              <p><b>Loại:</b> ${vb.loaiTen || ""}</p>
-              <p><b>Chức vụ:</b> ${vb.chucVu || ""}</p>
-              <p><b>${vb.loaiGiay === "GIAY_GIOI_THIEU" ? "Kính gửi" : "Đi từ"}:</b> ${vb.cotG || ""}</p>
-              <p><b>${vb.loaiGiay === "GIAY_GIOI_THIEU" ? "Nơi đến" : "Đến"}:</b> ${vb.cotH || ""}</p>
-              <p><b>Nội dung:</b> ${vb.noiDung || ""}</p>
-              <p><b>${vb.loaiGiay === "GIAY_GIOI_THIEU" ? "Ngày hết hạn" : "Ngày đi"}:</b> ${vb.cotJ || ""}</p>
-              ${vb.ngayVe ? `<p><b>Ngày về:</b> ${vb.ngayVe}</p>` : ""}
-              ${vb.ngayCapGiay ? `<p><b>Ngày cấp trên giấy:</b> ${vb.ngayCapGiay}</p>` : ""}
-              ${vb.phuongTien ? `<p><b>Phương tiện:</b> ${vb.phuongTien}</p>` : ""}
-              ${vb.giayTo ? `<p><b>Giấy tờ:</b> ${vb.giayTo}</p>` : ""}
-              ${vb.trangThai ? `<p><b>Trạng thái:</b> ${vb.trangThai}</p>` : ""}
-              <p><a href="${vb.linkFile || "#"}" target="_blank">📄 Mở PDF</a></p>
-
-              <button class="danger-btn" onclick="huyVanBan('${vb.loaiGiay}', '${vb.so}')">
-                🗑️ Hủy số này
-              </button>
-            </div>
-          `;
-        });
-
-        html += `</div>`;
+        return text.includes(keyword);
       });
 
-      html += `</div></div>`;
+      const matchTen = ns.dongChi.toLowerCase().includes(keyword);
+      const matchPhong = phong.phongKhu.toLowerCase().includes(keyword);
+
+      if (matchTen || matchPhong) {
+        return ns;
+      }
+
+      if (danhSachLoc.length > 0) {
+        return {
+          ...ns,
+          danhSach: danhSachLoc,
+          tongCL: danhSachLoc.filter(v => v.loaiGiay === "CONG_LENH").length,
+          tongGGT: danhSachLoc.filter(v => v.loaiGiay === "GIAY_GIOI_THIEU").length
+        };
+      }
+
+      return null;
+    }).filter(Boolean);
+
+    if (nhanSuLoc.length === 0) return null;
+
+    return {
+      ...phong,
+      nhanSu: nhanSuLoc,
+      tongCL: nhanSuLoc.reduce((sum, ns) => sum + (ns.tongCL || 0), 0),
+      tongGGT: nhanSuLoc.reduce((sum, ns) => sum + (ns.tongGGT || 0), 0)
+    };
+  }).filter(Boolean);
+
+  hienThiNhatKy(ketQua);
+}
+
+function hienThiNhatKy(data) {
+  const box = document.getElementById("baoCaoList");
+
+  if (!data || data.length === 0) {
+    box.innerHTML = "<div class='empty'>Không tìm thấy dữ liệu phù hợp.</div>";
+    return;
+  }
+
+  let html = "";
+
+  data.forEach(function (phong, i) {
+    const phongId = "phong_" + i;
+
+    html += `
+      <div class="report-group">
+        <div class="report-title" onclick="toggleBox('${phongId}')">
+          <b>📁 ${phong.phongKhu}</b>
+          <div>
+            <span>${phong.tongCL || 0} công lệnh</span>
+            <span>${phong.tongGGT || 0} giấy giới thiệu</span>
+          </div>
+        </div>
+
+        <div id="${phongId}" class="report-body" style="display:none;">
+    `;
+
+    phong.nhanSu.forEach(function (ns, j) {
+      const nsId = "ns_" + i + "_" + j;
+
+      html += `
+        <div class="person-row" onclick="toggleBox('${nsId}')">
+          <b>👤 ${ns.dongChi}</b>
+          <div>
+            <span>${ns.tongCL || 0} CL</span>
+            <span>${ns.tongGGT || 0} GGT</span>
+          </div>
+        </div>
+
+        <div id="${nsId}" class="person-detail" style="display:none;">
+      `;
+
+      ns.danhSach.forEach(function (vb, k) {
+        const vbId = "vb_" + i + "_" + j + "_" + k;
+        const badge = vb.loaiGiay === "GIAY_GIOI_THIEU" ? "GGT" : "CL";
+
+        html += `
+          <div class="vb-mini-row" onclick="toggleBox('${vbId}')">
+            <div>
+              <b>${badge} ${vb.so}</b>
+              <small>${vb.noiDung || ""}</small>
+            </div>
+            <span>${vb.cotJ || ""}</span>
+          </div>
+
+          <div id="${vbId}" class="cl-detail mini-detail" style="display:none;">
+            <p><b>Loại:</b> ${vb.loaiTen || ""}</p>
+            <p><b>Người được cấp:</b> ${vb.dongChi || ""}</p>
+            <p><b>Chức vụ:</b> ${vb.chucVu || ""}</p>
+            <p><b>${vb.loaiGiay === "GIAY_GIOI_THIEU" ? "Kính gửi" : "Đi từ"}:</b> ${vb.cotG || ""}</p>
+            <p><b>${vb.loaiGiay === "GIAY_GIOI_THIEU" ? "Nơi đến" : "Đến"}:</b> ${vb.cotH || ""}</p>
+            <p><b>Nội dung:</b> ${vb.noiDung || ""}</p>
+            <p><b>${vb.loaiGiay === "GIAY_GIOI_THIEU" ? "Ngày hết hạn" : "Ngày đi"}:</b> ${vb.cotJ || ""}</p>
+            ${vb.ngayVe ? `<p><b>Ngày về:</b> ${vb.ngayVe}</p>` : ""}
+            ${vb.ngayCapGiay ? `<p><b>Ngày cấp trên giấy:</b> ${vb.ngayCapGiay}</p>` : ""}
+            ${vb.phuongTien ? `<p><b>Phương tiện:</b> ${vb.phuongTien}</p>` : ""}
+            ${vb.giayTo ? `<p><b>Giấy tờ:</b> ${vb.giayTo}</p>` : ""}
+            ${vb.trangThai ? `<p><b>Trạng thái:</b> ${vb.trangThai}</p>` : ""}
+            <p><a href="${vb.linkFile || "#"}" target="_blank">📄 Mở PDF</a></p>
+
+            <button class="danger-btn" onclick="huyVanBan('${vb.loaiGiay}', '${vb.so}')">
+              🗑️ Hủy số này
+            </button>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
     });
 
-    box.innerHTML = html;
+    html += `</div></div>`;
   });
+
+  box.innerHTML = html;
 }
 
 function toggleBox(id) {
