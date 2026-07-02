@@ -380,3 +380,104 @@ nav button.active {
     right: calc(50% - 246px);
   }
 }
+/* ===== Ô TÌM KIẾM NHẬT KÝ ===== */
+.search-box {
+  margin: 0 0 14px 0;
+}
+
+.search-box input {
+  width: 100%;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 18px;
+  padding: 13px 15px;
+  font-size: 14px;
+  background: #f8fafc;
+}
+
+/* ===== PHÂN CẤP NHẬT KÝ ===== */
+
+/* Cấp 1: Phòng/Khu - to nhất */
+.cap-phong {
+  background: #eaf2ff;
+  padding: 13px 14px;
+  border-radius: 16px;
+}
+
+.cap-phong b {
+  font-size: 15.5px;
+}
+
+.cap-phong small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+/* Cấp 2: Người - nhỏ hơn phòng */
+.cap-nguoi {
+  background: #f3f6fb;
+  margin: 8px 0 6px 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+}
+
+.cap-nguoi b {
+  font-size: 14px;
+}
+
+.cap-nguoi small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Cấp 3: Văn bản - nhỏ nhất */
+.cap-vanban {
+  margin-left: 26px;
+  min-height: 44px;
+  padding: 7px 10px;
+  border-radius: 11px;
+  border-left: 4px solid #2563eb;
+}
+
+.cap-vanban b {
+  font-size: 13px;
+}
+
+.cap-vanban small {
+  font-size: 11.5px;
+  max-width: 180px;
+}
+
+/* Ô số lượng bên phải */
+.count-box {
+  min-width: 72px;
+  text-align: right;
+}
+
+.count-box span {
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+  color: #2563eb;
+  margin: 1px 0;
+}
+
+.small-count span {
+  font-size: 11.5px;
+}
+
+/* Chi tiết xổ xuống nhỏ lại */
+.mini-detail {
+  margin-left: 26px;
+  padding: 9px 11px;
+  font-size: 12.5px;
+  border-radius: 11px;
+}
+
+.mini-detail p {
+  margin: 4px 0;
+  line-height: 1.35;
+}
