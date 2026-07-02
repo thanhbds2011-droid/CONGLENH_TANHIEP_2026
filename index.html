@@ -1,41 +1,35 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 
-<meta charset="UTF-8">
+  <title>Công lệnh</title>
 
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 
-<title>Công lệnh</title>
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Công lệnh">
 
-<!-- Không cho trình duyệt dùng cache -->
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-
-<meta name="theme-color" content="#2563eb">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Công lệnh">
-
-<link rel="manifest" href="manifest.json">
-
-<link rel="apple-touch-icon" href="logo.png.png">
-
-<link rel="stylesheet" href="css/style.css?v=103">
-
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="logo.png.png">
+  <link rel="stylesheet" href="css/style.css?v=106">
 </head>
 
 <body>
   <header class="header">
-   <div class="brand">
-  <img src="logo.png.png" alt="Logo Trung tâm">
-  <div>
-    <h1>Giấy công lệnh, giấy đi đường</h1>
-    <p>Trung tâm Bảo trợ xã hội Tân Hiệp</p>
-  </div>
-</div>
+    <div class="brand">
+      <img src="logo.png.png" alt="Logo Trung tâm">
+      <div>
+        <h1>Giấy công lệnh, giấy đi đường</h1>
+        <p>Trung tâm Bảo trợ xã hội Tân Hiệp</p>
+      </div>
+    </div>
+
     <h2 id="pageTitle">Trang chủ</h2>
   </header>
 
@@ -44,36 +38,37 @@ content="width=device-width,initial-scale=1">
       <h3>📊 Dashboard</h3>
 
       <div class="dashboard dashboard-2col">
-  <div>
-    <span>Số tiếp CL</span>
-    <h2 id="soTiepTheoCL">-</h2>
-  </div>
+        <div>
+          <span>Số tiếp CL</span>
+          <h2 id="soTiepTheoCL">-</h2>
+        </div>
 
-  <div>
-    <span>Số tiếp GGT</span>
-    <h2 id="soTiepTheoGGT">-</h2>
-  </div>
+        <div>
+          <span>Số tiếp GGT</span>
+          <h2 id="soTiepTheoGGT">-</h2>
+        </div>
 
-  <div>
-    <span>Tổng CL</span>
-    <h2 id="tongCL">-</h2>
-  </div>
+        <div>
+          <span>Tổng CL</span>
+          <h2 id="tongCL">-</h2>
+        </div>
 
-  <div>
-    <span>Tổng GGT</span>
-    <h2 id="tongGGT">-</h2>
-  </div>
+        <div>
+          <span>Tổng GGT</span>
+          <h2 id="tongGGT">-</h2>
+        </div>
 
-  <div>
-    <span>Hủy CL</span>
-    <h2 id="huyCL">-</h2>
-  </div>
+        <div>
+          <span>Hủy CL</span>
+          <h2 id="huyCL">-</h2>
+        </div>
 
-  <div>
-    <span>Hủy GGT</span>
-    <h2 id="huyGGT">-</h2>
-  </div>
-</div>
+        <div>
+          <span>Hủy GGT</span>
+          <h2 id="huyGGT">-</h2>
+        </div>
+      </div>
+    </div>
 
     <div class="card">
       <button onclick="showScreen('cap', this)">➕ Cấp văn bản</button>
@@ -175,21 +170,21 @@ content="width=device-width,initial-scale=1">
   </section>
 
   <section id="nhatky" class="screen">
-  <div class="card">
-    <h3>📒 Nhật ký</h3>
+    <div class="card">
+      <h3>📒 Nhật ký</h3>
 
-    <div class="search-box">
-      <input
-        id="timKiemNhatKy"
-        type="text"
-        placeholder="🔍 Tìm tên, số CL/GGT, nội dung, phòng/khu..."
-        oninput="locNhatKy()"
-      >
+      <div class="search-box">
+        <input
+          id="timKiemNhatKy"
+          type="text"
+          placeholder="🔍 Tìm tên, số CL/GGT, nội dung, phòng/khu..."
+          oninput="locNhatKy()"
+        >
+      </div>
+
+      <div id="baoCaoList">Đang tải...</div>
     </div>
-
-    <div id="baoCaoList">Đang tải...</div>
-  </div>
-</section>
+  </section>
 
   <nav>
     <button class="nav-btn active" onclick="showScreen('home', this)">
@@ -205,7 +200,6 @@ content="width=device-width,initial-scale=1">
     </button>
   </nav>
 
-  <link rel="stylesheet" href="css/style.css?v=105">
-<script src="js/app.js?v=105"></script>
+  <script src="js/app.js?v=106"></script>
 </body>
 </html>
