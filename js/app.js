@@ -192,7 +192,7 @@ function resetForm() {
   document.getElementById("ngayVe").value = "";
   document.getElementById("phuongTien").value = "";
   document.getElementById("giayTo").value = "";
-
+document.getElementById("ngayCapGiay").value = "";
   document.getElementById("kinhGui").value = "";
   document.getElementById("noiDen").selectedIndex = 0;
   document.getElementById("noiDenKhac").value = "";
