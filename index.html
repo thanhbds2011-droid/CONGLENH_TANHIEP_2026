@@ -1,121 +1,445 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Công lệnh</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="css/style.css">
+
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+
+<title>Công lệnh</title>
+
+<link rel="stylesheet" href="css/style.css">
+
 </head>
 
 <body>
-  <div class="app">
-    <div id="updateBox" style="display:none;" class="update-box">
-  <div>
-    🔄 Có phiên bản mới
-    <br>
-    <small id="updateText">Bấm cập nhật để tải bản mới nhất.</small>
-  </div>
-  <button onclick="capNhatUngDung()">Cập nhật ngay</button>
+
+<header class="header">
+
+<h1>Công lệnh</h1>
+
+<p>Trung tâm BTXH Tân Hiệp</p>
+
+<h2 id="pageTitle">
+
+Trang chủ
+
+</h2>
+
+</header>
+
+
+<!-- ========================= -->
+<!-- HOME -->
+<!-- ========================= -->
+
+<section id="home" class="screen active">
+
+<div class="card">
+
+<h3>
+
+📊 Dashboard
+
+</h3>
+
+<div class="dashboard">
+
+<div>
+
+<span>Số tiếp CL</span>
+
+<h2 id="soTiepTheoCL">-</h2>
+
 </div>
-    <header class="hero">
-      <h1>Công lệnh</h1>
-      <p>Trung tâm Bảo trợ xã hội Tân Hiệp</p>
-      <h2 id="pageTitle">Trang chủ</h2>
-    </header>
 
-    <main class="main">
-      <section id="home" class="screen active">
-        <div class="card">
-          <h3>📊 Dashboard</h3>
-          <div class="grid">
-            <div><span>Số cuối</span><b id="soCuoi">-</b></div>
-            <div><span>Số tiếp theo</span><b id="soTiepTheo">-</b></div>
-            <div><span>Tổng đã cấp</span><b id="tongCongLenh">-</b></div>
-          </div>
-        </div>
+<div>
 
-        <div class="card">
-          <h3>⚡ Chức năng</h3>
-          <button class="menu-btn" onclick="showScreen('cap')">➕ Cấp công lệnh</button>
-          <button class="menu-btn" onclick="showScreen('nhatky')">📒 Nhật ký / Báo cáo</button>
-        </div>
-      </section>
+<span>Tổng CL</span>
 
-      <section id="cap" class="screen">
-        <div class="card">
-          <h3>➕ Cấp công lệnh</h3>
+<h2 id="tongCL">-</h2>
 
-          <label for="dongChi">Đồng chí</label>
-          <input id="dongChi" placeholder="Nhập họ tên">
+</div>
 
-          <label for="tuoi">Tuổi</label>
-          <input id="tuoi" placeholder="Nhập tuổi">
+<div>
 
-          <label for="chucVu">Chức vụ</label>
-          <input id="chucVu" placeholder="Ví dụ: Viên chức">
+<span>Số tiếp GGT</span>
 
-          <label for="diTu">Đi từ</label>
-          <input id="diTu" value="TTBTXH Tân Hiệp">
+<h2 id="soTiepTheoGGT">-</h2>
 
-          <label for="den">Đến</label>
-          <select id="denSelect" onchange="xuLyNoiDenKhac()">
-  <option value="TTYT KV Bình Long">TTYT KV Bình Long</option>
-  <option value="Bệnh viện ĐK Bình Phước">Bệnh viện ĐK Bình Phước</option>
-  <option value="Bệnh viện Chợ Rẫy">Bệnh viện Chợ Rẫy</option>
-  <option value="Khác">Khác</option>
+</div>
+
+<div>
+
+<span>Tổng GGT</span>
+
+<h2 id="tongGGT">-</h2>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<button onclick="showScreen('cap',this)">
+
+➕ Cấp văn bản
+
+</button>
+
+<button onclick="showScreen('nhatky',this)">
+
+📒 Nhật ký
+
+</button>
+
+</div>
+
+</section>
+
+
+
+
+
+<!-- ========================= -->
+<!-- CẤP -->
+<!-- ========================= -->
+
+<section id="cap" class="screen">
+
+<div class="card">
+
+<h3>
+
+📄 Cấp văn bản
+
+</h3>
+
+<label>
+
+Loại giấy
+
+</label>
+
+<select id="loaiGiay" onchange="doiLoaiGiay()">
+
+<option value="CONG_LENH">
+
+Công lệnh
+
+</option>
+
+<option value="GIAY_GIOI_THIEU">
+
+Giấy giới thiệu
+
+</option>
+
 </select>
 
-<input id="denKhac" placeholder="Nhập nơi đến khác" style="display:none; margin-top:10px;">
+<hr>
 
-          <label for="noiDung">Nội dung công tác</label>
-          <textarea id="noiDung" placeholder="Nhập nội dung"></textarea>
+<label>Đồng chí</label>
 
-          <label for="ngayDi">Ngày đi</label>
-          <input id="ngayDi" type="date">
+<input id="dongChi">
 
-          <label for="ngayVe">Ngày về</label>
-          <input id="ngayVe" type="date">
+<label>Tuổi</label>
 
-          <label for="phuongTien">Phương tiện</label>
-          <input id="phuongTien" placeholder="Ví dụ: Tự túc">
+<input id="tuoi">
 
-          <label for="giayTo">Giấy tờ kèm theo</label>
-          <input id="giayTo" placeholder="Nếu có">
+<label>Chức vụ</label>
 
-          <label for="phongKhu">Phòng/Khu</label>
-          <select id="phongKhu">
-            <option value="Ban Giám đốc">Ban Giám đốc</option>
-            <option value="Phòng Tổ chức - Hành chính">Phòng Tổ chức - Hành chính</option>
-            <option value="Phòng Công tác xã hội">Phòng Công tác xã hội</option>
-            <option value="Phòng Y tế">Phòng Y tế</option>
-            <option value="Phòng Kế hoạch - Tài chính">Phòng Kế hoạch - Tài chính</option>
-            <option value="Khu I">Khu I</option>
-            <option value="Khu II">Khu II</option>
-            <option value="Khu III">Khu III</option>
-          </select>
+<input id="chucVu">
 
-          <button class="primary" onclick="capCongLenh()">📄 Xuất công lệnh PDF</button>
+<!-- ================= -->
+<!-- FORM CÔNG LỆNH -->
+<!-- ================= -->
 
-          <div id="ketqua"></div>
-        </div>
-      </section>
+<div id="formCL">
 
-      <section id="nhatky" class="screen">
-        <div class="card">
-          <h3>📒 Nhật ký / Báo cáo theo Phòng, Khu</h3>
-          <div id="baoCaoList"></div>
-        </div>
-      </section>
-    </main>
+<label>Đi từ</label>
 
-    <nav class="bottom-nav">
-      <button class="nav-btn active" onclick="showScreen('home', this)">🏠<br>Trang chủ</button>
-      <button class="nav-btn" onclick="showScreen('cap', this)">➕<br>Cấp</button>
-      <button class="nav-btn" onclick="showScreen('nhatky', this)">📒<br>Nhật ký</button>
-    </nav>
-  </div>
+<input id="diTu" value="TTBTXH Tân Hiệp">
 
-  <script src="js/app.js?v=20260701"></script>
+<label>Đến</label>
+
+<select id="den" onchange="chonNoiDen()">
+
+<option>
+
+TTYT KV Bình Long
+
+</option>
+
+<option>
+
+BV ĐK Bình Phước
+
+</option>
+
+<option>
+
+BV Chợ Rẫy
+
+</option>
+
+<option>
+
+Khác...
+
+</option>
+
+</select>
+
+<input
+id="denKhac"
+style="display:none"
+placeholder="Nhập nơi đến">
+
+<label>Nội dung</label>
+
+<textarea id="noiDung"></textarea>
+
+<label>Ngày đi</label>
+
+<input type="date" id="ngayDi">
+
+<label>Ngày về</label>
+
+<input type="date" id="ngayVe">
+
+<label>Phương tiện</label>
+
+<input id="phuongTien">
+
+<label>Giấy tờ</label>
+
+<input id="giayTo">
+
+</div>
+
+<!-- ================= -->
+<!-- FORM GGT -->
+<!-- ================= -->
+
+<div id="formGGT"
+style="display:none">
+
+<label>Kính gửi</label>
+
+<input id="kinhGui">
+
+<label>Nơi đến</label>
+
+<select id="noiDen">
+
+<option>
+
+TTYT KV Bình Long
+
+</option>
+
+<option>
+
+BV ĐK Bình Phước
+
+</option>
+
+<option>
+
+BV Chợ Rẫy
+
+</option>
+
+<option>
+
+Khác...
+
+</option>
+
+</select>
+
+<input
+id="noiDenKhac"
+style="display:none">
+
+<label>Về việc</label>
+
+<textarea id="noiDungGGT">
+
+</textarea>
+
+<label>
+
+Có giá trị đến hết ngày
+
+</label>
+
+<input
+type="date"
+id="ngayHetHan">
+
+</div>
+
+<label>
+
+Phòng/Khu
+
+</label>
+
+<select id="phongKhu">
+
+<option>
+
+Ban Giám đốc
+
+</option>
+
+<option>
+
+Phòng Tổ chức - Hành chính
+
+</option>
+
+<option>
+
+Phòng Công tác xã hội
+
+</option>
+
+<option>
+
+Phòng Y tế
+
+</option>
+
+<option>
+
+Phòng Kế hoạch - Tài chính
+
+</option>
+
+<option>
+
+Khu I
+
+</option>
+
+<option>
+
+Khu II
+
+</option>
+
+<option>
+
+Khu III
+
+</option>
+
+</select>
+
+<br><br>
+
+<button
+onclick="capCongLenh()">
+
+📄 Xuất PDF
+
+</button>
+
+<div id="ketqua">
+
+</div>
+
+</div>
+
+</section>
+
+
+
+
+
+<!-- ========================= -->
+<!-- NHẬT KÝ -->
+<!-- ========================= -->
+
+<section id="nhatky"
+class="screen">
+
+<div class="card">
+
+<h3>
+
+📒 Nhật ký
+
+</h3>
+
+<div id="baoCaoList">
+
+Đang tải...
+
+</div>
+
+</div>
+
+</section>
+
+
+
+
+
+
+
+<nav>
+
+<button
+class="nav-btn active"
+
+onclick="showScreen('home',this)">
+
+🏠
+
+<br>
+
+Trang chủ
+
+</button>
+
+<button
+class="nav-btn"
+
+onclick="showScreen('cap',this)">
+
+➕
+
+<br>
+
+Cấp
+
+</button>
+
+<button
+class="nav-btn"
+
+onclick="showScreen('nhatky',this)">
+
+📒
+
+<br>
+
+Nhật ký
+
+</button>
+
+</nav>
+
+
+<script src="js/app.js"></script>
+
 </body>
+
 </html>
