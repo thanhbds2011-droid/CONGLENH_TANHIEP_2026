@@ -1,5 +1,7 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
+const CURRENT_VERSION = "106";
+
 let DU_LIEU_NHAT_KY = [];
 
 function goiApi(action, params, callback) {
@@ -66,23 +68,28 @@ function showScreen(id, btn) {
 function taiDashboard() {
   goiApi("dashboard", {}, function (res) {
     if (!res || !res.ok || !res.data) {
-      document.getElementById("soTiepTheoCL").innerText = "Lỗi";
-      document.getElementById("tongCL").innerText = "Lỗi";
-      document.getElementById("huyCL").innerText = "Lỗi";
-      document.getElementById("soTiepTheoGGT").innerText = "Lỗi";
-      document.getElementById("tongGGT").innerText = "Lỗi";
-      document.getElementById("huyGGT").innerText = "Lỗi";
+      ganText("soTiepTheoCL", "Lỗi");
+      ganText("tongCL", "Lỗi");
+      ganText("huyCL", "Lỗi");
+      ganText("soTiepTheoGGT", "Lỗi");
+      ganText("tongGGT", "Lỗi");
+      ganText("huyGGT", "Lỗi");
       return;
     }
 
-    document.getElementById("soTiepTheoCL").innerText = res.data.soTiepTheoCL ?? "-";
-    document.getElementById("tongCL").innerText = res.data.tongCL ?? 0;
-    document.getElementById("huyCL").innerText = res.data.huyCL ?? 0;
+    ganText("soTiepTheoCL", res.data.soTiepTheoCL ?? "-");
+    ganText("tongCL", res.data.tongCL ?? 0);
+    ganText("huyCL", res.data.huyCL ?? 0);
 
-    document.getElementById("soTiepTheoGGT").innerText = res.data.soTiepTheoGGT ?? "-";
-    document.getElementById("tongGGT").innerText = res.data.tongGGT ?? 0;
-    document.getElementById("huyGGT").innerText = res.data.huyGGT ?? 0;
+    ganText("soTiepTheoGGT", res.data.soTiepTheoGGT ?? "-");
+    ganText("tongGGT", res.data.tongGGT ?? 0);
+    ganText("huyGGT", res.data.huyGGT ?? 0);
   });
+}
+
+function ganText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = value;
 }
 
 function doiLoaiGiay() {
@@ -235,10 +242,10 @@ function taiBaoCao() {
     hienThiNhatKy(DU_LIEU_NHAT_KY);
   });
 }
+
 function locNhatKy() {
-  const keyword = document.getElementById("timKiemNhatKy").value
-    .toLowerCase()
-    .trim();
+  const input = document.getElementById("timKiemNhatKy");
+  const keyword = input ? input.value.toLowerCase().trim() : "";
 
   if (!keyword) {
     hienThiNhatKy(DU_LIEU_NHAT_KY);
@@ -408,16 +415,6 @@ function huyVanBan(loaiGiay, so) {
   });
 }
 
-window.addEventListener("load", function () {
-  doiLoaiGiay();
-  taiDashboard();
-
-  setInterval(function () {
-    taiDashboard();
-  }, 10000);
-});
-const CURRENT_VERSION = "104";
-
 function kiemTraCapNhat() {
   fetch("version.json?v=" + Date.now())
     .then(res => res.json())
@@ -430,26 +427,24 @@ function kiemTraCapNhat() {
 }
 
 function hienThongBaoCapNhat(message) {
+  if (document.getElementById("updateBox")) return;
+
   const box = document.createElement("div");
+  box.id = "updateBox";
   box.innerHTML = `
-    <div style="
-      position: fixed;
-      left: 16px;
-      right: 16px;
-      bottom: 90px;
-      background: white;
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.2);
-      z-index: 9999;
-      font-weight: 700;
-    ">
+    <div class="update-box">
       🔄 ${message}
       <br><br>
-      <button onclick="location.reload(true)">Cập nhật ngay</button>
+      <button onclick="location.reload()">Cập nhật ngay</button>
     </div>
   `;
   document.body.appendChild(box);
 }
 
-setInterval(kiemTraCapNhat, 30000);
+window.addEventListener("load", function () {
+  doiLoaiGiay();
+  taiDashboard();
+
+  setInterval(taiDashboard, 10000);
+  setInterval(kiemTraCapNhat, 30000);
+});
