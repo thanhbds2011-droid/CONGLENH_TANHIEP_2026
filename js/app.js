@@ -349,13 +349,33 @@ function kiemTraCapNhat() {
     .then(res => res.json())
     .then(data => {
       if (data.version && data.version !== CURRENT_VERSION) {
-        const ok = confirm("🔄 Có bản cập nhật mới. Anh có muốn cập nhật ngay không?");
-        if (ok) {
-          location.reload(true);
-        }
+        hienThongBaoCapNhat(data.message || "Có phiên bản mới.");
       }
     })
     .catch(() => {});
+}
+
+function hienThongBaoCapNhat(message) {
+  const box = document.createElement("div");
+  box.innerHTML = `
+    <div style="
+      position: fixed;
+      left: 16px;
+      right: 16px;
+      bottom: 90px;
+      background: white;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+      z-index: 9999;
+      font-weight: 700;
+    ">
+      🔄 ${message}
+      <br><br>
+      <button onclick="location.reload(true)">Cập nhật ngay</button>
+    </div>
+  `;
+  document.body.appendChild(box);
 }
 
 setInterval(kiemTraCapNhat, 30000);
