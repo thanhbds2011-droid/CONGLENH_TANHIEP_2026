@@ -449,8 +449,28 @@ function hienThongBaoCapNhat(message) {
 
 window.addEventListener("load", function () {
   doiLoaiGiay();
+  damBaoOCtimKiemNhatKy();
   taiDashboard();
 
   setInterval(taiDashboard, 10000);
   setInterval(kiemTraCapNhat, 30000);
 });
+function damBaoOCtimKiemNhatKy() {
+  const baoCaoList = document.getElementById("baoCaoList");
+  if (!baoCaoList) return;
+
+  if (document.getElementById("timKiemNhatKy")) return;
+
+  const box = document.createElement("div");
+  box.className = "search-box";
+  box.innerHTML = `
+    <input
+      id="timKiemNhatKy"
+      type="text"
+      placeholder="🔍 Tìm tên, số CL/GGT, nội dung, phòng/khu..."
+      oninput="locNhatKy()"
+    >
+  `;
+
+  baoCaoList.parentNode.insertBefore(box, baoCaoList);
+}
