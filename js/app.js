@@ -446,15 +446,6 @@ function hienThongBaoCapNhat(message) {
   `;
   document.body.appendChild(box);
 }
-
-window.addEventListener("load", function () {
-  doiLoaiGiay();
-  damBaoOCtimKiemNhatKy();
-  taiDashboard();
-
-  setInterval(taiDashboard, 10000);
-  setInterval(kiemTraCapNhat, 30000);
-});
 function damBaoOCtimKiemNhatKy() {
   const baoCaoList = document.getElementById("baoCaoList");
   if (!baoCaoList) return;
@@ -474,3 +465,12 @@ function damBaoOCtimKiemNhatKy() {
 
   baoCaoList.parentNode.insertBefore(box, baoCaoList);
 }
+window.addEventListener("load", function () {
+  doiLoaiGiay();
+  damBaoOCtimKiemNhatKy();
+  taiDashboard();
+
+  setInterval(taiDashboard, 10000);
+  setInterval(kiemTraCapNhat, 30000);
+});
+
