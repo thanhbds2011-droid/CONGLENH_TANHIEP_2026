@@ -67,15 +67,20 @@ function taiDashboard() {
     if (!res || !res.ok || !res.data) {
       document.getElementById("soTiepTheoCL").innerText = "Lỗi";
       document.getElementById("tongCL").innerText = "Lỗi";
+      document.getElementById("huyCL").innerText = "Lỗi";
       document.getElementById("soTiepTheoGGT").innerText = "Lỗi";
       document.getElementById("tongGGT").innerText = "Lỗi";
+      document.getElementById("huyGGT").innerText = "Lỗi";
       return;
     }
 
     document.getElementById("soTiepTheoCL").innerText = res.data.soTiepTheoCL ?? "-";
     document.getElementById("tongCL").innerText = res.data.tongCL ?? 0;
+    document.getElementById("huyCL").innerText = res.data.huyCL ?? 0;
+
     document.getElementById("soTiepTheoGGT").innerText = res.data.soTiepTheoGGT ?? "-";
     document.getElementById("tongGGT").innerText = res.data.tongGGT ?? 0;
+    document.getElementById("huyGGT").innerText = res.data.huyGGT ?? 0;
   });
 }
 
