@@ -342,3 +342,20 @@ window.addEventListener("load", function () {
     taiDashboard();
   }, 10000);
 });
+const CURRENT_VERSION = "103";
+
+function kiemTraCapNhat() {
+  fetch("version.json?v=" + Date.now())
+    .then(res => res.json())
+    .then(data => {
+      if (data.version && data.version !== CURRENT_VERSION) {
+        const ok = confirm("🔄 Có bản cập nhật mới. Anh có muốn cập nhật ngay không?");
+        if (ok) {
+          location.reload(true);
+        }
+      }
+    })
+    .catch(() => {});
+}
+
+setInterval(kiemTraCapNhat, 30000);
