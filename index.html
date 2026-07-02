@@ -175,11 +175,21 @@ content="width=device-width,initial-scale=1">
   </section>
 
   <section id="nhatky" class="screen">
-    <div class="card">
-      <h3>📒 Nhật ký</h3>
-      <div id="baoCaoList">Đang tải...</div>
+  <div class="card">
+    <h3>📒 Nhật ký</h3>
+
+    <div class="search-box">
+      <input
+        id="timKiemNhatKy"
+        type="text"
+        placeholder="🔍 Tìm theo tên, số CL/GGT, nội dung, phòng/khu..."
+        oninput="locNhatKy()"
+      >
     </div>
-  </section>
+
+    <div id="baoCaoList">Đang tải...</div>
+  </div>
+</section>
 
   <nav>
     <button class="nav-btn active" onclick="showScreen('home', this)">
