@@ -349,3 +349,66 @@ nav button.active {
 .dashboard-2col {
   grid-template-columns: 1fr 1fr;
 }
+/* ====== CHỈNH LOGO CHO ĐẸP HƠN ====== */
+.brand img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  background: white;
+  border-radius: 22px;
+  padding: 8px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+}
+
+/* ====== LÀM NHẬT KÝ GỌN HƠN ====== */
+.person-row {
+  padding: 10px 12px;
+  border-radius: 14px;
+  margin: 8px 0;
+}
+
+.person-row b {
+  font-size: 15px;
+}
+
+.person-row span {
+  font-size: 12px;
+}
+
+/* Dòng công lệnh/giấy giới thiệu nhỏ lại */
+.cl-row {
+  padding: 9px 12px;
+  margin: 7px 0;
+  border-left: 4px solid #2563eb;
+  border-radius: 12px;
+  min-height: 58px;
+}
+
+.cl-row b {
+  font-size: 14px;
+  margin-bottom: 3px;
+}
+
+.cl-row small {
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+/* Chi tiết xổ xuống nhỏ gọn hơn */
+.cl-detail {
+  padding: 10px 12px;
+  font-size: 13px;
+  border-radius: 12px;
+}
+
+.cl-detail p {
+  margin: 5px 0;
+  line-height: 1.35;
+}
+
+/* Nút hủy nhỏ lại */
+.danger-btn {
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 12px;
+}
