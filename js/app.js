@@ -133,6 +133,7 @@ document.addEventListener("change", function (e) {
 function capCongLenh() {
   const loaiGiay = document.getElementById("loaiGiay").value;
   const ketqua = document.getElementById("ketqua");
+  ngayCapGiay: document.getElementById("ngayCapGiay").value,
 
   const params = {
     loaiGiay: loaiGiay,
