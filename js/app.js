@@ -279,6 +279,10 @@ function taiBaoCao() {
               ${vb.giayTo ? `<p><b>Giấy tờ:</b> ${vb.giayTo}</p>` : ""}
               ${vb.trangThai ? `<p><b>Trạng thái:</b> ${vb.trangThai}</p>` : ""}
               <p><a href="${vb.linkFile || "#"}" target="_blank">📄 Mở PDF</a></p>
+
+<button class="danger-btn" onclick="huyVanBan('${vb.loaiGiay}', '${vb.so}')">
+  🗑️ Hủy số này
+</button>
             </div>
           `;
         });
@@ -308,3 +312,21 @@ window.addEventListener("load", function () {
     taiDashboard();
   }, 15000);
 });
+function huyVanBan(loaiGiay, so) {
+  const tenLoai = loaiGiay === "GIAY_GIOI_THIEU" ? "giấy giới thiệu" : "công lệnh";
+
+  if (!confirm("Anh có chắc muốn hủy " + tenLoai + " số " + so + " không?")) {
+    return;
+  }
+
+  goiApi("huy", { loaiGiay: loaiGiay, so: so }, function(res) {
+    if (!res || !res.ok) {
+      alert("❌ " + ((res && res.message) ? res.message : "Không hủy được."));
+      return;
+    }
+
+    alert("✅ " + res.message);
+    taiDashboard();
+    taiBaoCao();
+  });
+}
