@@ -324,3 +324,12 @@ nav button.active {
     right: calc(50% - 246px);
   }
 }
+.danger-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  margin-top: 10px;
+  font-weight: 900;
+}
