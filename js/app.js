@@ -64,12 +64,27 @@ function showScreen(id, btn) {
 
 function taiDashboard() {
   goiApi("dashboard", {}, function (res) {
-    if (!res || !res.ok) return;
+    console.log("Dashboard:", res);
 
-    document.getElementById("soTiepTheoCL").innerText = res.data.soTiepTheoCL || "-";
-    document.getElementById("tongCL").innerText = res.data.tongCL || 0;
-    document.getElementById("soTiepTheoGGT").innerText = res.data.soTiepTheoGGT || "-";
-    document.getElementById("tongGGT").innerText = res.data.tongGGT || 0;
+    if (!res || !res.ok || !res.data) {
+      document.getElementById("soTiepTheoCL").innerText = "Lỗi";
+      document.getElementById("tongCL").innerText = "Lỗi";
+      document.getElementById("soTiepTheoGGT").innerText = "Lỗi";
+      document.getElementById("tongGGT").innerText = "Lỗi";
+      return;
+    }
+
+    document.getElementById("soTiepTheoCL").innerText =
+      res.data.soTiepTheoCL ?? res.data.soTiepTheoCongLenh ?? "-";
+
+    document.getElementById("tongCL").innerText =
+      res.data.tongCL ?? res.data.tongCongLenh ?? 0;
+
+    document.getElementById("soTiepTheoGGT").innerText =
+      res.data.soTiepTheoGGT ?? res.data.soTiepTheoGiayGioiThieu ?? "-";
+
+    document.getElementById("tongGGT").innerText =
+      res.data.tongGGT ?? res.data.tongGiayGioiThieu ?? 0;
   });
 }
 
@@ -330,3 +345,11 @@ function huyVanBan(loaiGiay, so) {
     taiBaoCao();
   });
 }
+window.addEventListener("load", function () {
+  doiLoaiGiay();
+  taiDashboard();
+
+  setInterval(function () {
+    taiDashboard();
+  }, 10000);
+});
