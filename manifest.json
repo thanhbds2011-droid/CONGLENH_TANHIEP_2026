@@ -1,9 +1,20 @@
 {
-  "name": "Công lệnh",
+  "name": "Công lệnh Tân Hiệp",
   "short_name": "Công lệnh",
-  "start_url": "./",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f8fafc",
+  "background_color": "#eef4fb",
   "theme_color": "#2563eb",
-  "icons": []
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
