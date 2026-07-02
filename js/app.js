@@ -141,6 +141,7 @@ function capCongLenh() {
     tuoi: document.getElementById("tuoi").value.trim(),
     chucVu: document.getElementById("chucVu").value.trim(),
     phongKhu: document.getElementById("phongKhu").value
+    ngayCapGiay: document.getElementById("ngayCapGiay").value,
   };
 
   if (loaiGiay === "CONG_LENH") {
