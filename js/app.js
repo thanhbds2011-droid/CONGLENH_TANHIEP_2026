@@ -64,8 +64,6 @@ function showScreen(id, btn) {
 
 function taiDashboard() {
   goiApi("dashboard", {}, function (res) {
-    console.log("Dashboard:", res);
-
     if (!res || !res.ok || !res.data) {
       document.getElementById("soTiepTheoCL").innerText = "Lỗi";
       document.getElementById("tongCL").innerText = "Lỗi";
@@ -74,17 +72,10 @@ function taiDashboard() {
       return;
     }
 
-    document.getElementById("soTiepTheoCL").innerText =
-      res.data.soTiepTheoCL ?? res.data.soTiepTheoCongLenh ?? "-";
-
-    document.getElementById("tongCL").innerText =
-      res.data.tongCL ?? res.data.tongCongLenh ?? 0;
-
-    document.getElementById("soTiepTheoGGT").innerText =
-      res.data.soTiepTheoGGT ?? res.data.soTiepTheoGiayGioiThieu ?? "-";
-
-    document.getElementById("tongGGT").innerText =
-      res.data.tongGGT ?? res.data.tongGiayGioiThieu ?? 0;
+    document.getElementById("soTiepTheoCL").innerText = res.data.soTiepTheoCL ?? "-";
+    document.getElementById("tongCL").innerText = res.data.tongCL ?? 0;
+    document.getElementById("soTiepTheoGGT").innerText = res.data.soTiepTheoGGT ?? "-";
+    document.getElementById("tongGGT").innerText = res.data.tongGGT ?? 0;
   });
 }
 
