@@ -105,14 +105,12 @@ function chonNoiDen() {
 function layNoiDenCongLenh() {
   const den = document.getElementById("den").value;
   const denKhac = document.getElementById("denKhac").value.trim();
-
   return den === "Khác..." ? denKhac : den;
 }
 
 function layNoiDenGGT() {
   const noiDen = document.getElementById("noiDen").value;
   const noiDenKhac = document.getElementById("noiDenKhac").value.trim();
-
   return noiDen === "Khác..." ? noiDenKhac : noiDen;
 }
 
@@ -133,15 +131,14 @@ document.addEventListener("change", function (e) {
 function capCongLenh() {
   const loaiGiay = document.getElementById("loaiGiay").value;
   const ketqua = document.getElementById("ketqua");
-  ngayCapGiay: document.getElementById("ngayCapGiay").value,
 
   const params = {
     loaiGiay: loaiGiay,
     dongChi: document.getElementById("dongChi").value.trim(),
     tuoi: document.getElementById("tuoi").value.trim(),
     chucVu: document.getElementById("chucVu").value.trim(),
-    phongKhu: document.getElementById("phongKhu").value
-    ngayCapGiay: document.getElementById("ngayCapGiay").value,
+    phongKhu: document.getElementById("phongKhu").value,
+    ngayCapGiay: document.getElementById("ngayCapGiay").value
   };
 
   if (loaiGiay === "CONG_LENH") {
@@ -192,7 +189,7 @@ function resetForm() {
   document.getElementById("ngayVe").value = "";
   document.getElementById("phuongTien").value = "";
   document.getElementById("giayTo").value = "";
-document.getElementById("ngayCapGiay").value = "";
+
   document.getElementById("kinhGui").value = "";
   document.getElementById("noiDen").selectedIndex = 0;
   document.getElementById("noiDenKhac").value = "";
@@ -200,6 +197,7 @@ document.getElementById("ngayCapGiay").value = "";
   document.getElementById("noiDungGGT").value = "";
   document.getElementById("ngayHetHan").value = "";
 
+  document.getElementById("ngayCapGiay").value = "";
   document.getElementById("phongKhu").selectedIndex = 0;
   document.getElementById("dongChi").focus();
 }
@@ -283,14 +281,15 @@ function taiBaoCao() {
               <p><b>Nội dung:</b> ${vb.noiDung || ""}</p>
               <p><b>${vb.loaiGiay === "GIAY_GIOI_THIEU" ? "Ngày hết hạn" : "Ngày đi"}:</b> ${vb.cotJ || ""}</p>
               ${vb.ngayVe ? `<p><b>Ngày về:</b> ${vb.ngayVe}</p>` : ""}
+              ${vb.ngayCapGiay ? `<p><b>Ngày cấp trên giấy:</b> ${vb.ngayCapGiay}</p>` : ""}
               ${vb.phuongTien ? `<p><b>Phương tiện:</b> ${vb.phuongTien}</p>` : ""}
               ${vb.giayTo ? `<p><b>Giấy tờ:</b> ${vb.giayTo}</p>` : ""}
               ${vb.trangThai ? `<p><b>Trạng thái:</b> ${vb.trangThai}</p>` : ""}
               <p><a href="${vb.linkFile || "#"}" target="_blank">📄 Mở PDF</a></p>
 
-<button class="danger-btn" onclick="huyVanBan('${vb.loaiGiay}', '${vb.so}')">
-  🗑️ Hủy số này
-</button>
+              <button class="danger-btn" onclick="huyVanBan('${vb.loaiGiay}', '${vb.so}')">
+                🗑️ Hủy số này
+              </button>
             </div>
           `;
         });
@@ -308,18 +307,9 @@ function taiBaoCao() {
 function toggleBox(id) {
   const el = document.getElementById(id);
   if (!el) return;
-
   el.style.display = el.style.display === "none" ? "block" : "none";
 }
 
-window.addEventListener("load", function () {
-  doiLoaiGiay();
-  taiDashboard();
-
-  setInterval(function () {
-    taiDashboard();
-  }, 15000);
-});
 function huyVanBan(loaiGiay, so) {
   const tenLoai = loaiGiay === "GIAY_GIOI_THIEU" ? "giấy giới thiệu" : "công lệnh";
 
@@ -327,7 +317,7 @@ function huyVanBan(loaiGiay, so) {
     return;
   }
 
-  goiApi("huy", { loaiGiay: loaiGiay, so: so }, function(res) {
+  goiApi("huy", { loaiGiay: loaiGiay, so: so }, function (res) {
     if (!res || !res.ok) {
       alert("❌ " + ((res && res.message) ? res.message : "Không hủy được."));
       return;
@@ -338,6 +328,7 @@ function huyVanBan(loaiGiay, so) {
     taiBaoCao();
   });
 }
+
 window.addEventListener("load", function () {
   doiLoaiGiay();
   taiDashboard();
