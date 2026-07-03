@@ -298,10 +298,14 @@ function capLaiVanBan(loaiGiay, soCu, lyDoHuy, ghiChuHuy) {
       "<br><br><a class='link-btn' href='" + res.data.linkFile + "' target='_blank'>📄 Mở file PDF mới</a>" +
       "<br><button class='share-btn' onclick=\"chiaSePdf('" + res.data.linkFile + "', '" + res.data.tenFile + "')\">📲 Chia sẻ qua Zalo</button>";
 
-    document.getElementById("lichSuCapLai").style.display = "none";
-    resetForm();
-    taiDashboard();
-    taiBaoCao();
+    anLichSuCapLai();
+resetForm();
+taiDashboard();
+
+const ketqua = document.getElementById("ketqua");
+if (ketqua) {
+  ketqua.scrollIntoView({ behavior: "smooth", block: "center" });
+}
   });
 }
 function resetForm() {
@@ -329,6 +333,7 @@ function resetForm() {
   document.getElementById("ngayCapGiay").value = "";
   document.getElementById("phongKhu").selectedIndex = 0;
   document.getElementById("dongChi").focus();
+  anLichSuCapLai();
 }
 
 function chiaSePdf(link, tenFile) {
@@ -585,6 +590,31 @@ function damBaoOCtimKiemNhatKy() {
 
   baoCaoList.parentNode.insertBefore(box, baoCaoList);
 }
+function anLichSuCapLai() {
+  const box = document.getElementById("lichSuCapLai");
+  if (box) {
+    box.style.display = "none";
+    box.innerHTML = "";
+  }
+}
+
+document.addEventListener("input", function (e) {
+  if (
+    e.target &&
+    ["dongChi", "tuoi", "chucVu", "noiDung", "noiDungGGT", "ngayDi", "ngayVe", "ngayHetHan"].includes(e.target.id)
+  ) {
+    anLichSuCapLai();
+  }
+});
+
+document.addEventListener("change", function (e) {
+  if (
+    e.target &&
+    ["loaiGiay", "phongKhu", "den", "noiDen"].includes(e.target.id)
+  ) {
+    anLichSuCapLai();
+  }
+});
 window.addEventListener("load", function () {
   doiLoaiGiay();
   damBaoOCtimKiemNhatKy();
