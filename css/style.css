@@ -554,3 +554,49 @@ nav button.active {
   font-weight: 900 !important;
   color: #2563eb !important;
 }
+.check-btn {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 12px;
+  font-size: 14px;
+  border-radius: 14px;
+}
+
+.history-box {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 16px;
+  padding: 12px;
+  margin-top: 12px;
+  color: #7c2d12;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.history-item {
+  background: white;
+  border-radius: 14px;
+  padding: 10px;
+  margin-top: 10px;
+  border-left: 4px solid #f97316;
+}
+
+.history-item b {
+  display: block;
+  font-size: 14px;
+}
+
+.history-item small {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.warning-btn {
+  background: #fed7aa;
+  color: #9a3412;
+  padding: 10px;
+  font-size: 13px;
+  border-radius: 12px;
+}
