@@ -683,18 +683,23 @@ function hienThongBaoCapNhat(message) {
 }
 
 function capNhatUngDung() {
+  const box = document.getElementById("updateBox");
+  if (box) box.remove();
+
   localStorage.clear();
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.getRegistrations().then(function(registrations) {
-      registrations.forEach(function(reg) {
-        reg.unregister();
+      const jobs = registrations.map(function(reg) {
+        return reg.unregister();
       });
 
-      location.href = "index.html?v=" + Date.now();
+      Promise.all(jobs).then(function() {
+        window.location.replace("index.html?v=" + Date.now());
+      });
     });
   } else {
-    location.href = "index.html?v=" + Date.now();
+    window.location.replace("index.html?v=" + Date.now());
   }
 }
 
