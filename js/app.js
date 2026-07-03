@@ -1,8 +1,10 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "106";
+const CURRENT_VERSION = "118";
 
 let DU_LIEU_NHAT_KY = [];
+
+/* ================= API JSONP ================= */
 
 function goiApi(action, params, callback) {
   const cbName = "cb_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
@@ -42,6 +44,8 @@ function goiApi(action, params, callback) {
   document.body.appendChild(script);
 }
 
+/* ================= ĐIỀU HƯỚNG ================= */
+
 function showScreen(id, btn) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
 
@@ -60,10 +64,17 @@ function showScreen(id, btn) {
   document.getElementById("pageTitle").innerText = titles[id] || "Công lệnh";
 
   if (id === "home") taiDashboard();
-  if (id === "nhatky") taiBaoCao();
+
+  if (id === "nhatky") {
+    damBaoOCtimKiemNhatKy();
+    taiBaoCao();
+  }
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
+/* ================= DASHBOARD KHÔNG HIỆN LỖI KHI CHỜ ================= */
+
 function taiDashboard() {
   const ids = [
     "soTiepTheoCL",
@@ -100,18 +111,21 @@ function taiDashboard() {
 }
 
 function capNhatSoDashboard(data) {
-  document.getElementById("soTiepTheoCL").innerText = data.soTiepTheoCL ?? "-";
-  document.getElementById("tongCL").innerText = data.tongCL ?? 0;
-  document.getElementById("huyCL").innerText = data.huyCL ?? 0;
+  ganText("soTiepTheoCL", data.soTiepTheoCL ?? "-");
+  ganText("tongCL", data.tongCL ?? 0);
+  ganText("huyCL", data.huyCL ?? 0);
 
-  document.getElementById("soTiepTheoGGT").innerText = data.soTiepTheoGGT ?? "-";
-  document.getElementById("tongGGT").innerText = data.tongGGT ?? 0;
-  document.getElementById("huyGGT").innerText = data.huyGGT ?? 0;
+  ganText("soTiepTheoGGT", data.soTiepTheoGGT ?? "-");
+  ganText("tongGGT", data.tongGGT ?? 0);
+  ganText("huyGGT", data.huyGGT ?? 0);
 }
+
 function ganText(id, value) {
   const el = document.getElementById(id);
   if (el) el.innerText = value;
 }
+
+/* ================= FORM CẤP VĂN BẢN ================= */
 
 function doiLoaiGiay() {
   const loai = document.getElementById("loaiGiay").value;
@@ -121,6 +135,8 @@ function doiLoaiGiay() {
 
   document.getElementById("formGGT").style.display =
     loai === "GIAY_GIOI_THIEU" ? "block" : "none";
+
+  anLichSuCapLai();
 }
 
 function chonNoiDen() {
@@ -208,6 +224,9 @@ function capCongLenh() {
     taiDashboard();
   });
 }
+
+/* ================= KIỂM TRA - HỦY - CẤP LẠI ================= */
+
 function kiemTraCapLai() {
   const box = document.getElementById("lichSuCapLai");
   const loaiGiay = document.getElementById("loaiGiay").value;
@@ -257,6 +276,7 @@ function kiemTraCapLai() {
     box.innerHTML = html;
   });
 }
+
 function moFormCapLai(loaiGiay, soCu) {
   const lyDo = prompt(
     "Nhập lý do hủy số " + soCu + ":\n\nGợi ý: Mất, Rách, Sai nơi đến, Thay đổi nơi đến, Khác"
@@ -275,6 +295,7 @@ function moFormCapLai(loaiGiay, soCu) {
 
   capLaiVanBan(loaiGiay, soCu, lyDo, ghiChu);
 }
+
 function capLaiVanBan(loaiGiay, soCu, lyDoHuy, ghiChuHuy) {
   const ketqua = document.getElementById("ketqua");
 
@@ -320,15 +341,42 @@ function capLaiVanBan(loaiGiay, soCu, lyDoHuy, ghiChuHuy) {
       "<br><button class='share-btn' onclick=\"chiaSePdf('" + res.data.linkFile + "', '" + res.data.tenFile + "')\">📲 Chia sẻ qua Zalo</button>";
 
     anLichSuCapLai();
-resetForm();
-taiDashboard();
+    resetForm();
+    taiDashboard();
 
-const ketqua = document.getElementById("ketqua");
-if (ketqua) {
-  ketqua.scrollIntoView({ behavior: "smooth", block: "center" });
-}
+    const kq = document.getElementById("ketqua");
+    if (kq) kq.scrollIntoView({ behavior: "smooth", block: "center" });
   });
 }
+
+function anLichSuCapLai() {
+  const box = document.getElementById("lichSuCapLai");
+  if (box) {
+    box.style.display = "none";
+    box.innerHTML = "";
+  }
+}
+
+document.addEventListener("input", function (e) {
+  if (
+    e.target &&
+    ["dongChi", "tuoi", "chucVu", "noiDung", "noiDungGGT", "ngayDi", "ngayVe", "ngayHetHan"].includes(e.target.id)
+  ) {
+    anLichSuCapLai();
+  }
+});
+
+document.addEventListener("change", function (e) {
+  if (
+    e.target &&
+    ["loaiGiay", "phongKhu", "den", "noiDen"].includes(e.target.id)
+  ) {
+    anLichSuCapLai();
+  }
+});
+
+/* ================= RESET - CHIA SẺ ================= */
+
 function resetForm() {
   document.getElementById("dongChi").value = "";
   document.getElementById("tuoi").value = "";
@@ -353,8 +401,11 @@ function resetForm() {
 
   document.getElementById("ngayCapGiay").value = "";
   document.getElementById("phongKhu").selectedIndex = 0;
-  document.getElementById("dongChi").focus();
+
   anLichSuCapLai();
+
+  const inputTen = document.getElementById("dongChi");
+  if (inputTen) inputTen.focus();
 }
 
 function chiaSePdf(link, tenFile) {
@@ -370,7 +421,11 @@ function chiaSePdf(link, tenFile) {
   }
 }
 
+/* ================= NHẬT KÝ ================= */
+
 function taiBaoCao() {
+  damBaoOCtimKiemNhatKy();
+
   const box = document.getElementById("baoCaoList");
   box.innerHTML = "⏳ Đang tải báo cáo...";
 
@@ -418,9 +473,7 @@ function locNhatKy() {
       const matchTen = ns.dongChi.toLowerCase().includes(keyword);
       const matchPhong = phong.phongKhu.toLowerCase().includes(keyword);
 
-      if (matchTen || matchPhong) {
-        return ns;
-      }
+      if (matchTen || matchPhong) return ns;
 
       if (danhSachLoc.length > 0) {
         return {
@@ -461,21 +514,21 @@ function hienThiNhatKy(data) {
     const phongId = "phong_" + i;
 
     html += `
-  <div class="report-group">
-    <div class="report-title" onclick="toggleBox('${phongId}')">
-      <div class="phong-left">
-        <b>📁 ${phong.phongKhu}</b>
-        <small>Nhấn để xem danh sách viên chức</small>
-      </div>
+      <div class="report-group">
+        <div class="report-title" onclick="toggleBox('${phongId}')">
+          <div class="phong-left">
+            <b>📁 ${phong.phongKhu}</b>
+            <small>Nhấn để xem danh sách viên chức</small>
+          </div>
 
-      <div class="phong-right">
-        <span>${phong.tongCL || 0} CL</span>
-        <span>${phong.tongGGT || 0} GGT</span>
-      </div>
-    </div>
+          <div class="phong-right">
+            <span>${phong.tongCL || 0} CL</span>
+            <span>${phong.tongGGT || 0} GGT</span>
+          </div>
+        </div>
 
-    <div id="${phongId}" class="report-body" style="display:none;">
-`;
+        <div id="${phongId}" class="report-body" style="display:none;">
+    `;
 
     phong.nhanSu.forEach(function (ns, j) {
       const nsId = "ns_" + i + "_" + j;
@@ -567,31 +620,6 @@ function huyVanBan(loaiGiay, so) {
   });
 }
 
-function kiemTraCapNhat() {
-  fetch("version.json?v=" + Date.now())
-    .then(res => res.json())
-    .then(data => {
-      if (data.version && data.version !== CURRENT_VERSION) {
-        hienThongBaoCapNhat(data.message || "Có phiên bản mới.");
-      }
-    })
-    .catch(() => {});
-}
-
-function hienThongBaoCapNhat(message) {
-  if (document.getElementById("updateBox")) return;
-
-  const box = document.createElement("div");
-  box.id = "updateBox";
-  box.innerHTML = `
-    <div class="update-box">
-      🔄 ${message}
-      <br><br>
-      <button onclick="location.reload()">Cập nhật ngay</button>
-    </div>
-  `;
-  document.body.appendChild(box);
-}
 function damBaoOCtimKiemNhatKy() {
   const baoCaoList = document.getElementById("baoCaoList");
   if (!baoCaoList) return;
@@ -611,37 +639,79 @@ function damBaoOCtimKiemNhatKy() {
 
   baoCaoList.parentNode.insertBefore(box, baoCaoList);
 }
-function anLichSuCapLai() {
-  const box = document.getElementById("lichSuCapLai");
-  if (box) {
-    box.style.display = "none";
-    box.innerHTML = "";
+
+/* ================= PWA - CẬP NHẬT PHIÊN BẢN ================= */
+
+function dangKyServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js?v=" + CURRENT_VERSION)
+      .then(reg => {
+        reg.update();
+      })
+      .catch(err => {
+        console.log("Không đăng ký được service worker", err);
+      });
   }
 }
 
-document.addEventListener("input", function (e) {
-  if (
-    e.target &&
-    ["dongChi", "tuoi", "chucVu", "noiDung", "noiDungGGT", "ngayDi", "ngayVe", "ngayHetHan"].includes(e.target.id)
-  ) {
-    anLichSuCapLai();
-  }
-});
+function kiemTraCapNhatPhienBan() {
+  fetch("version.json?v=" + Date.now(), { cache: "no-store" })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.version) return;
 
-document.addEventListener("change", function (e) {
-  if (
-    e.target &&
-    ["loaiGiay", "phongKhu", "den", "noiDen"].includes(e.target.id)
-  ) {
-    anLichSuCapLai();
+      if (String(data.version) !== String(CURRENT_VERSION)) {
+        hienThongBaoCapNhat(data.message || "Đã có phiên bản mới.");
+      }
+    })
+    .catch(() => {});
+}
+
+function hienThongBaoCapNhat(message) {
+  if (document.getElementById("updateBox")) return;
+
+  const box = document.createElement("div");
+  box.id = "updateBox";
+  box.className = "update-box";
+  box.innerHTML = `
+    🔄 ${message}
+    <br><br>
+    <button onclick="capNhatUngDung()">Cập nhật ngay</button>
+  `;
+
+  document.body.appendChild(box);
+}
+
+function capNhatUngDung() {
+  localStorage.clear();
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+      registrations.forEach(function(reg) {
+        reg.unregister();
+      });
+
+      location.href = "index.html?v=" + Date.now();
+    });
+  } else {
+    location.href = "index.html?v=" + Date.now();
   }
-});
+}
+
+/* ================= KHỞI ĐỘNG ỨNG DỤNG ================= */
+
 window.addEventListener("load", function () {
+  dangKyServiceWorker();
+
   doiLoaiGiay();
-  damBaoOCtimKiemNhatKy();
   taiDashboard();
+  kiemTraCapNhatPhienBan();
 
-  setInterval(taiDashboard, 10000);
-  setInterval(kiemTraCapNhat, 30000);
+  setInterval(function () {
+    taiDashboard();
+  }, 15000);
+
+  setInterval(function () {
+    kiemTraCapNhatPhienBan();
+  }, 60000);
 });
-
