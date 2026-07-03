@@ -64,29 +64,50 @@ function showScreen(id, btn) {
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
-
 function taiDashboard() {
+  const ids = [
+    "soTiepTheoCL",
+    "tongCL",
+    "huyCL",
+    "soTiepTheoGGT",
+    "tongGGT",
+    "huyGGT"
+  ];
+
+  const cache = localStorage.getItem("dashboard_cache");
+
+  if (cache) {
+    try {
+      const data = JSON.parse(cache);
+      capNhatSoDashboard(data);
+    } catch (e) {}
+  } else {
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = "...";
+    });
+  }
+
   goiApi("dashboard", {}, function (res) {
     if (!res || !res.ok || !res.data) {
-      ganText("soTiepTheoCL", "Lỗi");
-      ganText("tongCL", "Lỗi");
-      ganText("huyCL", "Lỗi");
-      ganText("soTiepTheoGGT", "Lỗi");
-      ganText("tongGGT", "Lỗi");
-      ganText("huyGGT", "Lỗi");
+      console.log("Dashboard chưa phản hồi, giữ dữ liệu cũ.");
       return;
     }
 
-    ganText("soTiepTheoCL", res.data.soTiepTheoCL ?? "-");
-    ganText("tongCL", res.data.tongCL ?? 0);
-    ganText("huyCL", res.data.huyCL ?? 0);
-
-    ganText("soTiepTheoGGT", res.data.soTiepTheoGGT ?? "-");
-    ganText("tongGGT", res.data.tongGGT ?? 0);
-    ganText("huyGGT", res.data.huyGGT ?? 0);
+    localStorage.setItem("dashboard_cache", JSON.stringify(res.data));
+    capNhatSoDashboard(res.data);
   });
 }
 
+function capNhatSoDashboard(data) {
+  document.getElementById("soTiepTheoCL").innerText = data.soTiepTheoCL ?? "-";
+  document.getElementById("tongCL").innerText = data.tongCL ?? 0;
+  document.getElementById("huyCL").innerText = data.huyCL ?? 0;
+
+  document.getElementById("soTiepTheoGGT").innerText = data.soTiepTheoGGT ?? "-";
+  document.getElementById("tongGGT").innerText = data.tongGGT ?? 0;
+  document.getElementById("huyGGT").innerText = data.huyGGT ?? 0;
+}
 function ganText(id, value) {
   const el = document.getElementById(id);
   if (el) el.innerText = value;
