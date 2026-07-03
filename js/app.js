@@ -187,7 +187,123 @@ function capCongLenh() {
     taiDashboard();
   });
 }
+function kiemTraCapLai() {
+  const box = document.getElementById("lichSuCapLai");
+  const loaiGiay = document.getElementById("loaiGiay").value;
+  const dongChi = document.getElementById("dongChi").value.trim();
 
+  if (!dongChi) {
+    alert("Vui lòng nhập họ tên trước khi kiểm tra.");
+    return;
+  }
+
+  box.style.display = "block";
+  box.innerHTML = "⏳ Đang kiểm tra lịch sử cấp...";
+
+  goiApi("kiemtra_caplai", {
+    loaiGiay: loaiGiay,
+    dongChi: dongChi
+  }, function(res) {
+    if (!res || !res.ok) {
+      box.innerHTML = "❌ Không kiểm tra được lịch sử.";
+      return;
+    }
+
+    if (!res.found || !res.data || res.data.length === 0) {
+      box.innerHTML = "✅ Chưa có văn bản đang sử dụng của người này.";
+      return;
+    }
+
+    let html = "<b>⚠️ Người này đã có văn bản đang sử dụng:</b>";
+
+    res.data.forEach(function(vb) {
+      const badge = vb.loaiGiay === "GIAY_GIOI_THIEU" ? "GGT" : "CL";
+
+      html += `
+        <div class="history-item">
+          <b>${badge} ${vb.so} - ${vb.dongChi}</b>
+          <small>${vb.noiDung || ""}</small>
+          <small>Ngày: ${vb.cotJ || ""}</small>
+
+          <button type="button" class="warning-btn"
+            onclick="moFormCapLai('${vb.loaiGiay}', '${vb.so}')">
+            🔁 Hủy và cấp lại số này
+          </button>
+        </div>
+      `;
+    });
+
+    box.innerHTML = html;
+  });
+}
+function moFormCapLai(loaiGiay, soCu) {
+  const lyDo = prompt(
+    "Nhập lý do hủy số " + soCu + ":\n\nGợi ý: Mất, Rách, Sai nơi đến, Thay đổi nơi đến, Khác"
+  );
+
+  if (!lyDo) {
+    alert("Chưa nhập lý do hủy.");
+    return;
+  }
+
+  const ghiChu = prompt("Ghi chú thêm nếu có:", "") || "";
+
+  if (!confirm("Xác nhận hủy số " + soCu + " và cấp lại số mới?")) {
+    return;
+  }
+
+  capLaiVanBan(loaiGiay, soCu, lyDo, ghiChu);
+}
+function capLaiVanBan(loaiGiay, soCu, lyDoHuy, ghiChuHuy) {
+  const ketqua = document.getElementById("ketqua");
+
+  const params = {
+    loaiGiay: loaiGiay,
+    soCu: soCu,
+    lyDoHuy: lyDoHuy,
+    ghiChuHuy: ghiChuHuy,
+    dongChi: document.getElementById("dongChi").value.trim(),
+    tuoi: document.getElementById("tuoi").value.trim(),
+    chucVu: document.getElementById("chucVu").value.trim(),
+    phongKhu: document.getElementById("phongKhu").value,
+    ngayCapGiay: document.getElementById("ngayCapGiay").value
+  };
+
+  if (loaiGiay === "CONG_LENH") {
+    params.diTu = document.getElementById("diTu").value.trim();
+    params.den = layNoiDenCongLenh();
+    params.noiDung = document.getElementById("noiDung").value.trim();
+    params.ngayDi = document.getElementById("ngayDi").value;
+    params.ngayVe = document.getElementById("ngayVe").value;
+    params.phuongTien = document.getElementById("phuongTien").value.trim();
+    params.giayTo = document.getElementById("giayTo").value.trim();
+  } else {
+    params.kinhGui = document.getElementById("kinhGui").value.trim();
+    params.noiDen = layNoiDenGGT();
+    params.noiDung = document.getElementById("noiDungGGT").value.trim();
+    params.ngayHetHan = document.getElementById("ngayHetHan").value;
+  }
+
+  ketqua.style.display = "block";
+  ketqua.innerHTML = "⏳ Đang hủy số cũ và cấp lại số mới...";
+
+  goiApi("caplai", params, function(res) {
+    if (!res || !res.ok) {
+      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Cấp lại thất bại.");
+      return;
+    }
+
+    ketqua.innerHTML =
+      "✅ " + res.message +
+      "<br><br><a class='link-btn' href='" + res.data.linkFile + "' target='_blank'>📄 Mở file PDF mới</a>" +
+      "<br><button class='share-btn' onclick=\"chiaSePdf('" + res.data.linkFile + "', '" + res.data.tenFile + "')\">📲 Chia sẻ qua Zalo</button>";
+
+    document.getElementById("lichSuCapLai").style.display = "none";
+    resetForm();
+    taiDashboard();
+    taiBaoCao();
+  });
+}
 function resetForm() {
   document.getElementById("dongChi").value = "";
   document.getElementById("tuoi").value = "";
