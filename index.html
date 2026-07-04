@@ -17,17 +17,6 @@
 
   <link rel="apple-touch-icon" href="logo.png?v=122">
 <link rel="manifest" href="manifest.json?v=122">
-  <!-- OneSignal Web Push -->
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "c24d81a3-e212-4b2d-8607-55ce1652db01"
-    });
-  });
 </script>
   <link rel="stylesheet" href="css/style.css?v=122">
 </head>
@@ -85,9 +74,6 @@
     <div class="card">
       <button onclick="showScreen('cap', this)">➕ Cấp văn bản</button>
       <button onclick="showScreen('nhatky', this)">📒 Nhật ký</button>
-      <button type="button" onclick="batThongBao()">
-  🔔 Bật thông báo cho máy này
-</button>
     </div>
   </section>
 
