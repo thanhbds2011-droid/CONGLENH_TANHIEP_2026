@@ -704,47 +704,6 @@ function capNhatUngDung() {
 }
 
 /* ================= KHỞI ĐỘNG ỨNG DỤNG ================= */
-/*************** ONESIGNAL - BẬT THÔNG BÁO ***************/
-function batThongBao() {
-  if (!window.OneSignalDeferred) {
-    alert("OneSignal chưa sẵn sàng. Anh đóng và mở lại ứng dụng.");
-    return;
-  }
-
-  OneSignalDeferred.push(async function(OneSignal) {
-    try {
-      const hoTroThongBao = OneSignal.Notifications.isPushSupported();
-
-      if (!hoTroThongBao) {
-        alert("Thiết bị hoặc trình duyệt này chưa hỗ trợ thông báo.");
-        return;
-      }
-
-      /*
-       * Nếu máy chưa có quyền, OneSignal sẽ hiện hộp thoại
-       * Cho phép thông báo của iPhone.
-       */
-      await OneSignal.User.PushSubscription.optIn();
-
-      if (!OneSignal.User.PushSubscription.optedIn) {
-        alert("Anh chưa cho phép nhận thông báo.");
-        return;
-      }
-
-      /*
-       * Đánh dấu đây là máy nhận ghi chú của anh.
-       * Sau này Apps Script chỉ gửi đến máy có tag này.
-       */
-      OneSignal.User.addTag("nhan_ghi_chu", "thanh");
-
-      alert("Đã bật thông báo cho máy này.");
-
-    } catch (error) {
-      console.error("Lỗi bật thông báo:", error);
-      alert("Không bật được thông báo. Anh thử mở lại ứng dụng từ màn hình chính.");
-    }
-  });
-}
 window.addEventListener("load", function () {
   dangKyServiceWorker();
 
