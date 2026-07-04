@@ -197,11 +197,22 @@
     oninput="locNhatKy()"
   >
 </div>
+<button type="button" class="filter-toggle" onclick="toggleBoLoc()">
+  ⚙️ Bộ lọc nâng cao
+</button>
 
-<div class="filter-box">
-  <input type="date" id="tuNgay" onchange="locNhatKy()">
+<div id="boLocNangCao" class="filter-box collapsed">
+  <div class="filter-row">
+    <div>
+      <label>Từ ngày</label>
+      <input type="date" id="tuNgay" onchange="locNhatKy()">
+    </div>
 
-  <input type="date" id="denNgay" onchange="locNhatKy()">
+    <div>
+      <label>Đến ngày</label>
+      <input type="date" id="denNgay" onchange="locNhatKy()">
+    </div>
+  </div>
 
   <select id="locLoai" onchange="locNhatKy()">
     <option value="">Tất cả loại giấy</option>
@@ -222,9 +233,8 @@
   </select>
 
   <button type="button" onclick="resetLoc()">♻️ Đặt lại bộ lọc</button>
+  <div id="baoCaoList">Đang tải...</div>
 </div>
-
-<div id="baoCaoList">Đang tải...</div>
   </div>
 </section>
 
