@@ -643,7 +643,17 @@ function huyVanBan(loaiGiay, so) {
     taiBaoCao();
   });
 }
+function resetLoc() {
 
+  document.getElementById("timKiemNhatKy").value = "";
+  document.getElementById("tuNgay").value = "";
+  document.getElementById("denNgay").value = "";
+  document.getElementById("locLoai").selectedIndex = 0;
+  document.getElementById("locPhong").selectedIndex = 0;
+
+  hienThiNhatKy(DU_LIEU_NHAT_KY);
+
+}
 function damBaoOCtimKiemNhatKy() {
   const baoCaoList = document.getElementById("baoCaoList");
   if (!baoCaoList) return;
