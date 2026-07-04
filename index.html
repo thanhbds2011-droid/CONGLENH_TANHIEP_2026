@@ -232,7 +232,15 @@
     <option>Khu III</option>
   </select>
 
-  <button type="button" onclick="resetLoc()">♻️ Đặt lại bộ lọc</button>
+  <div class="filter-actions">
+  <button type="button" class="search-filter-btn" onclick="locNhatKy()">
+    🔎 Tìm kiếm
+  </button>
+
+  <button type="button" class="reset-filter-btn" onclick="resetLoc()">
+    ♻️ Đặt lại
+  </button>
+</div>
   <div id="baoCaoList">Đang tải...</div>
 </div>
   </div>
