@@ -1006,3 +1006,27 @@ margin-top:0;
   border-radius: 15px;
   font-size: 15px;
 }
+/* ===== NÚT TÌM KIẾM / ĐẶT LẠI BỘ LỌC ===== */
+
+.filter-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.filter-actions button {
+  margin-top: 0;
+  padding: 13px 10px;
+  border-radius: 15px;
+  font-size: 15px;
+}
+
+.search-filter-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.reset-filter-btn {
+  background: #e2e8f0;
+  color: #334155;
+}
