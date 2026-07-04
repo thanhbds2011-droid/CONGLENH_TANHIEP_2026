@@ -930,3 +930,26 @@ button,
     font-weight: 700;
   }
 }
+.filter-box{
+
+display:grid;
+
+gap:10px;
+
+margin-bottom:16px;
+
+}
+
+.filter-box input,
+
+.filter-box select{
+
+background:#fff;
+
+}
+
+.filter-box button{
+
+margin-top:0;
+
+}
