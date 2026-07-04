@@ -190,15 +190,41 @@
     <h3>📒 Nhật ký</h3>
 
     <div class="search-box">
-      <input
-        id="timKiemNhatKy"
-        type="text"
-        placeholder="🔍 Tìm tên, số CL/GGT, nội dung, phòng/khu..."
-        oninput="locNhatKy()"
-      >
-    </div>
+  <input
+    id="timKiemNhatKy"
+    type="text"
+    placeholder="🔍 Tìm tên, số CL/GGT, nội dung, phòng/khu..."
+    oninput="locNhatKy()"
+  >
+</div>
 
-    <div id="baoCaoList">Đang tải...</div>
+<div class="filter-box">
+  <input type="date" id="tuNgay" onchange="locNhatKy()">
+
+  <input type="date" id="denNgay" onchange="locNhatKy()">
+
+  <select id="locLoai" onchange="locNhatKy()">
+    <option value="">Tất cả loại giấy</option>
+    <option value="CONG_LENH">Công lệnh</option>
+    <option value="GIAY_GIOI_THIEU">Giấy giới thiệu</option>
+  </select>
+
+  <select id="locPhong" onchange="locNhatKy()">
+    <option value="">Tất cả phòng/khu</option>
+    <option>Ban Giám đốc</option>
+    <option>Phòng Tổ chức - Hành chính</option>
+    <option>Phòng Kế hoạch - Tài chính</option>
+    <option>Phòng Công tác xã hội</option>
+    <option>Phòng Y tế</option>
+    <option>Khu I</option>
+    <option>Khu II</option>
+    <option>Khu III</option>
+  </select>
+
+  <button type="button" onclick="resetLoc()">♻️ Đặt lại bộ lọc</button>
+</div>
+
+<div id="baoCaoList">Đang tải...</div>
   </div>
 </section>
 
