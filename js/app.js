@@ -518,7 +518,12 @@ function locNhatKy() {
 
   hienThiNhatKy(ketQua);
 }
+function toggleBoLoc() {
+  const box = document.getElementById("boLocNangCao");
+  if (!box) return;
 
+  box.classList.toggle("collapsed");
+}
 function hienThiNhatKy(data) {
   const box = document.getElementById("baoCaoList");
 
