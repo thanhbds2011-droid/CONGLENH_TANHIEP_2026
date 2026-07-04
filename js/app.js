@@ -439,21 +439,29 @@ function taiBaoCao() {
     hienThiNhatKy(DU_LIEU_NHAT_KY);
   });
 }
-
 function locNhatKy() {
-  const input = document.getElementById("timKiemNhatKy");
-  const keyword = input ? input.value.toLowerCase().trim() : "";
 
-  if (!keyword) {
-    hienThiNhatKy(DU_LIEU_NHAT_KY);
-    return;
-  }
+  const keyword = document.getElementById("timKiemNhatKy").value.toLowerCase().trim();
 
-  const ketQua = DU_LIEU_NHAT_KY.map(function (phong) {
-    const nhanSuLoc = phong.nhanSu.map(function (ns) {
+  const tuNgay = document.getElementById("tuNgay").value;
+  const denNgay = document.getElementById("denNgay").value;
+  const loai = document.getElementById("locLoai").value;
+  const phong = document.getElementById("locPhong").value;
+
+  const ketQua = DU_LIEU_NHAT_KY.map(function (itemPhong) {
+
+    // Lọc theo phòng
+    if (phong && itemPhong.phongKhu !== phong) {
+      return null;
+    }
+
+    const nhanSuLoc = itemPhong.nhanSu.map(function (ns) {
+
       const danhSachLoc = ns.danhSach.filter(function (vb) {
+
+        // Tìm kiếm
         const text = [
-          phong.phongKhu,
+          itemPhong.phongKhu,
           ns.dongChi,
           vb.loaiTen,
           vb.so,
@@ -467,34 +475,45 @@ function locNhatKy() {
           vb.tenFile
         ].join(" ").toLowerCase();
 
-        return text.includes(keyword);
+        if (keyword && !text.includes(keyword))
+          return false;
+
+        // Lọc loại giấy
+        if (loai && vb.loaiGiay !== loai)
+          return false;
+
+        // Lọc ngày cấp
+        if (tuNgay && vb.ngayCapGiay < tuNgay)
+          return false;
+
+        if (denNgay && vb.ngayCapGiay > denNgay)
+          return false;
+
+        return true;
       });
 
-      const matchTen = ns.dongChi.toLowerCase().includes(keyword);
-      const matchPhong = phong.phongKhu.toLowerCase().includes(keyword);
+      if (danhSachLoc.length === 0)
+        return null;
 
-      if (matchTen || matchPhong) return ns;
+      return {
+        ...ns,
+        danhSach: danhSachLoc,
+        tongCL: danhSachLoc.filter(v => v.loaiGiay === "CONG_LENH").length,
+        tongGGT: danhSachLoc.filter(v => v.loaiGiay === "GIAY_GIOI_THIEU").length
+      };
 
-      if (danhSachLoc.length > 0) {
-        return {
-          ...ns,
-          danhSach: danhSachLoc,
-          tongCL: danhSachLoc.filter(v => v.loaiGiay === "CONG_LENH").length,
-          tongGGT: danhSachLoc.filter(v => v.loaiGiay === "GIAY_GIOI_THIEU").length
-        };
-      }
-
-      return null;
     }).filter(Boolean);
 
-    if (nhanSuLoc.length === 0) return null;
+    if (nhanSuLoc.length === 0)
+      return null;
 
     return {
-      ...phong,
+      ...itemPhong,
       nhanSu: nhanSuLoc,
-      tongCL: nhanSuLoc.reduce((sum, ns) => sum + (ns.tongCL || 0), 0),
-      tongGGT: nhanSuLoc.reduce((sum, ns) => sum + (ns.tongGGT || 0), 0)
+      tongCL: nhanSuLoc.reduce((s, n) => s + n.tongCL, 0),
+      tongGGT: nhanSuLoc.reduce((s, n) => s + n.tongGGT, 0)
     };
+
   }).filter(Boolean);
 
   hienThiNhatKy(ketQua);
