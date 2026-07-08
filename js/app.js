@@ -592,8 +592,8 @@ function locNhatKy() {
   const tuNgay = document.getElementById("tuNgay").value;
   const denNgay = document.getElementById("denNgay").value;
   const loai = document.getElementById("locLoai").value;
-const trangThai = document.getElementById("locTrangThai").value;
-const phong = document.getElementById("locPhong").value;
+  const trangThai = document.getElementById("locTrangThai").value;
+  const phong = document.getElementById("locPhong").value;
 
   const ketQua = DU_LIEU_NHAT_KY.map(function (itemPhong) {
     if (phong && itemPhong.phongKhu !== phong) return null;
@@ -612,14 +612,18 @@ const phong = document.getElementById("locPhong").value;
           vb.cotJ,
           vb.ngayVe,
           vb.ngayCapGiay,
+          vb.trangThai,
+          vb.lyDoHuy,
+          vb.ghiChuHuy,
           vb.tenFile
         ].join(" ").toLowerCase();
 
         if (keyword && !text.includes(keyword)) return false;
         if (loai && vb.loaiGiay !== loai) return false;
         if (trangThai && vb.trangThai !== trangThai) return false;
-        if (tuNgay && vb.ngayCapGiay < tuNgay) return false;
-        if (denNgay && vb.ngayCapGiay > denNgay) return false;
+
+        if (tuNgay && chuyenNgayLoc(vb.ngayCapGiay) < tuNgay) return false;
+        if (denNgay && chuyenNgayLoc(vb.ngayCapGiay) > denNgay) return false;
 
         return true;
       });
@@ -639,14 +643,34 @@ const phong = document.getElementById("locPhong").value;
     return {
       ...itemPhong,
       nhanSu: nhanSuLoc,
-      tongCL: nhanSuLoc.reduce((s, n) => s + n.tongCL, 0),
-      tongGGT: nhanSuLoc.reduce((s, n) => s + n.tongGGT, 0)
+      tongCL: nhanSuLoc.reduce((sum, ns) => sum + (ns.tongCL || 0), 0),
+      tongGGT: nhanSuLoc.reduce((sum, ns) => sum + (ns.tongGGT || 0), 0)
     };
   }).filter(Boolean);
 
   hienThiNhatKy(ketQua);
 }
+function chuyenNgayLoc(value) {
+  if (!value) return "";
 
+  const s = String(value).trim();
+
+  // Nếu dạng dd/MM/yyyy
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
+    const parts = s.split("/");
+    const d = parts[0].padStart(2, "0");
+    const m = parts[1].padStart(2, "0");
+    const y = parts[2];
+    return `${y}-${m}-${d}`;
+  }
+
+  // Nếu đã là yyyy-MM-dd
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    return s;
+  }
+
+  return "";
+}
 function toggleBoLoc() {
   const box = document.getElementById("boLocNangCao");
   if (!box) return;
