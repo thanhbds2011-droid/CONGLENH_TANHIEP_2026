@@ -727,6 +727,8 @@ function hienThiNhatKy(data) {
             ${vb.phuongTien ? `<p><b>Phương tiện:</b> ${vb.phuongTien}</p>` : ""}
             ${vb.giayTo ? `<p><b>Giấy tờ:</b> ${vb.giayTo}</p>` : ""}
             ${vb.trangThai ? `<p><b>Trạng thái:</b> ${vb.trangThai}</p>` : ""}
+${vb.lyDoHuy ? `<p><b>Lý do hủy:</b> ${vb.lyDoHuy}</p>` : ""}
+${vb.ghiChuHuy ? `<p><b>Ghi chú hủy:</b> ${vb.ghiChuHuy}</p>` : ""}
 
             <p><a href="${vb.linkFile || "#"}" target="_blank">📄 Mở PDF</a></p>
 
@@ -755,11 +757,25 @@ function toggleBox(id) {
 function huyVanBan(loaiGiay, so) {
   const tenLoai = loaiGiay === "GIAY_GIOI_THIEU" ? "giấy giới thiệu" : "công lệnh";
 
-  if (!confirm("Anh có chắc muốn hủy " + tenLoai + " số " + so + " không?")) {
+  const lyDoHuy = prompt("Nhập lý do hủy " + tenLoai + " số " + so + ":");
+
+  if (!lyDoHuy) {
+    alert("Chưa nhập lý do hủy.");
     return;
   }
 
-  goiApi("huy", { loaiGiay: loaiGiay, so: so }, function (res) {
+  const ghiChuHuy = prompt("Ghi chú thêm nếu có:", "") || "";
+
+  if (!confirm("Xác nhận hủy " + tenLoai + " số " + so + " không?")) {
+    return;
+  }
+
+  goiApi("huy", {
+    loaiGiay: loaiGiay,
+    so: so,
+    lyDoHuy: lyDoHuy,
+    ghiChuHuy: ghiChuHuy
+  }, function (res) {
     if (!res || !res.ok) {
       alert("❌ " + ((res && res.message) ? res.message : "Không hủy được."));
       return;
