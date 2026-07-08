@@ -368,36 +368,6 @@ function hienKetQuaXuatThanhCong(res) {
     "<br><button class='share-btn' onclick=\"chiaSePdf('" + res.data.linkFile + "', '" + res.data.tenFile + "')\">📲 Chia sẻ qua Zalo</button>";
 }
 
-function layThongTinFormCapVanBan() {
-  const loaiGiay = document.getElementById("loaiGiay").value;
-
-  const params = {
-    loaiGiay,
-    dongChi: document.getElementById("dongChi").value.trim(),
-    tuoi: document.getElementById("tuoi").value.trim(),
-    chucVu: document.getElementById("chucVu").value.trim(),
-    phongKhu: document.getElementById("phongKhu").value,
-    ngayCapGiay: document.getElementById("ngayCapGiay").value
-  };
-
-  if (loaiGiay === "CONG_LENH") {
-    params.diTu = document.getElementById("diTu").value.trim();
-    params.den = layNoiDenCongLenh();
-    params.noiDung = document.getElementById("noiDung").value.trim();
-    params.ngayDi = document.getElementById("ngayDi").value;
-    params.ngayVe = document.getElementById("ngayVe").value;
-    params.phuongTien = document.getElementById("phuongTien").value.trim();
-    params.giayTo = document.getElementById("giayTo").value.trim();
-  } else {
-    params.kinhGui = document.getElementById("kinhGui").value.trim();
-    params.noiDen = layNoiDenGGT();
-    params.noiDung = document.getElementById("noiDungGGT").value.trim();
-    params.ngayHetHan = document.getElementById("ngayHetHan").value;
-  }
-
-  return params;
-}
-
 
 function xemCongLenhTrung() {
   if (!DU_LIEU_TRUNG_CL || !DU_LIEU_TRUNG_CL.linkFile) {
@@ -502,36 +472,6 @@ function hienKetQuaXuatThanhCong(res) {
     "✅ " + res.message +
     "<br><br><a class='link-btn' href='" + res.data.linkFile + "' target='_blank'>📄 Mở file PDF</a>" +
     "<br><button class='share-btn' onclick=\"chiaSePdf('" + res.data.linkFile + "', '" + res.data.tenFile + "')\">📲 Chia sẻ qua Zalo</button>";
-}
-
-function layThongTinFormCapVanBan() {
-  const loaiGiay = document.getElementById("loaiGiay").value;
-
-  const params = {
-    loaiGiay: loaiGiay,
-    dongChi: document.getElementById("dongChi").value.trim(),
-    tuoi: document.getElementById("tuoi").value.trim(),
-    chucVu: document.getElementById("chucVu").value.trim(),
-    phongKhu: document.getElementById("phongKhu").value,
-    ngayCapGiay: document.getElementById("ngayCapGiay").value
-  };
-
-  if (loaiGiay === "CONG_LENH") {
-    params.diTu = document.getElementById("diTu").value.trim();
-    params.den = layNoiDenCongLenh();
-    params.noiDung = document.getElementById("noiDung").value.trim();
-    params.ngayDi = document.getElementById("ngayDi").value;
-    params.ngayVe = document.getElementById("ngayVe").value;
-    params.phuongTien = document.getElementById("phuongTien").value.trim();
-    params.giayTo = document.getElementById("giayTo").value.trim();
-  } else {
-    params.kinhGui = document.getElementById("kinhGui").value.trim();
-    params.noiDen = layNoiDenGGT();
-    params.noiDung = document.getElementById("noiDungGGT").value.trim();
-    params.ngayHetHan = document.getElementById("ngayHetHan").value;
-  }
-
-  return params;
 }
 
 function xemCongLenhTrung() {
