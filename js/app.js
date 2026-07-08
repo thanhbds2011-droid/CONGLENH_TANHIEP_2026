@@ -592,7 +592,8 @@ function locNhatKy() {
   const tuNgay = document.getElementById("tuNgay").value;
   const denNgay = document.getElementById("denNgay").value;
   const loai = document.getElementById("locLoai").value;
-  const phong = document.getElementById("locPhong").value;
+const trangThai = document.getElementById("locTrangThai").value;
+const phong = document.getElementById("locPhong").value;
 
   const ketQua = DU_LIEU_NHAT_KY.map(function (itemPhong) {
     if (phong && itemPhong.phongKhu !== phong) return null;
@@ -616,6 +617,7 @@ function locNhatKy() {
 
         if (keyword && !text.includes(keyword)) return false;
         if (loai && vb.loaiGiay !== loai) return false;
+        if (trangThai && vb.trangThai !== trangThai) return false;
         if (tuNgay && vb.ngayCapGiay < tuNgay) return false;
         if (denNgay && vb.ngayCapGiay > denNgay) return false;
 
@@ -792,7 +794,8 @@ function resetLoc() {
   document.getElementById("tuNgay").value = "";
   document.getElementById("denNgay").value = "";
   document.getElementById("locLoai").selectedIndex = 0;
-  document.getElementById("locPhong").selectedIndex = 0;
+document.getElementById("locTrangThai").selectedIndex = 0;
+document.getElementById("locPhong").selectedIndex = 0;
 
   hienThiNhatKy(DU_LIEU_NHAT_KY);
 }
