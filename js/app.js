@@ -208,6 +208,165 @@ function layThongTinFormCapVanBan() {
   const loaiGiay = document.getElementById("loaiGiay").value;
 
   const params = {
+    loaiGiay: loaiGiay,
+    dongChi: document.getElementById("dongChi").value.trim(),
+    tuoi: document.getElementById("tuoi").value.trim(),
+    chucVu: document.getElementById("chucVu").value.trim(),
+    phongKhu: document.getElementById("phongKhu").value,
+    ngayCapGiay: document.getElementById("ngayCapGiay").value
+  };
+
+  if (loaiGiay === "CONG_LENH") {
+    params.diTu = document.getElementById("diTu").value.trim();
+    params.den = layNoiDenCongLenh();
+    params.noiDung = document.getElementById("noiDung").value.trim();
+    params.ngayDi = document.getElementById("ngayDi").value;
+    params.ngayVe = document.getElementById("ngayVe").value;
+    params.phuongTien = document.getElementById("phuongTien").value.trim();
+    params.giayTo = document.getElementById("giayTo").value.trim();
+  } else {
+    params.kinhGui = document.getElementById("kinhGui").value.trim();
+    params.noiDen = layNoiDenGGT();
+    params.noiDung = document.getElementById("noiDungGGT").value.trim();
+    params.ngayHetHan = document.getElementById("ngayHetHan").value;
+  }
+
+  return params;
+}
+
+function hienCanhBaoTrungCongLenh(vb, params) {
+  DU_LIEU_TRUNG_CL = vb;
+  PARAMS_DANG_CAP = params;
+
+  const ketqua = document.getElementById("ketqua");
+
+  ketqua.style.display = "block";
+  ketqua.innerHTML = `
+    <div class="conflict-box">
+      <h3>⚠️ Phát hiện công lệnh đang hiệu lực</h3>
+
+      <p><b>Đồng chí:</b> ${vb.dongChi || ""}</p>
+      <p><b>Công lệnh số:</b> ${vb.so || ""}</p>
+      <p><b>Thời gian đã cấp:</b> ${vb.ngayDi || ""} → ${vb.ngayVe || ""}</p>
+      <p><b>Lý do trùng:</b> ${vb.lyDoTrung || "Khoảng thời gian chồng lấn"}</p>
+
+      <div class="conflict-actions">
+        <button type="button" onclick="xemCongLenhTrung()">👁 Xem</button>
+        <button type="button" onclick="thuHoiVaCapLaiCongLenh()">♻️ Thu hồi để cấp lại số ${vb.so}</button>
+        <button type="button" onclick="capCongLenhMoiBoQuaTrung()">➕ Cấp số mới</button>
+        <button type="button" onclick="dongCanhBaoTrung()">❌ Đóng</button>
+      </div>
+    </div>
+  `;
+
+  ketqua.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function xemCongLenhTrung() {
+  if (!DU_LIEU_TRUNG_CL || !DU_LIEU_TRUNG_CL.linkFile) {
+    alert("Không tìm thấy link PDF công lệnh cũ.");
+    return;
+  }
+
+  window.open(DU_LIEU_TRUNG_CL.linkFile, "_blank");
+}
+
+function thuHoiVaCapLaiCongLenh() {
+  if (!DU_LIEU_TRUNG_CL || !PARAMS_DANG_CAP) {
+    alert("Không có dữ liệu công lệnh cần thu hồi.");
+    return;
+  }
+
+  const lyDoHuy = prompt(
+    "Nhập lý do thu hồi công lệnh số " + DU_LIEU_TRUNG_CL.so + ":",
+    "Nhập sai thông tin, thu hồi để cấp lại"
+  );
+
+  if (!lyDoHuy) {
+    alert("Chưa nhập lý do thu hồi.");
+    return;
+  }
+
+  if (!confirm("Xác nhận thu hồi và cấp lại công lệnh số " + DU_LIEU_TRUNG_CL.so + "?\n\nSố công lệnh sẽ được giữ nguyên.")) {
+    return;
+  }
+
+  const ketqua = document.getElementById("ketqua");
+  ketqua.innerHTML = "⏳ Đang thu hồi và cấp lại công lệnh số " + DU_LIEU_TRUNG_CL.so + "...";
+
+  const params = {
+    ...PARAMS_DANG_CAP,
+    row: DU_LIEU_TRUNG_CL.row,
+    soCu: DU_LIEU_TRUNG_CL.so,
+    lyDoHuy: lyDoHuy
+  };
+
+  goiApi("thuhoi_caplai_cl", params, function(res) {
+    if (!res || !res.ok) {
+      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không thu hồi/cấp lại được công lệnh.");
+      return;
+    }
+
+    hienKetQuaXuatThanhCong(res);
+    resetForm();
+    taiDashboard();
+  });
+}
+
+function capCongLenhMoiBoQuaTrung() {
+  if (!PARAMS_DANG_CAP) {
+    alert("Không có dữ liệu để cấp mới.");
+    return;
+  }
+
+  if (!confirm("Xác nhận vẫn cấp công lệnh mới?\n\nCông lệnh cũ sẽ được giữ nguyên.")) {
+    return;
+  }
+
+  const ketqua = document.getElementById("ketqua");
+  ketqua.innerHTML = "⏳ Đang cấp công lệnh mới...";
+
+  const params = {
+    ...PARAMS_DANG_CAP,
+    boQuaTrung: "1"
+  };
+
+  goiApi("xuat", params, function(res) {
+    if (!res || !res.ok) {
+      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không cấp được công lệnh mới.");
+      return;
+    }
+
+    hienKetQuaXuatThanhCong(res);
+    resetForm();
+    taiDashboard();
+  });
+}
+
+function dongCanhBaoTrung() {
+  const ketqua = document.getElementById("ketqua");
+
+  ketqua.style.display = "none";
+  ketqua.innerHTML = "";
+
+  DU_LIEU_TRUNG_CL = null;
+  PARAMS_DANG_CAP = null;
+}
+
+function hienKetQuaXuatThanhCong(res) {
+  const ketqua = document.getElementById("ketqua");
+
+  ketqua.style.display = "block";
+  ketqua.innerHTML =
+    "✅ " + res.message +
+    "<br><br><a class='link-btn' href='" + res.data.linkFile + "' target='_blank'>📄 Mở file PDF</a>" +
+    "<br><button class='share-btn' onclick=\"chiaSePdf('" + res.data.linkFile + "', '" + res.data.tenFile + "')\">📲 Chia sẻ qua Zalo</button>";
+}
+
+function layThongTinFormCapVanBan() {
+  const loaiGiay = document.getElementById("loaiGiay").value;
+
+  const params = {
     loaiGiay,
     dongChi: document.getElementById("dongChi").value.trim(),
     tuoi: document.getElementById("tuoi").value.trim(),
