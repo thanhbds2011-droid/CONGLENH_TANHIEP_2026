@@ -252,8 +252,13 @@ function hienCanhBaoTrungCongLenh(vb, params) {
 
       <div class="conflict-actions">
         <button type="button" onclick="xemCongLenhTrung()">👁 Xem</button>
-        <button type="button" onclick="thuHoiVaCapLaiCongLenh()">♻️ Thu hồi để cấp lại số ${vb.so}</button>
+
+        <button type="button" onclick="thuHoiVaCapLaiCongLenh()">
+          ♻️ Thu hồi để cấp lại số ${vb.so}
+        </button>
+
         <button type="button" onclick="capCongLenhMoiBoQuaTrung()">➕ Cấp số mới</button>
+
         <button type="button" onclick="dongCanhBaoTrung()">❌ Đóng</button>
       </div>
     </div>
