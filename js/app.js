@@ -620,7 +620,7 @@ function locNhatKy() {
 
         if (keyword && !text.includes(keyword)) return false;
         if (loai && vb.loaiGiay !== loai) return false;
-        if (trangThai && vb.trangThai !== trangThai) return false;
+        if (trangThai && chuanHoaTrangThai(vb.trangThai) !== chuanHoaTrangThai(trangThai)) return false;
 
         if (tuNgay && chuyenNgayLoc(vb.ngayCapGiay) < tuNgay) return false;
         if (denNgay && chuyenNgayLoc(vb.ngayCapGiay) > denNgay) return false;
