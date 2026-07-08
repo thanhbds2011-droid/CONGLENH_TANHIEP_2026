@@ -398,33 +398,6 @@ function layThongTinFormCapVanBan() {
   return params;
 }
 
-function hienCanhBaoTrungCongLenh(vb, params) {
-  DU_LIEU_TRUNG_CL = vb;
-  PARAMS_DANG_CAP = params;
-
-  const ketqua = document.getElementById("ketqua");
-
-  ketqua.style.display = "block";
-  ketqua.innerHTML = `
-    <div class="conflict-box">
-      <h3>⚠️ Phát hiện công lệnh đang hiệu lực</h3>
-
-      <p><b>Đồng chí:</b> ${vb.dongChi || ""}</p>
-      <p><b>Công lệnh số:</b> ${vb.so || ""}</p>
-      <p><b>Thời gian đã cấp:</b> ${vb.ngayDi || ""} → ${vb.ngayVe || ""}</p>
-      <p><b>Lý do trùng:</b> ${vb.lyDoTrung || "Khoảng thời gian chồng lấn"}</p>
-
-      <div class="conflict-actions">
-        <button type="button" onclick="xemCongLenhTrung()">👁 Xem</button>
-        <button type="button" onclick="suaCongLenhTrung()">✏️ Sửa số ${vb.so}</button>
-        <button type="button" onclick="capCongLenhMoiBoQuaTrung()">➕ Cấp số mới</button>
-        <button type="button" onclick="dongCanhBaoTrung()">❌ Đóng</button>
-      </div>
-    </div>
-  `;
-
-  ketqua.scrollIntoView({ behavior: "smooth", block: "center" });
-}
 
 function xemCongLenhTrung() {
   if (!DU_LIEU_TRUNG_CL || !DU_LIEU_TRUNG_CL.linkFile) {
@@ -559,34 +532,6 @@ function layThongTinFormCapVanBan() {
   }
 
   return params;
-}
-
-function hienCanhBaoTrungCongLenh(vb, params) {
-  DU_LIEU_TRUNG_CL = vb;
-  PARAMS_DANG_CAP = params;
-
-  const ketqua = document.getElementById("ketqua");
-
-  ketqua.style.display = "block";
-  ketqua.innerHTML = `
-    <div class="conflict-box">
-      <h3>⚠️ Phát hiện công lệnh đang hiệu lực</h3>
-
-      <p><b>Đồng chí:</b> ${vb.dongChi || ""}</p>
-      <p><b>Công lệnh số:</b> ${vb.so || ""}</p>
-      <p><b>Thời gian đã cấp:</b> ${vb.ngayDi || ""} → ${vb.ngayVe || ""}</p>
-      <p><b>Lý do trùng:</b> ${vb.lyDoTrung || "Khoảng thời gian chồng lấn"}</p>
-
-      <div class="conflict-actions">
-        <button type="button" onclick="xemCongLenhTrung()">👁 Xem</button>
-        <button type="button" onclick="suaCongLenhTrung()">✏️ Sửa số ${vb.so}</button>
-        <button type="button" onclick="capCongLenhMoiBoQuaTrung()">➕ Cấp số mới</button>
-        <button type="button" onclick="dongCanhBaoTrung()">❌ Đóng</button>
-      </div>
-    </div>
-  `;
-
-  ketqua.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 function xemCongLenhTrung() {
