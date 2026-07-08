@@ -671,6 +671,12 @@ function chuyenNgayLoc(value) {
 
   return "";
 }
+function chuanHoaTrangThai(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/huỷ/g, "hủy");
+}
 function toggleBoLoc() {
   const box = document.getElementById("boLocNangCao");
   if (!box) return;
