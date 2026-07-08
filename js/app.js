@@ -179,8 +179,33 @@ document.addEventListener("change", function (e) {
 });
 
 function capCongLenh() {
-  const loaiGiay = document.getElementById("loaiGiay").value;
+  const params = layThongTinFormCapVanBan();
   const ketqua = document.getElementById("ketqua");
+
+  ketqua.style.display = "block";
+  ketqua.innerHTML = "⏳ Đang kiểm tra và xuất PDF...";
+
+  goiApi("xuat", params, function (res) {
+    if (res && res.conflict) {
+      hienCanhBaoTrungCongLenh(res.data, params);
+      return;
+    }
+
+    if (!res || !res.ok) {
+      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Xuất PDF thất bại.");
+      return;
+    }
+
+    hienKetQuaXuatThanhCong(res);
+    resetForm();
+    taiDashboard();
+  });
+}
+let DU_LIEU_TRUNG_CL = null;
+let PARAMS_DANG_CAP = null;
+
+function layThongTinFormCapVanBan() {
+  const loaiGiay = document.getElementById("loaiGiay").value;
 
   const params = {
     loaiGiay: loaiGiay,
@@ -206,23 +231,139 @@ function capCongLenh() {
     params.ngayHetHan = document.getElementById("ngayHetHan").value;
   }
 
-  ketqua.style.display = "block";
-  ketqua.innerHTML = "⏳ Đang xuất PDF...";
+  return params;
+}
 
-  goiApi("xuat", params, function (res) {
-    if (!res || !res.ok) {
-      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Xuất PDF thất bại.");
+function hienCanhBaoTrungCongLenh(vb, params) {
+  DU_LIEU_TRUNG_CL = vb;
+  PARAMS_DANG_CAP = params;
+
+  const ketqua = document.getElementById("ketqua");
+
+  ketqua.style.display = "block";
+  ketqua.innerHTML = `
+    <div class="conflict-box">
+      <h3>⚠️ Phát hiện công lệnh đang hiệu lực</h3>
+
+      <p><b>Đồng chí:</b> ${vb.dongChi || ""}</p>
+      <p><b>Công lệnh số:</b> ${vb.so || ""}</p>
+      <p><b>Thời gian đã cấp:</b> ${vb.ngayDi || ""} → ${vb.ngayVe || ""}</p>
+      <p><b>Lý do trùng:</b> ${vb.lyDoTrung || "Khoảng thời gian chồng lấn"}</p>
+
+      <div class="conflict-actions">
+        <button type="button" onclick="xemCongLenhTrung()">👁 Xem</button>
+        <button type="button" onclick="suaCongLenhTrung()">✏️ Sửa số ${vb.so}</button>
+        <button type="button" onclick="capCongLenhMoiBoQuaTrung()">➕ Cấp số mới</button>
+        <button type="button" onclick="dongCanhBaoTrung()">❌ Đóng</button>
+      </div>
+    </div>
+  `;
+
+  ketqua.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function xemCongLenhTrung() {
+  if (!DU_LIEU_TRUNG_CL || !DU_LIEU_TRUNG_CL.linkFile) {
+    alert("Không tìm thấy link PDF công lệnh cũ.");
+    return;
+  }
+
+  window.open(DU_LIEU_TRUNG_CL.linkFile, "_blank");
+}
+
+function suaCongLenhTrung() {
+  if (!DU_LIEU_TRUNG_CL || !PARAMS_DANG_CAP) {
+    alert("Không có dữ liệu công lệnh cần sửa.");
+    return;
+  }
+
+  const lyDoSua = prompt(
+    "Nhập lý do sửa công lệnh số " + DU_LIEU_TRUNG_CL.so + ":",
+    "Nhập sai thông tin, cần điều chỉnh lại"
+  );
+
+  if (!lyDoSua) {
+    alert("Chưa nhập lý do sửa.");
+    return;
+  }
+
+  if (!confirm("Xác nhận sửa công lệnh số " + DU_LIEU_TRUNG_CL.so + "?\n\nSố công lệnh sẽ được giữ nguyên.")) {
+    return;
+  }
+
+  const ketqua = document.getElementById("ketqua");
+  ketqua.innerHTML = "⏳ Đang sửa công lệnh số " + DU_LIEU_TRUNG_CL.so + "...";
+
+  const params = {
+    ...PARAMS_DANG_CAP,
+    row: DU_LIEU_TRUNG_CL.row,
+    lyDoSua: lyDoSua
+  };
+
+  goiApi("sua_cl", params, function(res) {
+    if (res && res.conflict) {
+      hienCanhBaoTrungCongLenh(res.data, params);
       return;
     }
 
-    ketqua.innerHTML =
-      "✅ " + res.message +
-      "<br><br><a class='link-btn' href='" + res.data.linkFile + "' target='_blank'>📄 Mở file PDF</a>" +
-      "<br><button class='share-btn' onclick=\"chiaSePdf('" + res.data.linkFile + "', '" + res.data.tenFile + "')\">📲 Chia sẻ qua Zalo</button>";
+    if (!res || !res.ok) {
+      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không sửa được công lệnh.");
+      return;
+    }
 
+    hienKetQuaXuatThanhCong(res);
     resetForm();
     taiDashboard();
   });
+}
+
+function capCongLenhMoiBoQuaTrung() {
+  if (!PARAMS_DANG_CAP) {
+    alert("Không có dữ liệu để cấp mới.");
+    return;
+  }
+
+  if (!confirm("Xác nhận vẫn cấp công lệnh mới?\n\nCông lệnh cũ sẽ được giữ nguyên.")) {
+    return;
+  }
+
+  const ketqua = document.getElementById("ketqua");
+  ketqua.innerHTML = "⏳ Đang cấp công lệnh mới...";
+
+  const params = {
+    ...PARAMS_DANG_CAP,
+    boQuaTrung: "1"
+  };
+
+  goiApi("xuat", params, function(res) {
+    if (!res || !res.ok) {
+      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không cấp được công lệnh mới.");
+      return;
+    }
+
+    hienKetQuaXuatThanhCong(res);
+    resetForm();
+    taiDashboard();
+  });
+}
+
+function dongCanhBaoTrung() {
+  const ketqua = document.getElementById("ketqua");
+  ketqua.style.display = "none";
+  ketqua.innerHTML = "";
+
+  DU_LIEU_TRUNG_CL = null;
+  PARAMS_DANG_CAP = null;
+}
+
+function hienKetQuaXuatThanhCong(res) {
+  const ketqua = document.getElementById("ketqua");
+
+  ketqua.style.display = "block";
+  ketqua.innerHTML =
+    "✅ " + res.message +
+    "<br><br><a class='link-btn' href='" + res.data.linkFile + "' target='_blank'>📄 Mở file PDF</a>" +
+    "<br><button class='share-btn' onclick=\"chiaSePdf('" + res.data.linkFile + "', '" + res.data.tenFile + "')\">📲 Chia sẻ qua Zalo</button>";
 }
 
 /* ================= KIỂM TRA - HỦY - CẤP LẠI ================= */
