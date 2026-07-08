@@ -1,8 +1,10 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "134";
+const CURRENT_VERSION = "135";
 
 let DU_LIEU_NHAT_KY = [];
+let DU_LIEU_TRUNG_CL = null;
+let PARAMS_DANG_CAP = null;
 
 /* ================= API JSONP ================= */
 
@@ -73,7 +75,7 @@ function showScreen(id, btn) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-/* ================= DASHBOARD KHÔNG HIỆN LỖI KHI CHỜ ================= */
+/* ================= DASHBOARD ================= */
 
 function taiDashboard() {
   const ids = [
@@ -178,32 +180,6 @@ document.addEventListener("change", function (e) {
   }
 });
 
-function capCongLenh() {
-  const params = layThongTinFormCapVanBan();
-  const ketqua = document.getElementById("ketqua");
-
-  ketqua.style.display = "block";
-  ketqua.innerHTML = "⏳ Đang kiểm tra và xuất PDF...";
-
-  goiApi("xuat", params, function (res) {
-    if (res && res.conflict) {
-      hienCanhBaoTrungCongLenh(res.data, params);
-      return;
-    }
-
-    if (!res || !res.ok) {
-      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Xuất PDF thất bại.");
-      return;
-    }
-
-    hienKetQuaXuatThanhCong(res);
-    resetForm();
-    taiDashboard();
-  });
-}
-let DU_LIEU_TRUNG_CL = null;
-let PARAMS_DANG_CAP = null;
-
 function layThongTinFormCapVanBan() {
   const loaiGiay = document.getElementById("loaiGiay").value;
 
@@ -233,6 +209,32 @@ function layThongTinFormCapVanBan() {
 
   return params;
 }
+
+function capCongLenh() {
+  const params = layThongTinFormCapVanBan();
+  const ketqua = document.getElementById("ketqua");
+
+  ketqua.style.display = "block";
+  ketqua.innerHTML = "⏳ Đang kiểm tra và xuất PDF...";
+
+  goiApi("xuat", params, function (res) {
+    if (res && res.conflict) {
+      hienCanhBaoTrungCongLenh(res.data, params);
+      return;
+    }
+
+    if (!res || !res.ok) {
+      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Xuất PDF thất bại.");
+      return;
+    }
+
+    hienKetQuaXuatThanhCong(res);
+    resetForm();
+    taiDashboard();
+  });
+}
+
+/* ================= CẢNH BÁO TRÙNG CÔNG LỆNH ================= */
 
 function hienCanhBaoTrungCongLenh(vb, params) {
   DU_LIEU_TRUNG_CL = vb;
@@ -297,6 +299,7 @@ function thuHoiVaCapLaiCongLenh() {
   }
 
   const ketqua = document.getElementById("ketqua");
+  ketqua.style.display = "block";
   ketqua.innerHTML = "⏳ Đang thu hồi và cấp lại công lệnh số " + DU_LIEU_TRUNG_CL.so + "...";
 
   const params = {
@@ -329,112 +332,7 @@ function capCongLenhMoiBoQuaTrung() {
   }
 
   const ketqua = document.getElementById("ketqua");
-  ketqua.innerHTML = "⏳ Đang cấp công lệnh mới...";
-
-  const params = {
-    ...PARAMS_DANG_CAP,
-    boQuaTrung: "1"
-  };
-
-  goiApi("xuat", params, function(res) {
-    if (!res || !res.ok) {
-      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không cấp được công lệnh mới.");
-      return;
-    }
-
-    hienKetQuaXuatThanhCong(res);
-    resetForm();
-    taiDashboard();
-  });
-}
-
-function dongCanhBaoTrung() {
-  const ketqua = document.getElementById("ketqua");
-
-  ketqua.style.display = "none";
-  ketqua.innerHTML = "";
-
-  DU_LIEU_TRUNG_CL = null;
-  PARAMS_DANG_CAP = null;
-}
-
-function hienKetQuaXuatThanhCong(res) {
-  const ketqua = document.getElementById("ketqua");
-
   ketqua.style.display = "block";
-  ketqua.innerHTML =
-    "✅ " + res.message +
-    "<br><br><a class='link-btn' href='" + res.data.linkFile + "' target='_blank'>📄 Mở file PDF</a>" +
-    "<br><button class='share-btn' onclick=\"chiaSePdf('" + res.data.linkFile + "', '" + res.data.tenFile + "')\">📲 Chia sẻ qua Zalo</button>";
-}
-
-
-function xemCongLenhTrung() {
-  if (!DU_LIEU_TRUNG_CL || !DU_LIEU_TRUNG_CL.linkFile) {
-    alert("Không tìm thấy link PDF công lệnh cũ.");
-    return;
-  }
-
-  window.open(DU_LIEU_TRUNG_CL.linkFile, "_blank");
-}
-
-function suaCongLenhTrung() {
-  if (!DU_LIEU_TRUNG_CL || !PARAMS_DANG_CAP) {
-    alert("Không có dữ liệu công lệnh cần sửa.");
-    return;
-  }
-
-  const lyDoSua = prompt(
-    "Nhập lý do sửa công lệnh số " + DU_LIEU_TRUNG_CL.so + ":",
-    "Nhập sai thông tin, cần điều chỉnh lại"
-  );
-
-  if (!lyDoSua) {
-    alert("Chưa nhập lý do sửa.");
-    return;
-  }
-
-  if (!confirm("Xác nhận sửa công lệnh số " + DU_LIEU_TRUNG_CL.so + "?\n\nSố công lệnh sẽ được giữ nguyên.")) {
-    return;
-  }
-
-  const ketqua = document.getElementById("ketqua");
-  ketqua.innerHTML = "⏳ Đang sửa công lệnh số " + DU_LIEU_TRUNG_CL.so + "...";
-
-  const params = {
-    ...PARAMS_DANG_CAP,
-    row: DU_LIEU_TRUNG_CL.row,
-    lyDoSua
-  };
-
-  goiApi("sua_cl", params, function(res) {
-    if (res && res.conflict) {
-      hienCanhBaoTrungCongLenh(res.data, params);
-      return;
-    }
-
-    if (!res || !res.ok) {
-      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không sửa được công lệnh.");
-      return;
-    }
-
-    hienKetQuaXuatThanhCong(res);
-    resetForm();
-    taiDashboard();
-  });
-}
-
-function capCongLenhMoiBoQuaTrung() {
-  if (!PARAMS_DANG_CAP) {
-    alert("Không có dữ liệu để cấp mới.");
-    return;
-  }
-
-  if (!confirm("Xác nhận vẫn cấp công lệnh mới?\n\nCông lệnh cũ sẽ được giữ nguyên.")) {
-    return;
-  }
-
-  const ketqua = document.getElementById("ketqua");
   ketqua.innerHTML = "⏳ Đang cấp công lệnh mới...";
 
   const params = {
@@ -457,110 +355,6 @@ function capCongLenhMoiBoQuaTrung() {
 function dongCanhBaoTrung() {
   const ketqua = document.getElementById("ketqua");
 
-  ketqua.style.display = "none";
-  ketqua.innerHTML = "";
-
-  DU_LIEU_TRUNG_CL = null;
-  PARAMS_DANG_CAP = null;
-}
-
-function hienKetQuaXuatThanhCong(res) {
-  const ketqua = document.getElementById("ketqua");
-
-  ketqua.style.display = "block";
-  ketqua.innerHTML =
-    "✅ " + res.message +
-    "<br><br><a class='link-btn' href='" + res.data.linkFile + "' target='_blank'>📄 Mở file PDF</a>" +
-    "<br><button class='share-btn' onclick=\"chiaSePdf('" + res.data.linkFile + "', '" + res.data.tenFile + "')\">📲 Chia sẻ qua Zalo</button>";
-}
-
-function xemCongLenhTrung() {
-  if (!DU_LIEU_TRUNG_CL || !DU_LIEU_TRUNG_CL.linkFile) {
-    alert("Không tìm thấy link PDF công lệnh cũ.");
-    return;
-  }
-
-  window.open(DU_LIEU_TRUNG_CL.linkFile, "_blank");
-}
-
-function suaCongLenhTrung() {
-  if (!DU_LIEU_TRUNG_CL || !PARAMS_DANG_CAP) {
-    alert("Không có dữ liệu công lệnh cần sửa.");
-    return;
-  }
-
-  const lyDoSua = prompt(
-    "Nhập lý do sửa công lệnh số " + DU_LIEU_TRUNG_CL.so + ":",
-    "Nhập sai thông tin, cần điều chỉnh lại"
-  );
-
-  if (!lyDoSua) {
-    alert("Chưa nhập lý do sửa.");
-    return;
-  }
-
-  if (!confirm("Xác nhận sửa công lệnh số " + DU_LIEU_TRUNG_CL.so + "?\n\nSố công lệnh sẽ được giữ nguyên.")) {
-    return;
-  }
-
-  const ketqua = document.getElementById("ketqua");
-  ketqua.innerHTML = "⏳ Đang sửa công lệnh số " + DU_LIEU_TRUNG_CL.so + "...";
-
-  const params = {
-    ...PARAMS_DANG_CAP,
-    row: DU_LIEU_TRUNG_CL.row,
-    lyDoSua: lyDoSua
-  };
-
-  goiApi("sua_cl", params, function(res) {
-    if (res && res.conflict) {
-      hienCanhBaoTrungCongLenh(res.data, params);
-      return;
-    }
-
-    if (!res || !res.ok) {
-      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không sửa được công lệnh.");
-      return;
-    }
-
-    hienKetQuaXuatThanhCong(res);
-    resetForm();
-    taiDashboard();
-  });
-}
-
-function capCongLenhMoiBoQuaTrung() {
-  if (!PARAMS_DANG_CAP) {
-    alert("Không có dữ liệu để cấp mới.");
-    return;
-  }
-
-  if (!confirm("Xác nhận vẫn cấp công lệnh mới?\n\nCông lệnh cũ sẽ được giữ nguyên.")) {
-    return;
-  }
-
-  const ketqua = document.getElementById("ketqua");
-  ketqua.innerHTML = "⏳ Đang cấp công lệnh mới...";
-
-  const params = {
-    ...PARAMS_DANG_CAP,
-    boQuaTrung: "1"
-  };
-
-  goiApi("xuat", params, function(res) {
-    if (!res || !res.ok) {
-      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không cấp được công lệnh mới.");
-      return;
-    }
-
-    hienKetQuaXuatThanhCong(res);
-    resetForm();
-    taiDashboard();
-  });
-}
-
-function dongCanhBaoTrung() {
-  const ketqua = document.getElementById("ketqua");
   ketqua.style.display = "none";
   ketqua.innerHTML = "";
 
@@ -792,27 +586,19 @@ function taiBaoCao() {
     hienThiNhatKy(DU_LIEU_NHAT_KY);
   });
 }
+
 function locNhatKy() {
-
   const keyword = document.getElementById("timKiemNhatKy").value.toLowerCase().trim();
-
   const tuNgay = document.getElementById("tuNgay").value;
   const denNgay = document.getElementById("denNgay").value;
   const loai = document.getElementById("locLoai").value;
   const phong = document.getElementById("locPhong").value;
 
   const ketQua = DU_LIEU_NHAT_KY.map(function (itemPhong) {
-
-    // Lọc theo phòng
-    if (phong && itemPhong.phongKhu !== phong) {
-      return null;
-    }
+    if (phong && itemPhong.phongKhu !== phong) return null;
 
     const nhanSuLoc = itemPhong.nhanSu.map(function (ns) {
-
       const danhSachLoc = ns.danhSach.filter(function (vb) {
-
-        // Tìm kiếm
         const text = [
           itemPhong.phongKhu,
           ns.dongChi,
@@ -828,25 +614,15 @@ function locNhatKy() {
           vb.tenFile
         ].join(" ").toLowerCase();
 
-        if (keyword && !text.includes(keyword))
-          return false;
-
-        // Lọc loại giấy
-        if (loai && vb.loaiGiay !== loai)
-          return false;
-
-        // Lọc ngày cấp
-        if (tuNgay && vb.ngayCapGiay < tuNgay)
-          return false;
-
-        if (denNgay && vb.ngayCapGiay > denNgay)
-          return false;
+        if (keyword && !text.includes(keyword)) return false;
+        if (loai && vb.loaiGiay !== loai) return false;
+        if (tuNgay && vb.ngayCapGiay < tuNgay) return false;
+        if (denNgay && vb.ngayCapGiay > denNgay) return false;
 
         return true;
       });
 
-      if (danhSachLoc.length === 0)
-        return null;
+      if (danhSachLoc.length === 0) return null;
 
       return {
         ...ns,
@@ -854,11 +630,9 @@ function locNhatKy() {
         tongCL: danhSachLoc.filter(v => v.loaiGiay === "CONG_LENH").length,
         tongGGT: danhSachLoc.filter(v => v.loaiGiay === "GIAY_GIOI_THIEU").length
       };
-
     }).filter(Boolean);
 
-    if (nhanSuLoc.length === 0)
-      return null;
+    if (nhanSuLoc.length === 0) return null;
 
     return {
       ...itemPhong,
@@ -866,17 +640,17 @@ function locNhatKy() {
       tongCL: nhanSuLoc.reduce((s, n) => s + n.tongCL, 0),
       tongGGT: nhanSuLoc.reduce((s, n) => s + n.tongGGT, 0)
     };
-
   }).filter(Boolean);
 
   hienThiNhatKy(ketQua);
 }
+
 function toggleBoLoc() {
   const box = document.getElementById("boLocNangCao");
   if (!box) return;
-
   box.classList.toggle("collapsed");
 }
+
 function hienThiNhatKy(data) {
   const box = document.getElementById("baoCaoList");
 
@@ -996,8 +770,8 @@ function huyVanBan(loaiGiay, so) {
     taiBaoCao();
   });
 }
-function resetLoc() {
 
+function resetLoc() {
   document.getElementById("timKiemNhatKy").value = "";
   document.getElementById("tuNgay").value = "";
   document.getElementById("denNgay").value = "";
@@ -1005,39 +779,19 @@ function resetLoc() {
   document.getElementById("locPhong").selectedIndex = 0;
 
   hienThiNhatKy(DU_LIEU_NHAT_KY);
-
 }
+
 function damBaoOCtimKiemNhatKy() {
-  const baoCaoList = document.getElementById("baoCaoList");
-  if (!baoCaoList) return;
-
-  if (document.getElementById("timKiemNhatKy")) return;
-
-  const box = document.createElement("div");
-  box.className = "search-box";
-  box.innerHTML = `
-    <input
-      id="timKiemNhatKy"
-      type="text"
-      placeholder="🔍 Tìm tên, số CL/GGT, nội dung, phòng/khu..."
-      oninput="locNhatKy()"
-    >
-  `;
-
-  baoCaoList.parentNode.insertBefore(box, baoCaoList);
+  return;
 }
 
-/* ================= PWA - CẬP NHẬT PHIÊN BẢN ================= */
+/* ================= PWA ================= */
 
 function dangKyServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js?v=" + CURRENT_VERSION)
-      .then(reg => {
-        reg.update();
-      })
-      .catch(err => {
-        console.log("Không đăng ký được service worker", err);
-      });
+      .then(reg => reg.update())
+      .catch(err => console.log("Không đăng ký được service worker", err));
   }
 }
 
@@ -1090,7 +844,8 @@ function capNhatUngDung() {
   }
 }
 
-/* ================= KHỞI ĐỘNG ỨNG DỤNG ================= */
+/* ================= KHỞI ĐỘNG ================= */
+
 window.addEventListener("load", function () {
   dangKyServiceWorker();
 
