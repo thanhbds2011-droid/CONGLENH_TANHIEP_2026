@@ -24,10 +24,14 @@ function goiApi(action, params, callback) {
   script.src = API_URL + "?" + query;
 
   const timeout = setTimeout(function () {
-    callback({ ok: false, message: "Apps Script xử lý quá lâu hoặc chưa phản hồi." });
+    callback({
+      ok: false,
+      message: "Hệ thống đang xử lý lâu hơn bình thường. Vui lòng chờ giây lát rồi thử lại."
+    });
+
     delete window[cbName];
     script.remove();
-  }, 60000);
+  }, 180000);
 
   window[cbName] = function (res) {
     clearTimeout(timeout);
@@ -38,7 +42,12 @@ function goiApi(action, params, callback) {
 
   script.onerror = function () {
     clearTimeout(timeout);
-    callback({ ok: false, message: "Không kết nối được Apps Script." });
+
+    callback({
+      ok: false,
+      message: "Không kết nối được hệ thống cấp văn bản. Vui lòng kiểm tra mạng hoặc thử lại sau."
+    });
+
     delete window[cbName];
     script.remove();
   };
@@ -215,7 +224,7 @@ function capCongLenh() {
   const ketqua = document.getElementById("ketqua");
 
   ketqua.style.display = "block";
-  ketqua.innerHTML = "⏳ Đang kiểm tra và xuất PDF...";
+  ketqua.innerHTML = "⏳ Hệ thống đang kiểm tra và tạo file PDF. Vui lòng không bấm lại nhiều lần...";
 
   goiApi("xuat", params, function (res) {
     if (res && res.conflict) {
