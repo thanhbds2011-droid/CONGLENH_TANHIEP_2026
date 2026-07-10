@@ -1,6 +1,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "140";
+const CURRENT_VERSION = "142";
 
 let DU_LIEU_NHAT_KY = [];
 let DU_LIEU_TRUNG_CL = null;
@@ -17,7 +17,7 @@ function goiApi(action, params, callback) {
   params.callback = cbName;
 
   const query = Object.keys(params)
-    .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(params[k]))
+    .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(params[k] == null ? "" : params[k]))
     .join("&");
 
   const script = document.createElement("script");
@@ -30,14 +30,14 @@ function goiApi(action, params, callback) {
     });
 
     delete window[cbName];
-    script.remove();
+    if (script && script.parentNode) script.remove();
   }, 180000);
 
   window[cbName] = function (res) {
     clearTimeout(timeout);
     callback(res);
     delete window[cbName];
-    script.remove();
+    if (script && script.parentNode) script.remove();
   };
 
   script.onerror = function () {
@@ -49,7 +49,7 @@ function goiApi(action, params, callback) {
     });
 
     delete window[cbName];
-    script.remove();
+    if (script && script.parentNode) script.remove();
   };
 
   document.body.appendChild(script);
@@ -72,7 +72,8 @@ function showScreen(id, btn) {
     nhatky: "Nhật ký"
   };
 
-  document.getElementById("pageTitle").innerText = titles[id] || "Công lệnh";
+  const pageTitle = document.getElementById("pageTitle");
+  if (pageTitle) pageTitle.innerText = titles[id] || "Công lệnh";
 
   if (id === "home") taiDashboard();
 
@@ -259,10 +260,12 @@ function hienCanhBaoTrungVanBan(vb, params) {
   PARAMS_DANG_CAP = params;
 
   const ketqua = document.getElementById("ketqua");
-  const laGGT = vb && vb.loaiGiay === "GIAY_GIOI_THIEU";
+  const laGGT = params && params.loaiGiay === "GIAY_GIOI_THIEU";
+
   const tenLoai = laGGT ? "giấy giới thiệu" : "công lệnh";
   const maLoai = laGGT ? "GGT" : "CL";
-  const thoiGian = laGGT
+
+  const ngayText = laGGT
     ? (vb.ngayHetHan || vb.cotJ || vb.ngayCapGiay || "")
     : ((vb.ngayDi || vb.cotJ || "") + (vb.ngayVe ? " → " + vb.ngayVe : ""));
 
@@ -273,10 +276,13 @@ function hienCanhBaoTrungVanBan(vb, params) {
 
       <p><b>Đồng chí:</b> ${vb.dongChi || ""}</p>
       <p><b>${maLoai} số:</b> ${vb.so || ""}</p>
-      <p><b>Thông tin thời gian:</b> ${thoiGian || ""}</p>
-      <p><b>Lý do trùng:</b> ${vb.lyDoTrung || "Nội dung có khả năng trùng với văn bản đang hiệu lực"}</p>
+      <p><b>${laGGT ? "Ngày liên quan" : "Thời gian đã cấp"}:</b> ${ngayText || ""}</p>
+      <p><b>Nội dung:</b> ${vb.noiDung || ""}</p>
+      <p><b>Lý do trùng:</b> ${vb.lyDoTrung || "Thông tin trùng với văn bản đang hiệu lực"}</p>
       ${vb.trangThaiNhan ? `<p><b>Trạng thái nhận:</b> ${vb.trangThaiNhan}</p>` : ""}
       ${vb.thoiGianNhan ? `<p><b>Thời gian nhận:</b> ${vb.thoiGianNhan}</p>` : ""}
+      ${vb.nguoiNhanThucTe ? `<p><b>Người nhận thực tế:</b> ${vb.nguoiNhanThucTe}</p>` : ""}
+      ${vb.lyDoNhanThay ? `<p><b>Lý do nhận thay:</b> ${vb.lyDoNhanThay}</p>` : ""}
 
       <div class="conflict-actions">
         <button type="button" onclick="xemVanBanTrung()">👁 Xem PDF cũ</button>
@@ -310,7 +316,7 @@ function thuHoiVaCapLaiVanBan() {
     return;
   }
 
-  const laGGT = DU_LIEU_TRUNG_CL.loaiGiay === "GIAY_GIOI_THIEU";
+  const laGGT = PARAMS_DANG_CAP.loaiGiay === "GIAY_GIOI_THIEU";
   const tenLoai = laGGT ? "giấy giới thiệu" : "công lệnh";
   const action = laGGT ? "thuhoi_caplai_ggt" : "thuhoi_caplai_cl";
 
@@ -319,33 +325,50 @@ function thuHoiVaCapLaiVanBan() {
     "Nhập sai thông tin, thu hồi để cấp lại"
   );
 
-  if (!lyDoHuy) {
+  if (!lyDoHuy || !lyDoHuy.trim()) {
     alert("Chưa nhập lý do thu hồi.");
     return;
   }
 
-  if (!confirm("Xác nhận thu hồi và cấp lại " + tenLoai + " số " + DU_LIEU_TRUNG_CL.so + "?\n\nSố văn bản sẽ được giữ nguyên.")) {
-    return;
-  }
+  const ghiChuHuy = prompt(
+    "Ghi chú thêm nếu có:",
+    "Thu hồi để cấp lại cùng số " + DU_LIEU_TRUNG_CL.so
+  ) || "";
+
+  const xacNhan = confirm(
+    "Xác nhận thu hồi và cấp lại " + tenLoai + " số " + DU_LIEU_TRUNG_CL.so + "?\n\n" +
+    "Lý do thu hồi: " + lyDoHuy.trim() + "\n" +
+    "Ghi chú: " + (ghiChuHuy.trim() || "Không có") + "\n\n" +
+    "Số văn bản sẽ được giữ nguyên."
+  );
+
+  if (!xacNhan) return;
 
   const ketqua = document.getElementById("ketqua");
   ketqua.style.display = "block";
-  ketqua.innerHTML = "⏳ Đang thu hồi và cấp lại " + tenLoai + " số " + DU_LIEU_TRUNG_CL.so + "...";
+  ketqua.innerHTML =
+    "⏳ Đang thu hồi và cấp lại " + tenLoai + " số " + DU_LIEU_TRUNG_CL.so + "...";
 
   const params = {
     ...PARAMS_DANG_CAP,
     row: DU_LIEU_TRUNG_CL.row,
     soCu: DU_LIEU_TRUNG_CL.so,
-    lyDoHuy: lyDoHuy
+    lyDoHuy: lyDoHuy.trim(),
+    ghiChuHuy: ghiChuHuy.trim()
   };
 
   goiApi(action, params, function(res) {
     if (!res || !res.ok) {
-      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không thu hồi/cấp lại được văn bản.");
+      ketqua.innerHTML =
+        "❌ " + ((res && res.message) ? res.message : "Không thu hồi/cấp lại được văn bản.");
       return;
     }
 
     hienKetQuaXuatThanhCong(res);
+
+    DU_LIEU_TRUNG_CL = null;
+    PARAMS_DANG_CAP = null;
+
     resetForm();
     taiDashboard();
   });
@@ -395,143 +418,11 @@ function dongCanhBaoTrung() {
   PARAMS_DANG_CAP = null;
 }
 
-// Giữ alias cũ để tránh lỗi nếu cache cũ còn gọi tên hàm cũ.
+// Alias cũ để tránh lỗi nếu trình duyệt còn cache tên hàm cũ
 function hienCanhBaoTrungCongLenh(vb, params) {
   hienCanhBaoTrungVanBan(vb, params);
 }
 
-function hienCanhBaoTrungVanBan(vb, params) {
-  DU_LIEU_TRUNG_CL = vb;
-  PARAMS_DANG_CAP = params;
-
-  const ketqua = document.getElementById("ketqua");
-  const laGGT = params && params.loaiGiay === "GIAY_GIOI_THIEU";
-
-  const tenLoai = laGGT ? "giấy giới thiệu" : "công lệnh";
-  const maLoai = laGGT ? "GGT" : "CL";
-  const ngayText = laGGT
-    ? (vb.ngayHetHan || vb.cotJ || "")
-    : ((vb.ngayDi || "") + " → " + (vb.ngayVe || ""));
-
-  ketqua.style.display = "block";
-  ketqua.innerHTML = `
-    <div class="conflict-box">
-      <h3>⚠️ Phát hiện ${tenLoai} đang hiệu lực</h3>
-
-      <p><b>Đồng chí:</b> ${vb.dongChi || ""}</p>
-      <p><b>${maLoai} số:</b> ${vb.so || ""}</p>
-      <p><b>${laGGT ? "Ngày hết hạn" : "Thời gian đã cấp"}:</b> ${ngayText}</p>
-      <p><b>Nội dung:</b> ${vb.noiDung || ""}</p>
-      <p><b>Lý do trùng:</b> ${vb.lyDoTrung || "Thông tin trùng với văn bản đang hiệu lực"}</p>
-
-      <div class="conflict-actions">
-        <button type="button" onclick="xemVanBanTrung()">👁 Xem</button>
-
-        <button type="button" onclick="thuHoiVaCapLaiVanBan()">
-          ♻️ Thu hồi để cấp lại số ${vb.so}
-        </button>
-
-        <button type="button" onclick="capVanBanMoiBoQuaTrung()">➕ Cấp số mới</button>
-
-        <button type="button" onclick="dongCanhBaoTrung()">❌ Đóng</button>
-      </div>
-    </div>
-  `;
-
-  ketqua.scrollIntoView({ behavior: "smooth", block: "center" });
-}
-
-function xemVanBanTrung() {
-  if (!DU_LIEU_TRUNG_CL || !DU_LIEU_TRUNG_CL.linkFile) {
-    alert("Không tìm thấy link PDF văn bản cũ.");
-    return;
-  }
-
-  window.open(DU_LIEU_TRUNG_CL.linkFile, "_blank");
-}
-
-function thuHoiVaCapLaiVanBan() {
-  if (!DU_LIEU_TRUNG_CL || !PARAMS_DANG_CAP) {
-    alert("Không có dữ liệu văn bản cần thu hồi.");
-    return;
-  }
-
-  const laGGT = PARAMS_DANG_CAP.loaiGiay === "GIAY_GIOI_THIEU";
-  const tenLoai = laGGT ? "giấy giới thiệu" : "công lệnh";
-  const action = laGGT ? "thuhoi_caplai_ggt" : "thuhoi_caplai_cl";
-
-  const lyDoHuy = prompt(
-    "Nhập lý do thu hồi " + tenLoai + " số " + DU_LIEU_TRUNG_CL.so + ":",
-    "Nhập sai thông tin, thu hồi để cấp lại"
-  );
-
-  if (!lyDoHuy) {
-    alert("Chưa nhập lý do thu hồi.");
-    return;
-  }
-
-  if (!confirm("Xác nhận thu hồi và cấp lại " + tenLoai + " số " + DU_LIEU_TRUNG_CL.so + "?\n\nSố văn bản sẽ được giữ nguyên.")) {
-    return;
-  }
-
-  const ketqua = document.getElementById("ketqua");
-  ketqua.style.display = "block";
-  ketqua.innerHTML = "⏳ Đang thu hồi và cấp lại " + tenLoai + " số " + DU_LIEU_TRUNG_CL.so + "...";
-
-  const params = {
-    ...PARAMS_DANG_CAP,
-    row: DU_LIEU_TRUNG_CL.row,
-    soCu: DU_LIEU_TRUNG_CL.so,
-    lyDoHuy: lyDoHuy
-  };
-
-  goiApi(action, params, function(res) {
-    if (!res || !res.ok) {
-      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không thu hồi/cấp lại được văn bản.");
-      return;
-    }
-
-    hienKetQuaXuatThanhCong(res);
-    resetForm();
-    taiDashboard();
-  });
-}
-
-function capVanBanMoiBoQuaTrung() {
-  if (!PARAMS_DANG_CAP) {
-    alert("Không có dữ liệu để cấp mới.");
-    return;
-  }
-
-  const laGGT = PARAMS_DANG_CAP.loaiGiay === "GIAY_GIOI_THIEU";
-  const tenLoai = laGGT ? "giấy giới thiệu" : "công lệnh";
-
-  if (!confirm("Xác nhận vẫn cấp " + tenLoai + " mới?\n\nVăn bản cũ sẽ được giữ nguyên.")) {
-    return;
-  }
-
-  const ketqua = document.getElementById("ketqua");
-  ketqua.style.display = "block";
-  ketqua.innerHTML = "⏳ Đang cấp văn bản mới...";
-
-  const params = {
-    ...PARAMS_DANG_CAP,
-    boQuaTrung: "1"
-  };
-
-  goiApi("xuat", params, function(res) {
-    if (!res || !res.ok) {
-      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không cấp được văn bản mới.");
-      return;
-    }
-
-    hienKetQuaXuatThanhCong(res);
-    resetForm();
-    taiDashboard();
-  });
-}
-
-// Giữ tên cũ để tránh lỗi cache
 function xemCongLenhTrung() {
   xemVanBanTrung();
 }
@@ -557,16 +448,18 @@ function hienKetQuaXuatThanhCong(res) {
 
   ketqua.style.display = "block";
   ketqua.innerHTML =
-    "✅ " + res.message +
+    "✅ " + (res.message || "Đã xử lý thành công.") +
     nhanHtml +
-    "<br><br><a class='link-btn' href='" + data.linkFile + "' target='_blank'>📄 Mở file PDF</a>" +
-    "<br><button class='share-btn' onclick=\"chiaSePdf('" + data.linkFile + "', '" + data.tenFile + "')\">📲 Chia sẻ qua Zalo</button>";
+    "<br><br><a class='link-btn' href='" + (data.linkFile || "#") + "' target='_blank'>📄 Mở file PDF</a>" +
+    "<br><button class='share-btn' onclick=\"chiaSePdf('" + (data.linkFile || "") + "', '" + (data.tenFile || "Văn bản") + "')\">📲 Chia sẻ qua Zalo</button>";
 }
 
-/* ================= KIỂM TRA - HỦY - CẤP LẠI ================= */
+/* ================= KIỂM TRA - HỦY - CẤP LẠI CŨ ================= */
 
 function kiemTraCapLai() {
   const box = document.getElementById("lichSuCapLai");
+  if (!box) return;
+
   const loaiGiay = document.getElementById("loaiGiay").value;
   const dongChi = document.getElementById("dongChi").value.trim();
 
@@ -620,7 +513,7 @@ function moFormCapLai(loaiGiay, soCu) {
     "Nhập lý do hủy số " + soCu + ":\n\nGợi ý: Mất, Rách, Sai nơi đến, Thay đổi nơi đến, Khác"
   );
 
-  if (!lyDo) {
+  if (!lyDo || !lyDo.trim()) {
     alert("Chưa nhập lý do hủy.");
     return;
   }
@@ -631,7 +524,7 @@ function moFormCapLai(loaiGiay, soCu) {
     return;
   }
 
-  capLaiVanBan(loaiGiay, soCu, lyDo, ghiChu);
+  capLaiVanBan(loaiGiay, soCu, lyDo.trim(), ghiChu.trim());
 }
 
 function capLaiVanBan(loaiGiay, soCu, lyDoHuy, ghiChuHuy) {
@@ -667,17 +560,15 @@ function capLaiVanBan(loaiGiay, soCu, lyDoHuy, ghiChuHuy) {
   ketqua.style.display = "block";
   ketqua.innerHTML = "⏳ Đang hủy số cũ và cấp lại số mới...";
 
-  goiApi("caplai", params, function(res) {
+  const action = loaiGiay === "GIAY_GIOI_THIEU" ? "thuhoi_caplai_ggt" : "thuhoi_caplai_cl";
+
+  goiApi(action, params, function(res) {
     if (!res || !res.ok) {
       ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Cấp lại thất bại.");
       return;
     }
 
-    ketqua.innerHTML =
-      "✅ " + res.message +
-      "<br><br><a class='link-btn' href='" + res.data.linkFile + "' target='_blank'>📄 Mở file PDF mới</a>" +
-      "<br><button class='share-btn' onclick=\"chiaSePdf('" + res.data.linkFile + "', '" + res.data.tenFile + "')\">📲 Chia sẻ qua Zalo</button>";
-
+    hienKetQuaXuatThanhCong(res);
     anLichSuCapLai();
     resetForm();
     taiDashboard();
@@ -747,6 +638,11 @@ function resetForm() {
 }
 
 function chiaSePdf(link, tenFile) {
+  if (!link) {
+    alert("Không có link PDF để chia sẻ.");
+    return;
+  }
+
   if (navigator.share) {
     navigator.share({
       title: tenFile || "Văn bản",
@@ -847,12 +743,12 @@ function locNhatKy() {
 
   hienThiNhatKy(ketQua);
 }
+
 function chuyenNgayLoc(value) {
   if (!value) return "";
 
   const s = String(value).trim();
 
-  // Nếu dạng dd/MM/yyyy
   if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
     const parts = s.split("/");
     const d = parts[0].padStart(2, "0");
@@ -861,19 +757,20 @@ function chuyenNgayLoc(value) {
     return `${y}-${m}-${d}`;
   }
 
-  // Nếu đã là yyyy-MM-dd
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
     return s;
   }
 
   return "";
 }
+
 function chuanHoaTrangThai(value) {
   return String(value || "")
     .trim()
     .toLowerCase()
     .replace(/huỷ/g, "hủy");
 }
+
 function toggleBoLoc() {
   const box = document.getElementById("boLocNangCao");
   if (!box) return;
@@ -959,12 +856,12 @@ function hienThiNhatKy(data) {
             ${vb.phuongTien ? `<p><b>Phương tiện:</b> ${vb.phuongTien}</p>` : ""}
             ${vb.giayTo ? `<p><b>Giấy tờ:</b> ${vb.giayTo}</p>` : ""}
             ${vb.trangThai ? `<p><b>Trạng thái cấp:</b> ${vb.trangThai}</p>` : ""}
-            ${vb.trangThaiNhan ? `<p><b>Trạng thái nhận:</b> ${vb.trangThaiNhan}</p>` : `<p><b>Trạng thái nhận:</b> Chưa nhận</p>`}
+            <p><b>Trạng thái nhận:</b> ${vb.trangThaiNhan || "Chưa nhận"}</p>
             ${vb.thoiGianNhan ? `<p><b>Thời gian nhận:</b> ${vb.thoiGianNhan}</p>` : ""}
             ${vb.nguoiNhanThucTe ? `<p><b>Người nhận thực tế:</b> ${vb.nguoiNhanThucTe}</p>` : ""}
             ${vb.lyDoNhanThay ? `<p><b>Lý do nhận thay:</b> ${vb.lyDoNhanThay}</p>` : ""}
-${vb.lyDoHuy ? `<p><b>Lý do hủy:</b> ${vb.lyDoHuy}</p>` : ""}
-${vb.ghiChuHuy ? `<p><b>Ghi chú hủy:</b> ${vb.ghiChuHuy}</p>` : ""}
+            ${vb.lyDoHuy ? `<p><b>Lý do hủy:</b> ${vb.lyDoHuy}</p>` : ""}
+            ${vb.ghiChuHuy ? `<p><b>Ghi chú hủy:</b> ${vb.ghiChuHuy}</p>` : ""}
 
             <p><a href="${vb.linkFile || "#"}" target="_blank">📄 Mở PDF</a></p>
 
@@ -995,7 +892,7 @@ function huyVanBan(loaiGiay, so) {
 
   const lyDoHuy = prompt("Nhập lý do hủy " + tenLoai + " số " + so + ":");
 
-  if (!lyDoHuy) {
+  if (!lyDoHuy || !lyDoHuy.trim()) {
     alert("Chưa nhập lý do hủy.");
     return;
   }
@@ -1009,8 +906,8 @@ function huyVanBan(loaiGiay, so) {
   goiApi("huy", {
     loaiGiay: loaiGiay,
     so: so,
-    lyDoHuy: lyDoHuy,
-    ghiChuHuy: ghiChuHuy
+    lyDoHuy: lyDoHuy.trim(),
+    ghiChuHuy: ghiChuHuy.trim()
   }, function (res) {
     if (!res || !res.ok) {
       alert("❌ " + ((res && res.message) ? res.message : "Không hủy được."));
@@ -1028,9 +925,13 @@ function resetLoc() {
   document.getElementById("tuNgay").value = "";
   document.getElementById("denNgay").value = "";
   document.getElementById("locLoai").selectedIndex = 0;
-document.getElementById("locTrangThai").selectedIndex = 0;
-if (document.getElementById("locTrangThaiNhan")) document.getElementById("locTrangThaiNhan").selectedIndex = 0;
-document.getElementById("locPhong").selectedIndex = 0;
+  document.getElementById("locTrangThai").selectedIndex = 0;
+
+  if (document.getElementById("locTrangThaiNhan")) {
+    document.getElementById("locTrangThaiNhan").selectedIndex = 0;
+  }
+
+  document.getElementById("locPhong").selectedIndex = 0;
 
   hienThiNhatKy(DU_LIEU_NHAT_KY);
 }
@@ -1038,7 +939,6 @@ document.getElementById("locPhong").selectedIndex = 0;
 function damBaoOCtimKiemNhatKy() {
   return;
 }
-
 
 /* ================= QR NHẬN VĂN BẢN ================= */
 
