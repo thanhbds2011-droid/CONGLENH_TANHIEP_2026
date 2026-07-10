@@ -1206,3 +1206,122 @@ margin-top:0;
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+/* =====================================================
+   TỐI ƯU TRANG CHỦ / DASHBOARD
+   Ẩn nút dư, làm dashboard cân đối hơn
+===================================================== */
+
+/* Nếu trong HTML còn sót home-actions thì vẫn ẩn */
+.home-actions {
+  display: none !important;
+}
+
+/* Trang chủ gọn hơn */
+#home {
+  padding-bottom: 115px !important;
+}
+
+/* Card Dashboard đẹp và cân đối */
+#home .card {
+  max-width: 1120px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  border-radius: 26px !important;
+  padding: 26px !important;
+}
+
+/* Tiêu đề dashboard */
+#home .card h3 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 23px !important;
+  margin-bottom: 22px !important;
+}
+
+/* Dashboard mobile mặc định: 2 cột */
+.dashboard {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+/* Ô thống kê */
+.dashboard div {
+  background: linear-gradient(180deg, #f8fbff, #eef4fb) !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 20px !important;
+  padding: 18px 12px !important;
+  min-height: 104px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* Nhãn thống kê */
+.dashboard span {
+  font-size: 13px !important;
+  color: #475569 !important;
+  margin-bottom: 8px !important;
+  font-weight: 600 !important;
+}
+
+/* Số thống kê */
+.dashboard h2 {
+  font-size: 31px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  color: #2563eb !important;
+}
+
+/* Desktop: 5 cột x 2 hàng cho đẹp */
+@media (min-width: 900px) {
+  .dashboard {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+  }
+
+  .dashboard div {
+    min-height: 116px !important;
+    padding: 20px 10px !important;
+  }
+
+  .dashboard h2 {
+    font-size: 34px !important;
+  }
+
+  #home .card {
+    padding: 30px !important;
+  }
+}
+
+/* Tablet: 3 cột */
+@media (min-width: 640px) and (max-width: 899px) {
+  .dashboard {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Mobile nhỏ: giữ 2 cột nhưng giảm chữ */
+@media (max-width: 420px) {
+  .dashboard {
+    gap: 10px !important;
+  }
+
+  .dashboard div {
+    min-height: 92px !important;
+    padding: 14px 8px !important;
+    border-radius: 17px !important;
+  }
+
+  .dashboard span {
+    font-size: 11.5px !important;
+  }
+
+  .dashboard h2 {
+    font-size: 27px !important;
+  }
+}
