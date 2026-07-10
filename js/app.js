@@ -1,6 +1,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "139";
+const CURRENT_VERSION = "140";
 
 let DU_LIEU_NHAT_KY = [];
 let DU_LIEU_TRUNG_CL = null;
@@ -417,7 +417,10 @@ function hienKetQuaXuatThanhCong(res) {
   const data = res && res.data ? res.data : {};
 
   const nhanHtml = data.trangThaiNhan
-    ? `<br><br><b>Trạng thái nhận:</b> ${data.trangThaiNhan}${data.thoiGianNhan ? "<br><b>Thời gian nhận:</b> " + data.thoiGianNhan : ""}`
+    ? `<br><br><b>Trạng thái nhận:</b> ${data.trangThaiNhan}` +
+      `${data.thoiGianNhan ? "<br><b>Thời gian nhận:</b> " + data.thoiGianNhan : ""}` +
+      `${data.nguoiNhanThucTe ? "<br><b>Người nhận thực tế:</b> " + data.nguoiNhanThucTe : ""}` +
+      `${data.lyDoNhanThay ? "<br><b>Lý do nhận thay:</b> " + data.lyDoNhanThay : ""}`
     : "";
 
   ketqua.style.display = "block";
@@ -672,6 +675,8 @@ function locNhatKy() {
           vb.trangThai,
           vb.trangThaiNhan,
           vb.thoiGianNhan,
+          vb.nguoiNhanThucTe,
+          vb.lyDoNhanThay,
           vb.lyDoHuy,
           vb.ghiChuHuy,
           vb.tenFile
@@ -824,6 +829,8 @@ function hienThiNhatKy(data) {
             ${vb.trangThai ? `<p><b>Trạng thái cấp:</b> ${vb.trangThai}</p>` : ""}
             ${vb.trangThaiNhan ? `<p><b>Trạng thái nhận:</b> ${vb.trangThaiNhan}</p>` : `<p><b>Trạng thái nhận:</b> Chưa nhận</p>`}
             ${vb.thoiGianNhan ? `<p><b>Thời gian nhận:</b> ${vb.thoiGianNhan}</p>` : ""}
+            ${vb.nguoiNhanThucTe ? `<p><b>Người nhận thực tế:</b> ${vb.nguoiNhanThucTe}</p>` : ""}
+            ${vb.lyDoNhanThay ? `<p><b>Lý do nhận thay:</b> ${vb.lyDoNhanThay}</p>` : ""}
 ${vb.lyDoHuy ? `<p><b>Lý do hủy:</b> ${vb.lyDoHuy}</p>` : ""}
 ${vb.ghiChuHuy ? `<p><b>Ghi chú hủy:</b> ${vb.ghiChuHuy}</p>` : ""}
 
