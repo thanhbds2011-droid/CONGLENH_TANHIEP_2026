@@ -1188,3 +1188,21 @@ margin-top:0;
   background: #fee2e2;
   color: #991b1b;
 }
+
+/* ===== BỔ SUNG QR NHẬN VĂN BẢN - v138 ===== */
+.nhan-status {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+@media (min-width: 768px) {
+  .home-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
