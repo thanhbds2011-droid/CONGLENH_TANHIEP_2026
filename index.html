@@ -14,22 +14,25 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Giấy công lệnh, giấy giới thiệu">
-<link rel="icon" type="image/png" href="icons/icon-192.png?v=137">
-<link rel="apple-touch-icon" sizes="1024x1024" href="logo.png?v=137">
-<link rel="manifest" href="manifest.json?v=137">
-  <!-- Font giao diện -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link
-  href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
-  rel="stylesheet"
->
-  <link rel="stylesheet" href="css/style.css?v=137">
+
+  <link rel="icon" type="image/png" href="icons/icon-192.png?v=138">
+  <link rel="apple-touch-icon" sizes="1024x1024" href="logo.png?v=138">
+  <link rel="manifest" href="manifest.json?v=138">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="css/style.css?v=138">
 </head>
+
 <body>
   <header class="header">
     <div class="brand">
-      <img class="brand-logo" src="logo.png?v=137" alt="Logo Trung tâm">
+      <img class="brand-logo" src="logo.png?v=138" alt="Logo Trung tâm">
       <div>
         <h1>Giấy công lệnh, giấy giới thiệu</h1>
         <p>Trung tâm Bảo trợ xã hội Tân Hiệp</p>
@@ -73,16 +76,41 @@
           <span>Hủy GGT</span>
           <h2 id="huyGGT">-</h2>
         </div>
+
+        <div>
+          <span>Chưa nhận CL</span>
+          <h2 id="chuaNhanCL">-</h2>
+        </div>
+
+        <div>
+          <span>Đã nhận CL</span>
+          <h2 id="daNhanCL">-</h2>
+        </div>
+
+        <div>
+          <span>Chưa nhận GGT</span>
+          <h2 id="chuaNhanGGT">-</h2>
+        </div>
+
+        <div>
+          <span>Đã nhận GGT</span>
+          <h2 id="daNhanGGT">-</h2>
+        </div>
       </div>
     </div>
-      <div class="home-actions">
-  <button onclick="showScreen('cap', this)">
-    ➕ Cấp văn bản
-  </button>
 
-  <button onclick="showScreen('nhatky', this)">
-    📒 Nhật ký
-  </button>
+    <div class="home-actions">
+      <button onclick="showScreen('cap', this)">
+        ➕ Cấp văn bản
+      </button>
+
+      <button onclick="showScreen('nhatky', this)">
+        📒 Nhật ký
+      </button>
+
+      <button onclick="moTrangNhanVanBan()">
+        📱 Trang QR nhận văn bản
+      </button>
     </div>
   </section>
 
@@ -178,70 +206,82 @@
       <div id="ketqua"></div>
     </div>
   </section>
+
   <section id="nhatky" class="screen">
-  <div class="card">
-    <h3>📒 Nhật ký</h3>
+    <div class="card">
+      <h3>📒 Nhật ký</h3>
 
-    <div class="search-box">
-  <input
-    id="timKiemNhatKy"
-    type="text"
-    placeholder="🔍 Tìm tên, số CL/GGT, nội dung, phòng/khu..."
-    oninput="locNhatKy()"
-  >
-</div>
-<button type="button" class="filter-toggle" onclick="toggleBoLoc()">
-  ⚙️ Bộ lọc nâng cao
-</button>
+      <div class="search-box">
+        <input
+          id="timKiemNhatKy"
+          type="text"
+          placeholder="🔍 Tìm tên, số CL/GGT, nội dung, phòng/khu..."
+          oninput="locNhatKy()"
+        >
+      </div>
 
-<div id="boLocNangCao" class="filter-box collapsed">
-  <div class="filter-row">
-    <div>
-      <label>Từ ngày</label>
-      <input type="date" id="tuNgay" onchange="locNhatKy()">
+      <button type="button" class="filter-toggle" onclick="toggleBoLoc()">
+        ⚙️ Bộ lọc nâng cao
+      </button>
+
+      <div id="boLocNangCao" class="filter-box collapsed">
+        <div class="filter-row">
+          <div>
+            <label>Từ ngày</label>
+            <input type="date" id="tuNgay" onchange="locNhatKy()">
+          </div>
+
+          <div>
+            <label>Đến ngày</label>
+            <input type="date" id="denNgay" onchange="locNhatKy()">
+          </div>
+        </div>
+
+        <select id="locLoai" onchange="locNhatKy()">
+          <option value="">Tất cả loại giấy</option>
+          <option value="CONG_LENH">Công lệnh</option>
+          <option value="GIAY_GIOI_THIEU">Giấy giới thiệu</option>
+        </select>
+
+        <select id="locTrangThai" onchange="locNhatKy()">
+          <option value="">Tất cả trạng thái cấp</option>
+          <option value="Đã cấp">Đã cấp</option>
+          <option value="Đã hủy">Đã hủy</option>
+        </select>
+
+        <select id="locTrangThaiNhan" onchange="locNhatKy()">
+          <option value="">Tất cả trạng thái nhận</option>
+          <option value="Chưa nhận">Chưa nhận</option>
+          <option value="Đã nhận">Đã nhận</option>
+          <option value="Đã hủy">Đã hủy</option>
+        </select>
+
+        <select id="locPhong" onchange="locNhatKy()">
+          <option value="">Tất cả phòng/khu</option>
+          <option>Ban Giám đốc</option>
+          <option>Phòng Tổ chức - Hành chính</option>
+          <option>Phòng Kế hoạch - Tài chính</option>
+          <option>Phòng Công tác xã hội</option>
+          <option>Phòng Y tế</option>
+          <option>Khu I</option>
+          <option>Khu II</option>
+          <option>Khu III</option>
+        </select>
+
+        <div class="filter-actions">
+          <button type="button" class="search-filter-btn" onclick="locNhatKy()">
+            🔎 Tìm kiếm
+          </button>
+
+          <button type="button" class="reset-filter-btn" onclick="resetLoc()">
+            ♻️ Đặt lại
+          </button>
+        </div>
+      </div>
+
+      <div id="baoCaoList">Đang tải...</div>
     </div>
-
-    <div>
-      <label>Đến ngày</label>
-      <input type="date" id="denNgay" onchange="locNhatKy()">
-    </div>
-  </div>
-
-  <select id="locLoai" onchange="locNhatKy()">
-    <option value="">Tất cả loại giấy</option>
-    <option value="CONG_LENH">Công lệnh</option>
-    <option value="GIAY_GIOI_THIEU">Giấy giới thiệu</option>
-  </select>
-<select id="locTrangThai" onchange="locNhatKy()">
-  <option value="">Tất cả trạng thái</option>
-  <option value="Đã cấp">Đã cấp</option>
-  <option value="Đã hủy">Đã hủy</option>
-</select>
-  <select id="locPhong" onchange="locNhatKy()">
-    <option value="">Tất cả phòng/khu</option>
-    <option>Ban Giám đốc</option>
-    <option>Phòng Tổ chức - Hành chính</option>
-    <option>Phòng Kế hoạch - Tài chính</option>
-    <option>Phòng Công tác xã hội</option>
-    <option>Phòng Y tế</option>
-    <option>Khu I</option>
-    <option>Khu II</option>
-    <option>Khu III</option>
-  </select>
-
-  <div class="filter-actions">
-  <button type="button" class="search-filter-btn" onclick="locNhatKy()">
-    🔎 Tìm kiếm
-  </button>
-
-  <button type="button" class="reset-filter-btn" onclick="resetLoc()">
-    ♻️ Đặt lại
-  </button>
-</div>
-  <div id="baoCaoList">Đang tải...</div>
-</div>
-  </div>
-</section>
+  </section>
 
   <nav>
     <button class="nav-btn active" onclick="showScreen('home', this)">
@@ -257,6 +297,6 @@
     </button>
   </nav>
 
-  <script src="js/app.js?v=137"></script>
+  <script src="js/app.js?v=138"></script>
 </body>
 </html>
