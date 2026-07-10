@@ -4,166 +4,321 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Xác nhận nhận văn bản</title>
+
   <meta name="theme-color" content="#2563eb" />
+  <meta name="robots" content="noindex,nofollow" />
+
   <style>
-    * { box-sizing: border-box; }
-    html, body, button, input, select, textarea { font-family: Arial, Helvetica, sans-serif; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
       background: #eef4fb;
       color: #0f172a;
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 20px 14px 42px;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 26px 14px;
     }
-    .wrap { width: 100%; max-width: 460px; }
+
+    .wrap {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      border-radius: 26px;
+      overflow: hidden;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
+      background: white;
+    }
+
     .top {
       background: linear-gradient(135deg, #2563eb, #22c55e);
       color: white;
-      padding: 24px 22px 52px;
-      border-radius: 26px 26px 0 0;
-      box-shadow: 0 20px 50px rgba(15, 23, 42, .14);
+      padding: 28px 24px 46px;
+      border-bottom-left-radius: 26px;
+      border-bottom-right-radius: 26px;
     }
-    .top h1 { margin: 0; font-size: 25px; line-height: 1.25; font-weight: 900; }
-    .top p { margin: 9px 0 0; font-size: 14px; opacity: .95; }
+
+    .top h1 {
+      margin: 0;
+      font-size: 27px;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .top p {
+      margin: 10px 0 0;
+      opacity: 0.95;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
     .card {
       margin-top: -28px;
-      background: white;
-      border-radius: 24px;
-      padding: 22px;
-      box-shadow: 0 18px 50px rgba(15, 23, 42, .12);
+      padding: 24px;
+      background: #fff;
+      border-radius: 26px;
     }
-    .card h2 { margin: 0; text-align: center; color: #2563eb; font-size: 22px; }
-    .sub { margin: 10px 0 20px; text-align: center; color: #64748b; font-size: 14px; line-height: 1.45; }
-    label { display: block; margin: 15px 0 7px; font-weight: 900; font-size: 14px; }
-    input, select, textarea {
+
+    .title {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .title h2 {
+      margin: 0;
+      color: #2563eb;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .title p {
+      margin: 10px 0 0;
+      color: #64748b;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 7px;
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    input,
+    select,
+    textarea {
       width: 100%;
       border: 1.5px solid #cbd5e1;
       border-radius: 16px;
       padding: 14px 15px;
       font-size: 16px;
-      outline: none;
       background: white;
       color: #0f172a;
+      outline: none;
+      font-family: Arial, Helvetica, sans-serif;
     }
-    textarea { min-height: 84px; resize: vertical; }
-    input:focus, select:focus, textarea:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+
+    textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
     .radio-box {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin-top: 8px;
     }
+
     .radio-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       border: 1.5px solid #cbd5e1;
       border-radius: 16px;
       padding: 12px;
-      cursor: pointer;
       font-weight: 800;
       font-size: 14px;
       color: #334155;
+      cursor: pointer;
       background: #f8fafc;
     }
-    .radio-card input { width: auto; margin-right: 6px; }
-    .nhan-thay-box {
-      display: none;
-      margin-top: 12px;
-      padding: 12px;
-      border-radius: 18px;
-      background: #fff7ed;
-      border: 1px solid #fed7aa;
+
+    .radio-card input {
+      width: 18px;
+      height: 18px;
     }
-    .nhan-thay-box.active { display: block; }
+
     .check {
       display: flex;
-      gap: 10px;
       align-items: flex-start;
-      margin-top: 16px;
+      gap: 12px;
+      margin-top: 18px;
+      color: #334155;
       font-size: 14px;
       line-height: 1.4;
-      color: #334155;
     }
-    .check input { width: 18px; height: 18px; flex: 0 0 auto; margin-top: 1px; }
+
+    .check input {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-top: 0;
+    }
+
     button {
       width: 100%;
-      margin-top: 18px;
       border: none;
       border-radius: 18px;
-      padding: 16px;
       background: #2563eb;
       color: white;
-      font-size: 16px;
+      padding: 16px;
+      margin-top: 20px;
+      font-size: 17px;
       font-weight: 900;
       cursor: pointer;
     }
-    button:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .note {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.45;
+    }
+
     .msg {
       display: none;
-      margin-top: 16px;
-      padding: 14px;
-      border-radius: 16px;
-      font-size: 15px;
+      margin-top: 18px;
+      border-radius: 18px;
+      padding: 15px;
       line-height: 1.5;
-      font-weight: 800;
+      font-size: 15px;
+      font-weight: 700;
     }
-    .msg.ok { display: block; background: #dcfce7; color: #166534; border: 1px solid #86efac; }
-    .msg.err { display: block; background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-    .note { margin-top: 16px; color: #64748b; font-size: 13px; line-height: 1.45; text-align: center; }
-    @media (min-width: 720px) { body { padding-top: 36px; } }
+
+    .msg.ok {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .msg.err {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (min-width: 768px) {
+      .page {
+        align-items: center;
+        padding-top: 34px;
+      }
+
+      .wrap {
+        max-width: 500px;
+      }
+    }
   </style>
 </head>
+
 <body>
-  <main class="wrap">
-    <div class="top">
-      <h1>📄 Xác nhận nhận văn bản</h1>
-      <p>Trung tâm Bảo trợ xã hội Tân Hiệp</p>
+  <main class="page">
+    <div class="wrap">
+      <div class="top">
+        <h1>📄 Xác nhận nhận văn bản</h1>
+        <p>Trung tâm Bảo trợ xã hội Tân Hiệp</p>
+      </div>
+
+      <div class="card">
+        <div class="title">
+          <h2>Quét QR để xác nhận</h2>
+          <p>Chọn đúng loại giấy, nhập thông tin nhận và bấm xác nhận.</p>
+        </div>
+
+        <form id="formNhan">
+          <label for="loai">Loại giấy</label>
+          <select id="loai" required>
+            <option value="">-- Chọn loại giấy --</option>
+            <option value="CONG_LENH">Công lệnh</option>
+            <option value="GIAY_GIOI_THIEU">Giấy giới thiệu</option>
+            <option value="GIAY_DI_DUONG">Giấy đi đường</option>
+          </select>
+
+          <div id="boxSoVanBan">
+            <label for="soVanBan">Số văn bản</label>
+            <input id="soVanBan" type="text" inputmode="numeric" placeholder="Ví dụ: 649" />
+          </div>
+
+          <div id="boxNgayGDD" class="hidden">
+            <label for="ngayGDD">Ngày sử dụng / ngày nhận giấy đi đường</label>
+            <input id="ngayGDD" type="date" />
+          </div>
+
+          <label for="nguoiDuocCap">Người được cấp</label>
+          <input id="nguoiDuocCap" type="text" placeholder="Nhập họ và tên người được cấp" required />
+
+          <div id="boxLyDoGDD" class="hidden">
+            <label for="lyDoGDD">Lý do cấp giấy đi đường</label>
+            <select id="lyDoGDD">
+              <option value="">-- Chọn lý do --</option>
+              <option>Nuôi bệnh TTYT KV Bình Long</option>
+              <option>Nuôi bệnh Bệnh viện ĐK Bình Phước</option>
+              <option>Nuôi bệnh Bệnh viện ĐK Bình Dương</option>
+              <option>Chuyển viện TTYT KV Bình Long</option>
+              <option>Chuyển viện Bệnh viện Chợ Rẫy</option>
+              <option>Khác</option>
+            </select>
+          </div>
+
+          <div id="boxLyDoGDDKhac" class="hidden">
+            <label for="lyDoGDDKhac">Lý do cụ thể</label>
+            <textarea id="lyDoGDDKhac" placeholder="Nhập lý do cụ thể"></textarea>
+          </div>
+
+          <label>Hình thức nhận</label>
+          <div class="radio-box">
+            <label class="radio-card">
+              <input type="radio" name="hinhThucNhan" value="tu-nhan" checked />
+              Tự nhận
+            </label>
+
+            <label class="radio-card">
+              <input type="radio" name="hinhThucNhan" value="nhan-thay" />
+              Nhận thay
+            </label>
+          </div>
+
+          <div id="boxNhanThay" class="hidden">
+            <label for="nguoiNhanThucTe">Người nhận thực tế</label>
+            <input id="nguoiNhanThucTe" type="text" placeholder="Nhập họ tên người nhận thực tế" />
+
+            <label for="lyDoNhanThay">Lý do nhận thay</label>
+            <textarea id="lyDoNhanThay" placeholder="Nhập lý do nhận thay"></textarea>
+          </div>
+
+          <div class="check">
+            <input id="dongY" type="checkbox" required />
+            <span>Tôi xác nhận đã nhận giấy/văn bản nêu trên và chịu trách nhiệm về thông tin đã khai báo.</span>
+          </div>
+
+          <button id="btnGui" type="submit">XÁC NHẬN ĐÃ NHẬN</button>
+
+          <div id="msg" class="msg"></div>
+        </form>
+
+        <div class="note">
+          Nếu nhập sai số văn bản hoặc họ tên đối với Công lệnh/Giấy giới thiệu, hệ thống sẽ không ghi nhận.
+        </div>
+      </div>
     </div>
-
-    <section class="card">
-      <h2>Quét QR để xác nhận</h2>
-      <div class="sub">Chọn đúng loại văn bản, nhập số văn bản và tên người được cấp như trên giấy đã cấp.</div>
-
-      <form id="formNhan">
-        <label for="loai">Loại văn bản</label>
-        <select id="loai" required>
-          <option value="">-- Chọn loại văn bản --</option>
-          <option value="CONG_LENH">Công lệnh</option>
-          <option value="GIAY_GIOI_THIEU">Giấy giới thiệu</option>
-        </select>
-
-        <label for="soVanBan">Số văn bản</label>
-        <input id="soVanBan" type="text" inputmode="numeric" placeholder="Ví dụ: 119" required />
-
-        <label for="nguoiDuocCap">Người được cấp</label>
-        <input id="nguoiDuocCap" type="text" placeholder="Nhập họ và tên trên giấy" required />
-
-        <label>Hình thức nhận</label>
-        <div class="radio-box">
-          <label class="radio-card"><input type="radio" name="hinhThucNhan" value="tu_nhan" checked> Tự nhận</label>
-          <label class="radio-card"><input type="radio" name="hinhThucNhan" value="nhan_thay"> Nhận thay</label>
-        </div>
-
-        <div id="nhanThayBox" class="nhan-thay-box">
-          <label for="nguoiNhanThucTe">Người nhận thực tế</label>
-          <input id="nguoiNhanThucTe" type="text" placeholder="Nhập họ tên người nhận thay" />
-
-          <label for="lyDoNhanThay">Lý do nhận thay</label>
-          <textarea id="lyDoNhanThay" placeholder="Ví dụ: Người được cấp đang trực, đi viện, bận nhiệm vụ khác..."></textarea>
-        </div>
-
-        <div class="check">
-          <input id="dongY" type="checkbox" required />
-          <span>Tôi xác nhận đã nhận văn bản nêu trên. Nếu nhận thay, tôi có trách nhiệm bàn giao lại cho người được cấp.</span>
-        </div>
-
-        <button id="btnGui" type="submit">XÁC NHẬN ĐÃ NHẬN</button>
-        <div id="msg" class="msg"></div>
-      </form>
-
-      <div class="note">Hệ thống chấp nhận khác chữ hoa/thường, dư khoảng trắng hoặc nhập không dấu; nhưng số văn bản và tên người được cấp phải đúng.</div>
-    </section>
   </main>
 
   <script>
@@ -171,102 +326,228 @@
     const API_TOKEN = "CONGLENH_TANHIEP_2026";
 
     const form = document.getElementById("formNhan");
+    const loai = document.getElementById("loai");
+    const soVanBan = document.getElementById("soVanBan");
+    const nguoiDuocCap = document.getElementById("nguoiDuocCap");
+    const ngayGDD = document.getElementById("ngayGDD");
+    const lyDoGDD = document.getElementById("lyDoGDD");
+    const lyDoGDDKhac = document.getElementById("lyDoGDDKhac");
+    const dongY = document.getElementById("dongY");
     const btnGui = document.getElementById("btnGui");
     const msg = document.getElementById("msg");
-    const nhanThayBox = document.getElementById("nhanThayBox");
 
-    document.querySelectorAll('input[name="hinhThucNhan"]').forEach(function(radio) {
-      radio.addEventListener("change", function() {
-        const isNhanThay = document.querySelector('input[name="hinhThucNhan"]:checked').value === "nhan_thay";
-        nhanThayBox.classList.toggle("active", isNhanThay);
-      });
-    });
+    const boxSoVanBan = document.getElementById("boxSoVanBan");
+    const boxNgayGDD = document.getElementById("boxNgayGDD");
+    const boxLyDoGDD = document.getElementById("boxLyDoGDD");
+    const boxLyDoGDDKhac = document.getElementById("boxLyDoGDDKhac");
+    const boxNhanThay = document.getElementById("boxNhanThay");
 
-    function showMessage(type, text) {
+    function showMsg(type, html) {
       msg.className = "msg " + type;
-      msg.innerHTML = text;
+      msg.innerHTML = html;
+    }
+
+    function clearMsg() {
+      msg.className = "msg";
+      msg.innerHTML = "";
     }
 
     function jsonp(url) {
       return new Promise(function(resolve, reject) {
-        const cbName = "cb_nhan_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
+        const cbName = "cb_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
+
         window[cbName] = function(data) {
           delete window[cbName];
           script.remove();
           resolve(data);
         };
+
         const script = document.createElement("script");
-        script.src = url + "&callback=" + encodeURIComponent(cbName);
+        script.src = url + "&callback=" + cbName;
+
         script.onerror = function() {
           delete window[cbName];
           script.remove();
           reject(new Error("Không kết nối được hệ thống."));
         };
+
         document.body.appendChild(script);
       });
     }
 
+    function layHinhThucNhan() {
+      const checked = document.querySelector("input[name='hinhThucNhan']:checked");
+      return checked ? checked.value : "tu-nhan";
+    }
+
+    function laGiayDiDuong() {
+      return loai.value === "GIAY_DI_DUONG";
+    }
+
+    function capNhatFormTheoLoai() {
+      clearMsg();
+
+      if (laGiayDiDuong()) {
+        boxSoVanBan.classList.add("hidden");
+        boxNgayGDD.classList.remove("hidden");
+        boxLyDoGDD.classList.remove("hidden");
+
+        soVanBan.value = "";
+
+        if (!ngayGDD.value) {
+          const today = new Date();
+          const yyyy = today.getFullYear();
+          const mm = String(today.getMonth() + 1).padStart(2, "0");
+          const dd = String(today.getDate()).padStart(2, "0");
+          ngayGDD.value = yyyy + "-" + mm + "-" + dd;
+        }
+      } else {
+        boxSoVanBan.classList.remove("hidden");
+        boxNgayGDD.classList.add("hidden");
+        boxLyDoGDD.classList.add("hidden");
+        boxLyDoGDDKhac.classList.add("hidden");
+
+        ngayGDD.value = "";
+        lyDoGDD.value = "";
+        lyDoGDDKhac.value = "";
+      }
+
+      capNhatLyDoKhac();
+    }
+
+    function capNhatNhanThay() {
+      const nhanThay = layHinhThucNhan() === "nhan-thay";
+      boxNhanThay.classList.toggle("hidden", !nhanThay);
+    }
+
+    function capNhatLyDoKhac() {
+      const isKhac = lyDoGDD.value === "Khác";
+      boxLyDoGDDKhac.classList.toggle("hidden", !isKhac);
+      if (!isKhac) lyDoGDDKhac.value = "";
+    }
+
+    loai.addEventListener("change", capNhatFormTheoLoai);
+    lyDoGDD.addEventListener("change", capNhatLyDoKhac);
+
+    document.querySelectorAll("input[name='hinhThucNhan']").forEach(function(r) {
+      r.addEventListener("change", capNhatNhanThay);
+    });
+
     form.addEventListener("submit", async function(e) {
       e.preventDefault();
+      clearMsg();
 
-      const loai = document.getElementById("loai").value.trim();
-      const soVanBan = document.getElementById("soVanBan").value.trim();
-      const nguoiDuocCap = document.getElementById("nguoiDuocCap").value.trim();
-      const hinhThuc = document.querySelector('input[name="hinhThucNhan"]:checked').value;
-      const nhanThay = hinhThuc === "nhan_thay";
-      const nguoiNhanThucTe = document.getElementById("nguoiNhanThucTe").value.trim();
-      const lyDoNhanThay = document.getElementById("lyDoNhanThay").value.trim();
-      const dongY = document.getElementById("dongY").checked;
+      const loaiVal = loai.value.trim();
+      const soVal = soVanBan.value.trim();
+      const nguoiDuocCapVal = nguoiDuocCap.value.trim();
+      const nhanThay = layHinhThucNhan() === "nhan-thay";
+      const nguoiNhanThucTeVal = document.getElementById("nguoiNhanThucTe").value.trim();
+      const lyDoNhanThayVal = document.getElementById("lyDoNhanThay").value.trim();
 
-      if (!loai || !soVanBan || !nguoiDuocCap || !dongY) {
-        showMessage("err", "❌ Vui lòng nhập đầy đủ thông tin và tích xác nhận.");
+      if (!loaiVal) {
+        showMsg("err", "❌ Vui lòng chọn loại giấy.");
         return;
       }
 
-      if (nhanThay && (!nguoiNhanThucTe || !lyDoNhanThay)) {
-        showMessage("err", "❌ Khi nhận thay, vui lòng nhập người nhận thực tế và lý do nhận thay.");
+      if (!nguoiDuocCapVal) {
+        showMsg("err", "❌ Vui lòng nhập người được cấp.");
+        return;
+      }
+
+      if (!laGiayDiDuong() && !soVal) {
+        showMsg("err", "❌ Vui lòng nhập số văn bản.");
+        return;
+      }
+
+      if (laGiayDiDuong()) {
+        if (!ngayGDD.value) {
+          showMsg("err", "❌ Vui lòng chọn ngày giấy đi đường.");
+          return;
+        }
+
+        if (!lyDoGDD.value) {
+          showMsg("err", "❌ Vui lòng chọn lý do cấp giấy đi đường.");
+          return;
+        }
+
+        if (lyDoGDD.value === "Khác" && !lyDoGDDKhac.value.trim()) {
+          showMsg("err", "❌ Vui lòng nhập lý do cụ thể khi chọn Khác.");
+          return;
+        }
+      }
+
+      if (nhanThay) {
+        if (!nguoiNhanThucTeVal) {
+          showMsg("err", "❌ Vui lòng nhập người nhận thực tế.");
+          return;
+        }
+
+        if (!lyDoNhanThayVal) {
+          showMsg("err", "❌ Vui lòng nhập lý do nhận thay.");
+          return;
+        }
+      }
+
+      if (!dongY.checked) {
+        showMsg("err", "❌ Vui lòng tích xác nhận.");
         return;
       }
 
       btnGui.disabled = true;
       btnGui.textContent = "ĐANG GỬI...";
-      showMessage("ok", "⏳ Đang kiểm tra thông tin, vui lòng chờ...");
+      showMsg("ok", "⏳ Đang gửi xác nhận, vui lòng chờ...");
 
       try {
         const params = new URLSearchParams();
         params.set("action", "xacNhanNhanVanBan");
         params.set("token", API_TOKEN);
-        params.set("loai", loai);
-        params.set("soVanBan", soVanBan);
-        params.set("nguoiDuocCap", nguoiDuocCap);
+        params.set("loai", loaiVal);
+        params.set("soVanBan", soVal);
+        params.set("nguoiDuocCap", nguoiDuocCapVal);
         params.set("nhanThay", nhanThay ? "1" : "0");
-        params.set("nguoiNhanThucTe", nguoiNhanThucTe);
-        params.set("lyDoNhanThay", lyDoNhanThay);
+        params.set("nguoiNhanThucTe", nguoiNhanThucTeVal);
+        params.set("lyDoNhanThay", lyDoNhanThayVal);
+
+        if (laGiayDiDuong()) {
+          params.set("ngayGDD", ngayGDD.value);
+          params.set("lyDoGDD", lyDoGDD.value);
+          params.set("lyDoGDDKhac", lyDoGDDKhac.value.trim());
+        }
 
         const data = await jsonp(API_URL + "?" + params.toString());
 
-        if (data.ok) {
-          showMessage(
-            "ok",
-            `✅ <b>${data.message}</b><br>` +
-            `Số văn bản: <b>${data.soVanBan}</b><br>` +
-            `Người được cấp: <b>${data.nguoiDuocCap || data.hoTen || ""}</b><br>` +
-            `Người nhận thực tế: <b>${data.nguoiNhanThucTe || data.hoTen || ""}</b><br>` +
-            `${data.lyDoNhanThay ? `Lý do nhận thay: <b>${data.lyDoNhanThay}</b><br>` : ""}` +
-            `Thời gian: <b>${data.thoiGian}</b>`
-          );
-          form.reset();
-          nhanThayBox.classList.remove("active");
-        } else {
-          showMessage("err", "❌ " + (data.message || "Không xác nhận được."));
+        if (!data || !data.ok) {
+          showMsg("err", "❌ " + ((data && data.message) ? data.message : "Không xác nhận được."));
+          return;
         }
+
+        const html =
+          `✅ <b>${data.message}</b>` +
+          `<br><br><b>Loại:</b> ${data.loaiTen || ""}` +
+          `${data.soVanBan ? `<br><b>Số văn bản:</b> ${data.soVanBan}` : ""}` +
+          `${data.ngayGDD ? `<br><b>Ngày giấy đi đường:</b> ${data.ngayGDD}` : ""}` +
+          `<br><b>Người được cấp:</b> ${data.nguoiDuocCap || data.hoTen || ""}` +
+          `${data.nguoiNhanThucTe ? `<br><b>Người nhận thực tế:</b> ${data.nguoiNhanThucTe}` : ""}` +
+          `${data.lyDoGDD ? `<br><b>Lý do giấy đi đường:</b> ${data.lyDoGDD}` : ""}` +
+          `${data.lyDoNhanThay ? `<br><b>Lý do nhận thay:</b> ${data.lyDoNhanThay}` : ""}` +
+          `<br><b>Thời gian:</b> ${data.thoiGian || ""}`;
+
+        showMsg("ok", html);
+
+        form.reset();
+        capNhatFormTheoLoai();
+        capNhatNhanThay();
+
       } catch (err) {
-        showMessage("err", "❌ Không gửi được xác nhận. Vui lòng kiểm tra kết nối hoặc liên hệ bộ phận phụ trách.");
+        showMsg("err", "❌ Không gửi được xác nhận. Vui lòng kiểm tra mạng hoặc thử lại.");
       } finally {
         btnGui.disabled = false;
         btnGui.textContent = "XÁC NHẬN ĐÃ NHẬN";
       }
     });
+
+    capNhatFormTheoLoai();
+    capNhatNhanThay();
   </script>
 </body>
 </html>
