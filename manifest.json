@@ -1,7 +1,7 @@
 {
   "name": "Giấy công lệnh, giấy giới thiệu",
   "short_name": "Công lệnh",
-  "start_url": "./index.html?v=139",
+  "start_url": "./index.html?v=140",
   "scope": "./",
   "display": "standalone",
   "background_color": "#eef4fb",
