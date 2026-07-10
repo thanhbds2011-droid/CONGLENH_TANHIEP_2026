@@ -400,6 +400,138 @@ function hienCanhBaoTrungCongLenh(vb, params) {
   hienCanhBaoTrungVanBan(vb, params);
 }
 
+function hienCanhBaoTrungVanBan(vb, params) {
+  DU_LIEU_TRUNG_CL = vb;
+  PARAMS_DANG_CAP = params;
+
+  const ketqua = document.getElementById("ketqua");
+  const laGGT = params && params.loaiGiay === "GIAY_GIOI_THIEU";
+
+  const tenLoai = laGGT ? "giấy giới thiệu" : "công lệnh";
+  const maLoai = laGGT ? "GGT" : "CL";
+  const ngayText = laGGT
+    ? (vb.ngayHetHan || vb.cotJ || "")
+    : ((vb.ngayDi || "") + " → " + (vb.ngayVe || ""));
+
+  ketqua.style.display = "block";
+  ketqua.innerHTML = `
+    <div class="conflict-box">
+      <h3>⚠️ Phát hiện ${tenLoai} đang hiệu lực</h3>
+
+      <p><b>Đồng chí:</b> ${vb.dongChi || ""}</p>
+      <p><b>${maLoai} số:</b> ${vb.so || ""}</p>
+      <p><b>${laGGT ? "Ngày hết hạn" : "Thời gian đã cấp"}:</b> ${ngayText}</p>
+      <p><b>Nội dung:</b> ${vb.noiDung || ""}</p>
+      <p><b>Lý do trùng:</b> ${vb.lyDoTrung || "Thông tin trùng với văn bản đang hiệu lực"}</p>
+
+      <div class="conflict-actions">
+        <button type="button" onclick="xemVanBanTrung()">👁 Xem</button>
+
+        <button type="button" onclick="thuHoiVaCapLaiVanBan()">
+          ♻️ Thu hồi để cấp lại số ${vb.so}
+        </button>
+
+        <button type="button" onclick="capVanBanMoiBoQuaTrung()">➕ Cấp số mới</button>
+
+        <button type="button" onclick="dongCanhBaoTrung()">❌ Đóng</button>
+      </div>
+    </div>
+  `;
+
+  ketqua.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function xemVanBanTrung() {
+  if (!DU_LIEU_TRUNG_CL || !DU_LIEU_TRUNG_CL.linkFile) {
+    alert("Không tìm thấy link PDF văn bản cũ.");
+    return;
+  }
+
+  window.open(DU_LIEU_TRUNG_CL.linkFile, "_blank");
+}
+
+function thuHoiVaCapLaiVanBan() {
+  if (!DU_LIEU_TRUNG_CL || !PARAMS_DANG_CAP) {
+    alert("Không có dữ liệu văn bản cần thu hồi.");
+    return;
+  }
+
+  const laGGT = PARAMS_DANG_CAP.loaiGiay === "GIAY_GIOI_THIEU";
+  const tenLoai = laGGT ? "giấy giới thiệu" : "công lệnh";
+  const action = laGGT ? "thuhoi_caplai_ggt" : "thuhoi_caplai_cl";
+
+  const lyDoHuy = prompt(
+    "Nhập lý do thu hồi " + tenLoai + " số " + DU_LIEU_TRUNG_CL.so + ":",
+    "Nhập sai thông tin, thu hồi để cấp lại"
+  );
+
+  if (!lyDoHuy) {
+    alert("Chưa nhập lý do thu hồi.");
+    return;
+  }
+
+  if (!confirm("Xác nhận thu hồi và cấp lại " + tenLoai + " số " + DU_LIEU_TRUNG_CL.so + "?\n\nSố văn bản sẽ được giữ nguyên.")) {
+    return;
+  }
+
+  const ketqua = document.getElementById("ketqua");
+  ketqua.style.display = "block";
+  ketqua.innerHTML = "⏳ Đang thu hồi và cấp lại " + tenLoai + " số " + DU_LIEU_TRUNG_CL.so + "...";
+
+  const params = {
+    ...PARAMS_DANG_CAP,
+    row: DU_LIEU_TRUNG_CL.row,
+    soCu: DU_LIEU_TRUNG_CL.so,
+    lyDoHuy: lyDoHuy
+  };
+
+  goiApi(action, params, function(res) {
+    if (!res || !res.ok) {
+      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không thu hồi/cấp lại được văn bản.");
+      return;
+    }
+
+    hienKetQuaXuatThanhCong(res);
+    resetForm();
+    taiDashboard();
+  });
+}
+
+function capVanBanMoiBoQuaTrung() {
+  if (!PARAMS_DANG_CAP) {
+    alert("Không có dữ liệu để cấp mới.");
+    return;
+  }
+
+  const laGGT = PARAMS_DANG_CAP.loaiGiay === "GIAY_GIOI_THIEU";
+  const tenLoai = laGGT ? "giấy giới thiệu" : "công lệnh";
+
+  if (!confirm("Xác nhận vẫn cấp " + tenLoai + " mới?\n\nVăn bản cũ sẽ được giữ nguyên.")) {
+    return;
+  }
+
+  const ketqua = document.getElementById("ketqua");
+  ketqua.style.display = "block";
+  ketqua.innerHTML = "⏳ Đang cấp văn bản mới...";
+
+  const params = {
+    ...PARAMS_DANG_CAP,
+    boQuaTrung: "1"
+  };
+
+  goiApi("xuat", params, function(res) {
+    if (!res || !res.ok) {
+      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không cấp được văn bản mới.");
+      return;
+    }
+
+    hienKetQuaXuatThanhCong(res);
+    resetForm();
+    taiDashboard();
+  });
+}
+
+// Giữ tên cũ để tránh lỗi cache
 function xemCongLenhTrung() {
   xemVanBanTrung();
 }
