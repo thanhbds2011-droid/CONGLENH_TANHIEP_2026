@@ -1,6 +1,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "142";
+const CURRENT_VERSION = "144";
 
 let DU_LIEU_NHAT_KY = [];
 let DU_LIEU_TRUNG_CL = null;
@@ -94,11 +94,7 @@ function taiDashboard() {
     "huyCL",
     "soTiepTheoGGT",
     "tongGGT",
-    "huyGGT",
-    "chuaNhanCL",
-    "daNhanCL",
-    "chuaNhanGGT",
-    "daNhanGGT"
+    "huyGGT"
   ];
 
   const cache = localStorage.getItem("dashboard_cache");
@@ -134,11 +130,6 @@ function capNhatSoDashboard(data) {
   ganText("soTiepTheoGGT", data.soTiepTheoGGT ?? "-");
   ganText("tongGGT", data.tongGGT ?? 0);
   ganText("huyGGT", data.huyGGT ?? 0);
-
-  ganText("chuaNhanCL", data.chuaNhanCL ?? 0);
-  ganText("daNhanCL", data.daNhanCL ?? 0);
-  ganText("chuaNhanGGT", data.chuaNhanGGT ?? 0);
-  ganText("daNhanGGT", data.daNhanGGT ?? 0);
 }
 
 function ganText(id, value) {
@@ -279,11 +270,6 @@ function hienCanhBaoTrungVanBan(vb, params) {
       <p><b>${laGGT ? "Ngày liên quan" : "Thời gian đã cấp"}:</b> ${ngayText || ""}</p>
       <p><b>Nội dung:</b> ${vb.noiDung || ""}</p>
       <p><b>Lý do trùng:</b> ${vb.lyDoTrung || "Thông tin trùng với văn bản đang hiệu lực"}</p>
-      ${vb.trangThaiNhan ? `<p><b>Trạng thái nhận:</b> ${vb.trangThaiNhan}</p>` : ""}
-      ${vb.thoiGianNhan ? `<p><b>Thời gian nhận:</b> ${vb.thoiGianNhan}</p>` : ""}
-      ${vb.nguoiNhanThucTe ? `<p><b>Người nhận thực tế:</b> ${vb.nguoiNhanThucTe}</p>` : ""}
-      ${vb.lyDoNhanThay ? `<p><b>Lý do nhận thay:</b> ${vb.lyDoNhanThay}</p>` : ""}
-
       <div class="conflict-actions">
         <button type="button" onclick="xemVanBanTrung()">👁 Xem PDF cũ</button>
 
@@ -439,17 +425,9 @@ function hienKetQuaXuatThanhCong(res) {
   const ketqua = document.getElementById("ketqua");
   const data = res && res.data ? res.data : {};
 
-  const nhanHtml = data.trangThaiNhan
-    ? `<br><br><b>Trạng thái nhận:</b> ${data.trangThaiNhan}` +
-      `${data.thoiGianNhan ? "<br><b>Thời gian nhận:</b> " + data.thoiGianNhan : ""}` +
-      `${data.nguoiNhanThucTe ? "<br><b>Người nhận thực tế:</b> " + data.nguoiNhanThucTe : ""}` +
-      `${data.lyDoNhanThay ? "<br><b>Lý do nhận thay:</b> " + data.lyDoNhanThay : ""}`
-    : "";
-
   ketqua.style.display = "block";
   ketqua.innerHTML =
     "✅ " + (res.message || "Đã xử lý thành công.") +
-    nhanHtml +
     "<br><br><a class='link-btn' href='" + (data.linkFile || "#") + "' target='_blank'>📄 Mở file PDF</a>" +
     "<br><button class='share-btn' onclick=\"chiaSePdf('" + (data.linkFile || "") + "', '" + (data.tenFile || "Văn bản") + "')\">📲 Chia sẻ qua Zalo</button>";
 }
@@ -680,7 +658,6 @@ function locNhatKy() {
   const denNgay = document.getElementById("denNgay").value;
   const loai = document.getElementById("locLoai").value;
   const trangThai = document.getElementById("locTrangThai").value;
-  const trangThaiNhan = document.getElementById("locTrangThaiNhan") ? document.getElementById("locTrangThaiNhan").value : "";
   const phong = document.getElementById("locPhong").value;
 
   const ketQua = DU_LIEU_NHAT_KY.map(function (itemPhong) {
@@ -701,10 +678,6 @@ function locNhatKy() {
           vb.ngayVe,
           vb.ngayCapGiay,
           vb.trangThai,
-          vb.trangThaiNhan,
-          vb.thoiGianNhan,
-          vb.nguoiNhanThucTe,
-          vb.lyDoNhanThay,
           vb.lyDoHuy,
           vb.ghiChuHuy,
           vb.tenFile
@@ -713,7 +686,6 @@ function locNhatKy() {
         if (keyword && !text.includes(keyword)) return false;
         if (loai && vb.loaiGiay !== loai) return false;
         if (trangThai && chuanHoaTrangThai(vb.trangThai) !== chuanHoaTrangThai(trangThai)) return false;
-        if (trangThaiNhan && chuanHoaTrangThai(vb.trangThaiNhan) !== chuanHoaTrangThai(trangThaiNhan)) return false;
 
         if (tuNgay && chuyenNgayLoc(vb.ngayCapGiay) < tuNgay) return false;
         if (denNgay && chuyenNgayLoc(vb.ngayCapGiay) > denNgay) return false;
@@ -829,15 +801,12 @@ function hienThiNhatKy(data) {
       ns.danhSach.forEach(function (vb, k) {
         const vbId = "vb_" + i + "_" + j + "_" + k;
         const badge = vb.loaiGiay === "GIAY_GIOI_THIEU" ? "GGT" : "CL";
-        const nhanText = vb.trangThaiNhan || "Chưa nhận";
-        const nhanIcon = chuanHoaTrangThai(nhanText) === "đã nhận" ? "🟢" : "🔴";
 
         html += `
           <div class="vb-mini-row" onclick="toggleBox('${vbId}')">
             <div>
               <b>${badge} ${vb.so}</b>
               <small>${vb.noiDung || ""}</small>
-              <small>${nhanIcon} ${nhanText}</small>
             </div>
 
             <span>${vb.cotJ || ""}</span>
@@ -856,10 +825,6 @@ function hienThiNhatKy(data) {
             ${vb.phuongTien ? `<p><b>Phương tiện:</b> ${vb.phuongTien}</p>` : ""}
             ${vb.giayTo ? `<p><b>Giấy tờ:</b> ${vb.giayTo}</p>` : ""}
             ${vb.trangThai ? `<p><b>Trạng thái cấp:</b> ${vb.trangThai}</p>` : ""}
-            <p><b>Trạng thái nhận:</b> ${vb.trangThaiNhan || "Chưa nhận"}</p>
-            ${vb.thoiGianNhan ? `<p><b>Thời gian nhận:</b> ${vb.thoiGianNhan}</p>` : ""}
-            ${vb.nguoiNhanThucTe ? `<p><b>Người nhận thực tế:</b> ${vb.nguoiNhanThucTe}</p>` : ""}
-            ${vb.lyDoNhanThay ? `<p><b>Lý do nhận thay:</b> ${vb.lyDoNhanThay}</p>` : ""}
             ${vb.lyDoHuy ? `<p><b>Lý do hủy:</b> ${vb.lyDoHuy}</p>` : ""}
             ${vb.ghiChuHuy ? `<p><b>Ghi chú hủy:</b> ${vb.ghiChuHuy}</p>` : ""}
 
@@ -927,9 +892,6 @@ function resetLoc() {
   document.getElementById("locLoai").selectedIndex = 0;
   document.getElementById("locTrangThai").selectedIndex = 0;
 
-  if (document.getElementById("locTrangThaiNhan")) {
-    document.getElementById("locTrangThaiNhan").selectedIndex = 0;
-  }
 
   document.getElementById("locPhong").selectedIndex = 0;
 
@@ -940,11 +902,6 @@ function damBaoOCtimKiemNhatKy() {
   return;
 }
 
-/* ================= QR NHẬN VĂN BẢN ================= */
-
-function moTrangNhanVanBan() {
-  window.open("nhan.html?v=" + CURRENT_VERSION, "_blank");
-}
 
 /* ================= PWA ================= */
 
