@@ -1,4 +1,4 @@
-const CACHE_NAME = "cong-lenh-cache-v142";
+const CACHE_NAME = "cong-lenh-cache-v144";
 
 self.addEventListener("install", event => {
   self.skipWaiting();
@@ -7,9 +7,12 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.map(key => {
-        if (key !== CACHE_NAME) return caches.delete(key);
-      }))
+      Promise.all(
+        keys.map(key => {
+          if (key !== CACHE_NAME) return caches.delete(key);
+          return null;
+        })
+      )
     )
   );
   self.clients.claim();
