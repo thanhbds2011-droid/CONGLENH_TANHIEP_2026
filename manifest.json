@@ -1,20 +1,20 @@
 {
   "name": "Giấy công lệnh, giấy giới thiệu",
   "short_name": "Công lệnh",
-  "start_url": "./index.html?v=140",
+  "start_url": "./index.html?v=144",
   "scope": "./",
   "display": "standalone",
   "background_color": "#eef4fb",
   "theme_color": "#2563eb",
   "icons": [
     {
-      "src": "icons/icon-192.png?v=142",
+      "src": "icons/icon-192.png?v=144",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png?v=142",
+      "src": "icons/icon-512.png?v=144",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
