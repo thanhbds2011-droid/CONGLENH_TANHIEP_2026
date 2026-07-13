@@ -1239,10 +1239,10 @@ margin-top:0;
   margin-bottom: 22px !important;
 }
 
-/* Dashboard mobile mặc định: 2 cột */
+/* Dashboard: 3 cột, 2 hàng theo từng loại giấy */
 .dashboard {
   display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   gap: 14px !important;
 }
 
@@ -1277,10 +1277,10 @@ margin-top:0;
   color: #2563eb !important;
 }
 
-/* Desktop: 5 cột x 2 hàng cho đẹp */
+/* Desktop: 3 cột x 2 hàng */
 @media (min-width: 900px) {
   .dashboard {
-    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 16px !important;
   }
 
@@ -1305,23 +1305,26 @@ margin-top:0;
   }
 }
 
-/* Mobile nhỏ: giữ 2 cột nhưng giảm chữ */
+/* Mobile nhỏ: vẫn giữ 3 cột, giảm kích thước để không chật */
 @media (max-width: 420px) {
   .dashboard {
-    gap: 10px !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
   }
 
   .dashboard div {
-    min-height: 92px !important;
-    padding: 14px 8px !important;
-    border-radius: 17px !important;
+    min-width: 0 !important;
+    min-height: 88px !important;
+    padding: 12px 5px !important;
+    border-radius: 16px !important;
   }
 
   .dashboard span {
-    font-size: 11.5px !important;
+    font-size: 10.5px !important;
+    line-height: 1.25 !important;
   }
 
   .dashboard h2 {
-    font-size: 27px !important;
+    font-size: 25px !important;
   }
 }
