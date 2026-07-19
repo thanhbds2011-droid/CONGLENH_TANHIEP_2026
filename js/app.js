@@ -1,8 +1,9 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "144";
+const CURRENT_VERSION = "146";
 
 let DU_LIEU_NHAT_KY = [];
+let DU_LIEU_NHAT_KY_DANG_HIEN_THI = [];
 let DU_LIEU_TRUNG_CL = null;
 let PARAMS_DANG_CAP = null;
 
@@ -648,7 +649,8 @@ function taiBaoCao() {
     }
 
     DU_LIEU_NHAT_KY = res.data || [];
-    hienThiNhatKy(DU_LIEU_NHAT_KY);
+    DU_LIEU_NHAT_KY_DANG_HIEN_THI = DU_LIEU_NHAT_KY;
+    hienThiNhatKy(DU_LIEU_NHAT_KY_DANG_HIEN_THI);
   });
 }
 
@@ -713,7 +715,8 @@ function locNhatKy() {
     };
   }).filter(Boolean);
 
-  hienThiNhatKy(ketQua);
+  DU_LIEU_NHAT_KY_DANG_HIEN_THI = ketQua;
+  hienThiNhatKy(DU_LIEU_NHAT_KY_DANG_HIEN_THI);
 }
 
 function chuyenNgayLoc(value) {
@@ -895,8 +898,129 @@ function resetLoc() {
 
   document.getElementById("locPhong").selectedIndex = 0;
 
-  hienThiNhatKy(DU_LIEU_NHAT_KY);
+  DU_LIEU_NHAT_KY_DANG_HIEN_THI = DU_LIEU_NHAT_KY;
+  hienThiNhatKy(DU_LIEU_NHAT_KY_DANG_HIEN_THI);
 }
+
+
+/* ================= XEM TRƯỚC VÀ LƯU BÁO CÁO PDF ================= */
+
+function layDieuKienBaoCao() {
+  return {
+    keyword: document.getElementById("timKiemNhatKy").value.trim(),
+    tuNgay: document.getElementById("tuNgay").value,
+    denNgay: document.getElementById("denNgay").value,
+    loai: document.getElementById("locLoai").value,
+    trangThai: document.getElementById("locTrangThai").value,
+    phong: document.getElementById("locPhong").value
+  };
+}
+
+function phangHoaDuLieuNhatKy(data) {
+  const ds = [];
+  (data || []).forEach(phong => {
+    (phong.nhanSu || []).forEach(ns => {
+      (ns.danhSach || []).forEach(vb => ds.push({ ...vb, phongKhu: vb.phongKhu || phong.phongKhu, dongChi: vb.dongChi || ns.dongChi }));
+    });
+  });
+  return ds;
+}
+
+function escapeHtml(value) {
+  return String(value == null ? "" : value)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function tenDieuKien(value, fallback) { return value ? escapeHtml(value) : fallback; }
+
+function xemTruocBaoCao() {
+  const ds = phangHoaDuLieuNhatKy(DU_LIEU_NHAT_KY_DANG_HIEN_THI);
+  if (!ds.length) { alert("Không có dữ liệu phù hợp để xem trước báo cáo."); return; }
+
+  const dk = layDieuKienBaoCao();
+  const tongCL = ds.filter(x => x.loaiGiay === "CONG_LENH").length;
+  const tongGGT = ds.filter(x => x.loaiGiay === "GIAY_GIOI_THIEU").length;
+  const daCap = ds.filter(x => chuanHoaTrangThai(x.trangThai) === "đã cấp").length;
+  const daHuy = ds.filter(x => chuanHoaTrangThai(x.trangThai) === "đã hủy").length;
+
+  const rows = ds.map((vb, i) => `
+    <tr>
+      <td>${i + 1}</td><td>${escapeHtml(vb.loaiGiay === "GIAY_GIOI_THIEU" ? "GGT" : "CL")}</td>
+      <td>${escapeHtml(vb.so)}</td><td>${escapeHtml(vb.dongChi)}</td>
+      <td>${escapeHtml(vb.noiDung)}</td><td>${escapeHtml(vb.ngayCapGiay)}</td>
+      <td>${escapeHtml(vb.phongKhu)}</td><td>${escapeHtml(vb.trangThai)}</td>
+      <td>${escapeHtml(vb.lyDoHuy || "")}</td>
+    </tr>`).join("");
+
+  document.getElementById("noiDungXemTruoc").innerHTML = `
+    <div class="report-paper">
+      <div class="report-agency">TRUNG TÂM BẢO TRỢ XÃ HỘI TÂN HIỆP</div>
+      <h2>BÁO CÁO NHẬT KÝ CẤP VĂN BẢN</h2>
+      <div class="report-filter-summary">
+        <span><b>Từ ngày:</b> ${tenDieuKien(dk.tuNgay, "Tất cả")}</span>
+        <span><b>Đến ngày:</b> ${tenDieuKien(dk.denNgay, "Tất cả")}</span>
+        <span><b>Loại:</b> ${tenDieuKien(dk.loai === "CONG_LENH" ? "Công lệnh" : dk.loai === "GIAY_GIOI_THIEU" ? "Giấy giới thiệu" : "", "Tất cả")}</span>
+        <span><b>Trạng thái:</b> ${tenDieuKien(dk.trangThai, "Tất cả")}</span>
+        <span><b>Phòng/Khu:</b> ${tenDieuKien(dk.phong, "Tất cả")}</span>
+      </div>
+      <div class="report-stats">
+        <div><b>${tongCL}</b><span>Công lệnh</span></div><div><b>${tongGGT}</b><span>Giấy giới thiệu</span></div>
+        <div><b>${daCap}</b><span>Đã cấp</span></div><div><b>${daHuy}</b><span>Đã hủy</span></div>
+      </div>
+      <div class="report-table-wrap"><table class="report-preview-table">
+        <thead><tr><th>STT</th><th>Loại</th><th>Số</th><th>Người được cấp</th><th>Nội dung</th><th>Ngày cấp</th><th>Phòng/Khu</th><th>Trạng thái</th><th>Lý do hủy</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+    </div>`;
+
+  const modal = document.getElementById("modalBaoCao");
+  modal.classList.add("open"); modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+  taiDanhSachBaoCaoPdf();
+}
+
+function dongXemTruocBaoCao() {
+  const modal = document.getElementById("modalBaoCao");
+  if (!modal) return;
+  modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+}
+
+function taoRequestIdBaoCao() {
+  return "BC-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
+}
+
+function xuatBaoCaoPdf() {
+  const ds = phangHoaDuLieuNhatKy(DU_LIEU_NHAT_KY_DANG_HIEN_THI);
+  if (!ds.length) { alert("Không có dữ liệu để tạo PDF."); return; }
+  const btn = document.getElementById("btnXuatBaoCaoPdf");
+  btn.disabled = true; btn.textContent = "⏳ Đang tạo PDF...";
+  goiApi("xuat_baocao_pdf", { ...layDieuKienBaoCao(), requestId: taoRequestIdBaoCao() }, function(res) {
+    btn.disabled = false; btn.textContent = "📄 Tạo và mở PDF";
+    if (!res || !res.ok) { alert("❌ " + ((res && res.message) || "Không tạo được báo cáo PDF.")); return; }
+    taiDanhSachBaoCaoPdf();
+    if (res.data && res.data.linkFile) window.open(res.data.linkFile, "_blank", "noopener");
+    else alert("Đã tạo báo cáo nhưng chưa nhận được đường dẫn mở file.");
+  });
+}
+
+function taiDanhSachBaoCaoPdf() {
+  const box = document.getElementById("danhSachBaoCaoDaLuu");
+  if (!box) return;
+  box.innerHTML = "⏳ Đang tải...";
+  goiApi("danh_sach_bao_cao_pdf", {}, function(res) {
+    if (!res || !res.ok) { box.innerHTML = "Không tải được danh sách báo cáo đã lưu."; return; }
+    const ds = (res.data || []);
+    if (!ds.length) { box.innerHTML = "Chưa có báo cáo PDF nào được lưu."; return; }
+    box.innerHTML = ds.map(x => `
+      <a class="saved-report-item" href="${escapeHtml(x.linkFile || "#")}" target="_blank" rel="noopener">
+        <div><b>${escapeHtml(x.tenFile)}</b><small>${escapeHtml(x.thoiGianTao)} · ${escapeHtml(x.tongSo)} văn bản</small></div><span> Mở ↗</span>
+      </a>`).join("");
+  });
+}
+
+document.addEventListener("keydown", function(e) { if (e.key === "Escape") dongXemTruocBaoCao(); });
 
 function damBaoOCtimKiemNhatKy() {
   return;
