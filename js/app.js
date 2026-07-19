@@ -934,6 +934,16 @@ function escapeHtml(value) {
 
 function tenDieuKien(value, fallback) { return value ? escapeHtml(value) : fallback; }
 
+function dinhDangNgayBoLoc(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+
+  const match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return text;
+
+  return `${match[3]}/${match[2]}/${match[1]}`;
+}
+
 function xemTruocBaoCao() {
   const ds = phangHoaDuLieuNhatKy(DU_LIEU_NHAT_KY_DANG_HIEN_THI);
   if (!ds.length) { alert("Không có dữ liệu phù hợp để xem trước báo cáo."); return; }
@@ -958,8 +968,8 @@ function xemTruocBaoCao() {
       <div class="report-agency">TRUNG TÂM BẢO TRỢ XÃ HỘI TÂN HIỆP</div>
       <h2>BÁO CÁO NHẬT KÝ CẤP VĂN BẢN</h2>
       <div class="report-filter-summary">
-        <span><b>Từ ngày:</b> ${tenDieuKien(dk.tuNgay, "Tất cả")}</span>
-        <span><b>Đến ngày:</b> ${tenDieuKien(dk.denNgay, "Tất cả")}</span>
+        <span><b>Từ ngày:</b> ${tenDieuKien(dinhDangNgayBoLoc(dk.tuNgay), "Tất cả")}</span>
+        <span><b>Đến ngày:</b> ${tenDieuKien(dinhDangNgayBoLoc(dk.denNgay), "Tất cả")}</span>
         <span><b>Loại:</b> ${tenDieuKien(dk.loai === "CONG_LENH" ? "Công lệnh" : dk.loai === "GIAY_GIOI_THIEU" ? "Giấy giới thiệu" : "", "Tất cả")}</span>
         <span><b>Trạng thái:</b> ${tenDieuKien(dk.trangThai, "Tất cả")}</span>
         <span><b>Phòng/Khu:</b> ${tenDieuKien(dk.phong, "Tất cả")}</span>
