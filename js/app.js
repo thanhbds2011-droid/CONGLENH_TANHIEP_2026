@@ -1,6 +1,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "148";
+const CURRENT_VERSION = "149";
 
 let DU_LIEU_NHAT_KY = [];
 let DU_LIEU_NHAT_KY_DANG_HIEN_THI = [];
@@ -200,6 +200,7 @@ function layThongTinFormCapVanBan() {
     tuoi: document.getElementById("tuoi").value.trim(),
     chucVu: document.getElementById("chucVu").value.trim(),
     phongKhu: document.getElementById("phongKhu").value,
+    nguoiCap: document.getElementById("nguoiCap").value,
     ngayCapGiay: document.getElementById("ngayCapGiay").value
   };
 
@@ -224,6 +225,13 @@ function layThongTinFormCapVanBan() {
 function capCongLenh() {
   const params = layThongTinFormCapVanBan();
   const ketqua = document.getElementById("ketqua");
+
+  if (!params.nguoiCap) {
+    ketqua.style.display = "block";
+    ketqua.innerHTML = "❌ Vui lòng chọn người cấp văn bản.";
+    document.getElementById("nguoiCap").focus();
+    return;
+  }
 
   ketqua.style.display = "block";
   ketqua.innerHTML = "⏳ Hệ thống đang kiểm tra và tạo file PDF. Vui lòng không bấm lại nhiều lần...";
@@ -518,6 +526,7 @@ function capLaiVanBan(loaiGiay, soCu, lyDoHuy, ghiChuHuy) {
     tuoi: document.getElementById("tuoi").value.trim(),
     chucVu: document.getElementById("chucVu").value.trim(),
     phongKhu: document.getElementById("phongKhu").value,
+    nguoiCap: document.getElementById("nguoiCap").value,
     ngayCapGiay: document.getElementById("ngayCapGiay").value
   };
 
@@ -609,6 +618,7 @@ function resetForm() {
 
   document.getElementById("ngayCapGiay").value = "";
   document.getElementById("phongKhu").selectedIndex = 0;
+  document.getElementById("nguoiCap").selectedIndex = 0;
 
   anLichSuCapLai();
 
