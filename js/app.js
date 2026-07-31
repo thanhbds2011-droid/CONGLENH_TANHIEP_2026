@@ -1,6 +1,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "149";
+const CURRENT_VERSION = "150";
 
 let DU_LIEU_NHAT_KY = [];
 let DU_LIEU_NHAT_KY_DANG_HIEN_THI = [];
@@ -671,6 +671,7 @@ function locNhatKy() {
   const loai = document.getElementById("locLoai").value;
   const trangThai = document.getElementById("locTrangThai").value;
   const phong = document.getElementById("locPhong").value;
+  const nguoiCap = document.getElementById("locNguoiCap").value;
 
   const ketQua = DU_LIEU_NHAT_KY.map(function (itemPhong) {
     if (phong && itemPhong.phongKhu !== phong) return null;
@@ -692,12 +693,14 @@ function locNhatKy() {
           vb.trangThai,
           vb.lyDoHuy,
           vb.ghiChuHuy,
-          vb.tenFile
+          vb.tenFile,
+          vb.nguoiCap
         ].join(" ").toLowerCase();
 
         if (keyword && !text.includes(keyword)) return false;
         if (loai && vb.loaiGiay !== loai) return false;
         if (trangThai && chuanHoaTrangThai(vb.trangThai) !== chuanHoaTrangThai(trangThai)) return false;
+        if (nguoiCap && chuanHoaTextTimKiem(vb.nguoiCap) !== chuanHoaTextTimKiem(nguoiCap)) return false;
 
         if (tuNgay && chuyenNgayLoc(vb.ngayCapGiay) < tuNgay) return false;
         if (denNgay && chuyenNgayLoc(vb.ngayCapGiay) > denNgay) return false;
@@ -727,6 +730,55 @@ function locNhatKy() {
 
   DU_LIEU_NHAT_KY_DANG_HIEN_THI = ketQua;
   hienThiNhatKy(DU_LIEU_NHAT_KY_DANG_HIEN_THI);
+}
+
+function dinhDangNgayInput(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function apDungLocThoiGianNhanh() {
+  const giaTri = document.getElementById("locThoiGianNhanh").value;
+  const tuNgayEl = document.getElementById("tuNgay");
+  const denNgayEl = document.getElementById("denNgay");
+
+  if (!giaTri) {
+    tuNgayEl.value = "";
+    denNgayEl.value = "";
+    locNhatKy();
+    return;
+  }
+
+  const homNay = new Date();
+  homNay.setHours(0, 0, 0, 0);
+  let batDau = new Date(homNay);
+  let ketThuc = new Date(homNay);
+
+  if (giaTri === "THANG_NAY") {
+    batDau = new Date(homNay.getFullYear(), homNay.getMonth(), 1);
+    ketThuc = new Date(homNay.getFullYear(), homNay.getMonth() + 1, 0);
+  } else if (giaTri === "QUY_NAY") {
+    const thangBatDauQuy = Math.floor(homNay.getMonth() / 3) * 3;
+    batDau = new Date(homNay.getFullYear(), thangBatDauQuy, 1);
+    ketThuc = new Date(homNay.getFullYear(), thangBatDauQuy + 3, 0);
+  }
+
+  tuNgayEl.value = dinhDangNgayInput(batDau);
+  denNgayEl.value = dinhDangNgayInput(ketThuc);
+  locNhatKy();
+}
+
+function chuanHoaTextTimKiem(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "d")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, " ");
 }
 
 function chuyenNgayLoc(value) {
@@ -770,7 +822,16 @@ function hienThiNhatKy(data) {
     return;
   }
 
-  let html = "";
+  const tongCLLoc = data.reduce((tong, phong) => tong + Number(phong.tongCL || 0), 0);
+  const tongGGTLoc = data.reduce((tong, phong) => tong + Number(phong.tongGGT || 0), 0);
+  const nguoiCapDangLoc = document.getElementById("locNguoiCap")?.value || "";
+
+  let html = `
+    <div class="journal-filter-summary">
+      <div><b>${tongCLLoc}</b><span>Công lệnh</span></div>
+      <div><b>${tongGGTLoc}</b><span>Giấy giới thiệu</span></div>
+      <div class="journal-filter-summary-wide"><b>${tongCLLoc + tongGGTLoc}</b><span>${nguoiCapDangLoc ? "Do " + escapeHtml(nguoiCapDangLoc) + " cấp" : "Tổng văn bản phù hợp"}</span></div>
+    </div>`;
 
   data.forEach(function (phong, i) {
     const phongId = "phong_" + i;
@@ -840,6 +901,7 @@ function hienThiNhatKy(data) {
             ${vb.trangThai ? `<p><b>Trạng thái cấp:</b> ${vb.trangThai}</p>` : ""}
             ${vb.lyDoHuy ? `<p><b>Lý do hủy:</b> ${vb.lyDoHuy}</p>` : ""}
             ${vb.ghiChuHuy ? `<p><b>Ghi chú hủy:</b> ${vb.ghiChuHuy}</p>` : ""}
+            ${vb.nguoiCap ? `<p><b>Người cấp:</b> ${vb.nguoiCap}</p>` : ""}
 
             <p><a href="${vb.linkFile || "#"}" target="_blank">📄 Mở PDF</a></p>
 
@@ -902,11 +964,11 @@ function resetLoc() {
   document.getElementById("timKiemNhatKy").value = "";
   document.getElementById("tuNgay").value = "";
   document.getElementById("denNgay").value = "";
+  document.getElementById("locThoiGianNhanh").selectedIndex = 0;
   document.getElementById("locLoai").selectedIndex = 0;
   document.getElementById("locTrangThai").selectedIndex = 0;
-
-
   document.getElementById("locPhong").selectedIndex = 0;
+  document.getElementById("locNguoiCap").selectedIndex = 0;
 
   DU_LIEU_NHAT_KY_DANG_HIEN_THI = DU_LIEU_NHAT_KY;
   hienThiNhatKy(DU_LIEU_NHAT_KY_DANG_HIEN_THI);
@@ -921,8 +983,9 @@ function layDieuKienBaoCao() {
     tuNgay: document.getElementById("tuNgay").value,
     denNgay: document.getElementById("denNgay").value,
     loai: document.getElementById("locLoai").value,
-    trangThai: document.getElementById("locTrangThai").value,
-    phong: document.getElementById("locPhong").value
+    trangThai: "Đã cấp",
+    phong: document.getElementById("locPhong").value,
+    nguoiCap: document.getElementById("locNguoiCap").value
   };
 }
 
@@ -955,22 +1018,41 @@ function dinhDangNgayBoLoc(value) {
 }
 
 function xemTruocBaoCao() {
-  const ds = phangHoaDuLieuNhatKy(DU_LIEU_NHAT_KY_DANG_HIEN_THI);
-  if (!ds.length) { alert("Không có dữ liệu phù hợp để xem trước báo cáo."); return; }
+  const locTrangThaiEl = document.getElementById("locTrangThai");
+  if (locTrangThaiEl && locTrangThaiEl.value !== "Đã cấp") {
+    locTrangThaiEl.value = "Đã cấp";
+    locNhatKy();
+  }
+
+  const ds = phangHoaDuLieuNhatKy(DU_LIEU_NHAT_KY_DANG_HIEN_THI)
+    .filter(vb => chuanHoaTrangThai(vb.trangThai) === "đã cấp")
+    .sort((a, b) => {
+      const soA = Number(a.so);
+      const soB = Number(b.so);
+      if (Number.isFinite(soA) && Number.isFinite(soB) && soA !== soB) return soA - soB;
+      if (a.loaiGiay !== b.loaiGiay) return String(a.loaiGiay).localeCompare(String(b.loaiGiay), "vi");
+      return String(a.so).localeCompare(String(b.so), "vi", { numeric: true });
+    });
+
+  if (!ds.length) {
+    alert("Không có văn bản đang ở trạng thái Đã cấp phù hợp để xem trước báo cáo.");
+    return;
+  }
 
   const dk = layDieuKienBaoCao();
   const tongCL = ds.filter(x => x.loaiGiay === "CONG_LENH").length;
   const tongGGT = ds.filter(x => x.loaiGiay === "GIAY_GIOI_THIEU").length;
-  const daCap = ds.filter(x => chuanHoaTrangThai(x.trangThai) === "đã cấp").length;
-  const daHuy = ds.filter(x => chuanHoaTrangThai(x.trangThai) === "đã hủy").length;
 
   const rows = ds.map((vb, i) => `
     <tr>
-      <td>${i + 1}</td><td>${escapeHtml(vb.loaiGiay === "GIAY_GIOI_THIEU" ? "GGT" : "CL")}</td>
-      <td>${escapeHtml(vb.so)}</td><td>${escapeHtml(vb.dongChi)}</td>
-      <td>${escapeHtml(vb.noiDung)}</td><td>${escapeHtml(vb.ngayCapGiay)}</td>
-      <td>${escapeHtml(vb.phongKhu)}</td><td>${escapeHtml(vb.trangThai)}</td>
-      <td>${escapeHtml(vb.lyDoHuy || "")}</td>
+      <td>${i + 1}</td>
+      <td>${escapeHtml(vb.loaiGiay === "GIAY_GIOI_THIEU" ? "GGT" : "CL")}</td>
+      <td>${escapeHtml(vb.so)}</td>
+      <td>${escapeHtml(vb.dongChi)}</td>
+      <td>${escapeHtml(vb.noiDung)}</td>
+      <td>${escapeHtml(vb.ngayCapGiay)}</td>
+      <td>${escapeHtml(vb.phongKhu)}</td>
+      <td>${escapeHtml(vb.nguoiCap || "Chưa cập nhật")}</td>
     </tr>`).join("");
 
   document.getElementById("noiDungXemTruoc").innerHTML = `
@@ -981,21 +1063,24 @@ function xemTruocBaoCao() {
         <span><b>Từ ngày:</b> ${tenDieuKien(dinhDangNgayBoLoc(dk.tuNgay), "Tất cả")}</span>
         <span><b>Đến ngày:</b> ${tenDieuKien(dinhDangNgayBoLoc(dk.denNgay), "Tất cả")}</span>
         <span><b>Loại:</b> ${tenDieuKien(dk.loai === "CONG_LENH" ? "Công lệnh" : dk.loai === "GIAY_GIOI_THIEU" ? "Giấy giới thiệu" : "", "Tất cả")}</span>
-        <span><b>Trạng thái:</b> ${tenDieuKien(dk.trangThai, "Tất cả")}</span>
+        <span><b>Trạng thái:</b> Chỉ văn bản đã cấp</span>
         <span><b>Phòng/Khu:</b> ${tenDieuKien(dk.phong, "Tất cả")}</span>
+        <span><b>Người cấp:</b> ${tenDieuKien(dk.nguoiCap, "Tất cả")}</span>
       </div>
-      <div class="report-stats">
-        <div><b>${tongCL}</b><span>Công lệnh</span></div><div><b>${tongGGT}</b><span>Giấy giới thiệu</span></div>
-        <div><b>${daCap}</b><span>Đã cấp</span></div><div><b>${daHuy}</b><span>Đã hủy</span></div>
+      <div class="report-stats report-stats-three">
+        <div><b>${tongCL}</b><span>Công lệnh</span></div>
+        <div><b>${tongGGT}</b><span>Giấy giới thiệu</span></div>
+        <div><b>${ds.length}</b><span>Tổng đã cấp</span></div>
       </div>
       <div class="report-table-wrap"><table class="report-preview-table">
-        <thead><tr><th>STT</th><th>Loại</th><th>Số</th><th>Người được cấp</th><th>Nội dung</th><th>Ngày cấp</th><th>Phòng/Khu</th><th>Trạng thái</th><th>Lý do hủy</th></tr></thead>
+        <thead><tr><th>STT</th><th>Loại</th><th>Số</th><th>Người được cấp</th><th>Nội dung</th><th>Ngày cấp</th><th>Phòng/Khu</th><th>Người cấp</th></tr></thead>
         <tbody>${rows}</tbody>
       </table></div>
     </div>`;
 
   const modal = document.getElementById("modalBaoCao");
-  modal.classList.add("open"); modal.setAttribute("aria-hidden", "false");
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
   document.body.classList.add("modal-open");
   taiDanhSachBaoCaoPdf();
 }
