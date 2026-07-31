@@ -17,7 +17,7 @@
 
   <link rel="icon" type="image/png" href="icons/icon-192.png?v=149">
   <link rel="apple-touch-icon" sizes="1024x1024" href="logo.png?v=149">
-  <link rel="manifest" href="manifest.json?v=149">
+  <link rel="manifest" href="manifest.json?v=150">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,7 +26,7 @@
     rel="stylesheet"
   >
 
-  <link rel="stylesheet" href="css/style.css?v=149">
+  <link rel="stylesheet" href="css/style.css?v=150">
 </head>
 
 <body>
@@ -219,6 +219,13 @@
           </div>
         </div>
 
+        <select id="locThoiGianNhanh" onchange="apDungLocThoiGianNhanh()">
+          <option value="">Tất cả thời gian</option>
+          <option value="HOM_NAY">Hôm nay</option>
+          <option value="THANG_NAY">Tháng này</option>
+          <option value="QUY_NAY">Quý này</option>
+        </select>
+
         <select id="locLoai" onchange="locNhatKy()">
           <option value="">Tất cả loại giấy</option>
           <option value="CONG_LENH">Công lệnh</option>
@@ -241,6 +248,19 @@
           <option>Khu I</option>
           <option>Khu II</option>
           <option>Khu III</option>
+        </select>
+
+        <select id="locNguoiCap" onchange="locNhatKy()">
+          <option value="">Tất cả người cấp</option>
+          <option>Vũ Ngọc Cẩm Lương - Phó Trưởng phòng</option>
+          <option>Phạm Thị Ngân - Phó Trưởng phòng</option>
+          <option>Nguyễn Thị Bích Huyền - Trưởng phòng</option>
+          <option>Nguyễn Chí Thạnh - Chuyên viên</option>
+          <option>Nguyễn Thị Linh Duy - Chuyên viên</option>
+          <option>Đinh Thị Hiền - Chuyên viên</option>
+          <option>Đặng Thị Hiền - Chuyên viên</option>
+          <option>Nguyễn Thị Thảo - Chuyên viên</option>
+          <option>Nguyễn Thị Hồng Thắm - Chuyên viên</option>
         </select>
 
         <div class="filter-actions">
@@ -304,6 +324,6 @@
     </button>
   </nav>
 
-  <script src="js/app.js?v=149"></script>
+  <script src="js/app.js?v=150"></script>
 </body>
 </html>

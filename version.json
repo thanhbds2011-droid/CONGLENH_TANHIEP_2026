@@ -1,4 +1,4 @@
 {
-  "version": "149",
-  "message": "Đã bổ sung trường Người cấp cho Công lệnh và Giấy giới thiệu."
+  "version": "150",
+  "message": "Bổ sung lọc Người cấp, lọc nhanh ngày/tháng/quý và chuẩn hóa báo cáo chỉ hiển thị văn bản đã cấp theo số tăng dần."
 }
