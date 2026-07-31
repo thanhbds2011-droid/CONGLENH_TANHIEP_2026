@@ -1346,3 +1346,26 @@ margin-top:0;
   font-weight: 500;
   color: #64748b;
 }
+
+.report-stats.report-stats-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 720px) { .report-stats.report-stats-three { grid-template-columns: 1fr; } }
+
+.journal-filter-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 14px;
+}
+.journal-filter-summary > div {
+  border: 1px solid #d7e1ef;
+  border-radius: 14px;
+  background: #f8fbff;
+  padding: 12px;
+  text-align: center;
+}
+.journal-filter-summary b { display: block; font-size: 22px; color: #123b74; }
+.journal-filter-summary span { display: block; margin-top: 3px; font-size: 12px; color: #607089; }
+@media (max-width: 720px) {
+  .journal-filter-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .journal-filter-summary-wide { grid-column: 1 / -1; }
+}
