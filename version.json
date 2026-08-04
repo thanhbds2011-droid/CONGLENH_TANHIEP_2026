@@ -1,4 +1,4 @@
 {
-  "version": "150",
-  "message": "Bổ sung lọc Người cấp, lọc nhanh ngày/tháng/quý và chuẩn hóa báo cáo chỉ hiển thị văn bản đã cấp theo số tăng dần."
+  "version": "151",
+  "message": "Đã chuẩn hóa họ tên, gộp người trùng tên và viết hoa Kính gửi của giấy giới thiệu."
 }

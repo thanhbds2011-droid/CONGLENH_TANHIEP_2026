@@ -1,4 +1,4 @@
-const CACHE_NAME = "cong-lenh-cache-v150";
+const CACHE_NAME = "cong-lenh-cache-v151";
 
 self.addEventListener("install", event => {
   self.skipWaiting();
