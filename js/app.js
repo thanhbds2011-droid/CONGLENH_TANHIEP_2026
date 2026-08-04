@@ -1,6 +1,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "150";
+const CURRENT_VERSION = "151";
 
 let DU_LIEU_NHAT_KY = [];
 let DU_LIEU_NHAT_KY_DANG_HIEN_THI = [];
@@ -196,7 +196,7 @@ function layThongTinFormCapVanBan() {
 
   const params = {
     loaiGiay: loaiGiay,
-    dongChi: document.getElementById("dongChi").value.trim(),
+    dongChi: chuanHoaHoTenHienThi(document.getElementById("dongChi").value),
     tuoi: document.getElementById("tuoi").value.trim(),
     chucVu: document.getElementById("chucVu").value.trim(),
     phongKhu: document.getElementById("phongKhu").value,
@@ -213,7 +213,7 @@ function layThongTinFormCapVanBan() {
     params.phuongTien = document.getElementById("phuongTien").value.trim();
     params.giayTo = document.getElementById("giayTo").value.trim();
   } else {
-    params.kinhGui = document.getElementById("kinhGui").value.trim();
+    params.kinhGui = chuanHoaInHoa(document.getElementById("kinhGui").value);
     params.noiDen = layNoiDenGGT();
     params.noiDung = document.getElementById("noiDungGGT").value.trim();
     params.ngayHetHan = document.getElementById("ngayHetHan").value;
@@ -658,7 +658,7 @@ function taiBaoCao() {
       return;
     }
 
-    DU_LIEU_NHAT_KY = res.data || [];
+    DU_LIEU_NHAT_KY = gopNhatKyTrungTen(res.data || []);
     DU_LIEU_NHAT_KY_DANG_HIEN_THI = DU_LIEU_NHAT_KY;
     hienThiNhatKy(DU_LIEU_NHAT_KY_DANG_HIEN_THI);
   });
@@ -779,6 +779,98 @@ function chuanHoaTextTimKiem(value) {
     .toLowerCase()
     .trim()
     .replace(/\s+/g, " ");
+}
+
+
+function chuanHoaHoTenHienThi(value) {
+  const text = String(value || "").trim().replace(/\s+/g, " ");
+  if (!text) return "";
+
+  return text
+    .toLocaleLowerCase("vi-VN")
+    .replace(/(^|[\s\-'])(\S)/g, function (_, dauCach, kyTu) {
+      return dauCach + kyTu.toLocaleUpperCase("vi-VN");
+    });
+}
+
+function chuanHoaInHoa(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLocaleUpperCase("vi-VN");
+}
+
+/**
+ * Gộp các nhóm có cùng họ tên nhưng khác kiểu viết hoa/thường hoặc khoảng trắng.
+ * Ví dụ: "Nguyễn Thị Thùy Trang", "NGUYỄN THỊ THÙY TRANG" và
+ * "nguyễn thị thùy trang" được xem là cùng một người.
+ */
+function gopNhatKyTrungTen(data) {
+  const phongMap = new Map();
+
+  (data || []).forEach(function (phong) {
+    const tenPhong = String(phong.phongKhu || "Chưa phân loại").trim().replace(/\s+/g, " ");
+    const khoaPhong = chuanHoaTextTimKiem(tenPhong);
+
+    if (!phongMap.has(khoaPhong)) {
+      phongMap.set(khoaPhong, {
+        phongKhu: tenPhong,
+        tongCL: 0,
+        tongGGT: 0,
+        nhanSuMap: new Map()
+      });
+    }
+
+    const nhomPhong = phongMap.get(khoaPhong);
+
+    (phong.nhanSu || []).forEach(function (ns) {
+      const tenHienThi = chuanHoaHoTenHienThi(ns.dongChi || "Chưa rõ tên");
+      const khoaTen = chuanHoaTextTimKiem(tenHienThi);
+
+      if (!nhomPhong.nhanSuMap.has(khoaTen)) {
+        nhomPhong.nhanSuMap.set(khoaTen, {
+          dongChi: tenHienThi,
+          tongCL: 0,
+          tongGGT: 0,
+          danhSach: []
+        });
+      }
+
+      const nhanSu = nhomPhong.nhanSuMap.get(khoaTen);
+      (ns.danhSach || []).forEach(function (vb) {
+        const banGhi = {
+          ...vb,
+          dongChi: chuanHoaHoTenHienThi(vb.dongChi || tenHienThi),
+          cotG: vb.loaiGiay === "GIAY_GIOI_THIEU" ? chuanHoaInHoa(vb.cotG) : vb.cotG
+        };
+        nhanSu.danhSach.push(banGhi);
+      });
+    });
+  });
+
+  return Array.from(phongMap.values()).map(function (phong) {
+    const nhanSu = Array.from(phong.nhanSuMap.values()).map(function (ns) {
+      ns.danhSach.sort(function (a, b) {
+        const soA = Number(a.so);
+        const soB = Number(b.so);
+        if (!Number.isNaN(soA) && !Number.isNaN(soB) && soA !== soB) return soA - soB;
+        return String(a.so || "").localeCompare(String(b.so || ""), "vi", { numeric: true });
+      });
+      ns.tongCL = ns.danhSach.filter(v => v.loaiGiay === "CONG_LENH").length;
+      ns.tongGGT = ns.danhSach.filter(v => v.loaiGiay === "GIAY_GIOI_THIEU").length;
+      return ns;
+    });
+
+    phong.tongCL = nhanSu.reduce((sum, ns) => sum + ns.tongCL, 0);
+    phong.tongGGT = nhanSu.reduce((sum, ns) => sum + ns.tongGGT, 0);
+
+    return {
+      phongKhu: phong.phongKhu,
+      tongCL: phong.tongCL,
+      tongGGT: phong.tongGGT,
+      nhanSu: nhanSu
+    };
+  });
 }
 
 function chuyenNgayLoc(value) {
