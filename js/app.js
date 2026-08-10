@@ -1,11 +1,13 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "151";
+const CURRENT_VERSION = "152";
 
 let DU_LIEU_NHAT_KY = [];
 let DU_LIEU_NHAT_KY_DANG_HIEN_THI = [];
 let DU_LIEU_TRUNG_CL = null;
 let PARAMS_DANG_CAP = null;
+let DU_LIEU_PHONG_KHU = null;
+let PARAMS_CANH_BAO_PHONG_KHU = null;
 
 /* ================= API JSONP ================= */
 
@@ -237,20 +239,156 @@ function capCongLenh() {
   ketqua.innerHTML = "⏳ Hệ thống đang kiểm tra và tạo file PDF. Vui lòng không bấm lại nhiều lần...";
 
   goiApi("xuat", params, function (res) {
-    if (res && res.conflict) {
-      hienCanhBaoTrungVanBan(res.data, params);
-      return;
-    }
-
-    if (!res || !res.ok) {
-      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Xuất PDF thất bại.");
-      return;
-    }
-
-    hienKetQuaXuatThanhCong(res);
-    resetForm();
-    taiDashboard();
+    xuLyPhanHoiXuatVanBan_(res, params);
   });
+}
+
+/* ================= GỢI Ý PHÒNG/KHU NGƯỜI ĐƯỢC CẤP ================= */
+
+function xuLyPhanHoiXuatVanBan_(res, params) {
+  const ketqua = document.getElementById("ketqua");
+
+  if (res && res.phongKhuConflict) {
+    hienCanhBaoPhongKhu(res.data, params);
+    return;
+  }
+
+  if (res && res.conflict) {
+    hienCanhBaoTrungVanBan(res.data, params);
+    return;
+  }
+
+  if (!res || !res.ok) {
+    ketqua.style.display = "block";
+    ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Xuất PDF thất bại.");
+    return;
+  }
+
+  DU_LIEU_PHONG_KHU = null;
+  PARAMS_CANH_BAO_PHONG_KHU = null;
+
+  hienKetQuaXuatThanhCong(res);
+  resetForm();
+  taiDashboard();
+}
+
+function hienCanhBaoPhongKhu(data, params) {
+  DU_LIEU_PHONG_KHU = data || null;
+  PARAMS_CANH_BAO_PHONG_KHU = params || null;
+
+  const ketqua = document.getElementById("ketqua");
+  if (!ketqua || !data || !params) return;
+
+  const dongChi = escapeHtml(data.dongChi || params.dongChi || "");
+  const phongCu = escapeHtml(data.phongKhuDaGhiNhan || "");
+  const phongMoi = escapeHtml(data.phongKhuDangChon || params.phongKhu || "");
+  const vanBanGanNhat = data.soVanBanGanNhat
+    ? `${escapeHtml(data.loaiTenGanNhat || "Văn bản")} số ${escapeHtml(String(data.soVanBanGanNhat))}`
+    : "";
+  const ngayGanNhat = data.ngayGhiNhan ? `, ngày ${escapeHtml(data.ngayGhiNhan)}` : "";
+
+  ketqua.style.display = "block";
+  ketqua.innerHTML = `
+    <div class="conflict-box">
+      <h3>🏷️ Kiểm tra Phòng/Khu</h3>
+      <p><b>${dongChi}</b> hiện được hệ thống ghi nhận gần nhất thuộc <b>${phongCu}</b>.</p>
+      <p>Bạn đang chọn <b>${phongMoi}</b> cho lần cấp này.</p>
+      ${vanBanGanNhat ? `<p><small>Nguồn gợi ý: ${vanBanGanNhat}${ngayGanNhat}.</small></p>` : ""}
+      <p>Bạn muốn đổi về Phòng/Khu đã ghi nhận hay vẫn cấp theo Phòng/Khu đang chọn?</p>
+
+      <div class="conflict-actions">
+        <button type="button" onclick="doiVePhongKhuDaGhiNhanVaCap()">
+          ↩️ Đổi về ${phongCu} và cấp
+        </button>
+
+        <button type="button" onclick="vanCapPhongKhuDangChon()">
+          ✅ Vẫn cấp ${phongMoi}
+        </button>
+
+        <button type="button" onclick="dongCanhBaoPhongKhu()">❌ Đóng</button>
+      </div>
+    </div>
+  `;
+
+  ketqua.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function guiLaiSauCanhBaoPhongKhu_(params, thongBao) {
+  const ketqua = document.getElementById("ketqua");
+  ketqua.style.display = "block";
+  ketqua.innerHTML = thongBao || "⏳ Đang tiếp tục cấp văn bản...";
+
+  goiApi("xuat", params, function (res) {
+    xuLyPhanHoiXuatVanBan_(res, params);
+  });
+}
+
+function doiVePhongKhuDaGhiNhanVaCap() {
+  if (!DU_LIEU_PHONG_KHU || !PARAMS_CANH_BAO_PHONG_KHU) {
+    alert("Không còn dữ liệu Phòng/Khu để xử lý.");
+    return;
+  }
+
+  const phongCu = String(DU_LIEU_PHONG_KHU.phongKhuDaGhiNhan || "").trim();
+  const select = document.getElementById("phongKhu");
+  if (!phongCu || !select) return;
+
+  const option = Array.from(select.options).find(function (opt) {
+    return chuanHoaTextTimKiem(opt.value) === chuanHoaTextTimKiem(phongCu);
+  });
+
+  if (!option) {
+    alert("Phòng/Khu đã ghi nhận trước đây không còn trong danh sách hiện tại: " + phongCu);
+    return;
+  }
+
+  select.value = option.value;
+
+  const params = {
+    ...PARAMS_CANH_BAO_PHONG_KHU,
+    phongKhu: option.value,
+    boQuaPhongKhu: "1"
+  };
+
+  DU_LIEU_PHONG_KHU = null;
+  PARAMS_CANH_BAO_PHONG_KHU = null;
+
+  guiLaiSauCanhBaoPhongKhu_(
+    params,
+    "⏳ Đã đổi Phòng/Khu về " + option.value + ". Đang tiếp tục cấp văn bản..."
+  );
+}
+
+function vanCapPhongKhuDangChon() {
+  if (!DU_LIEU_PHONG_KHU || !PARAMS_CANH_BAO_PHONG_KHU) {
+    alert("Không còn dữ liệu Phòng/Khu để xử lý.");
+    return;
+  }
+
+  const phongDangChon = String(PARAMS_CANH_BAO_PHONG_KHU.phongKhu || "").trim();
+  const params = {
+    ...PARAMS_CANH_BAO_PHONG_KHU,
+    boQuaPhongKhu: "1"
+  };
+
+  DU_LIEU_PHONG_KHU = null;
+  PARAMS_CANH_BAO_PHONG_KHU = null;
+
+  guiLaiSauCanhBaoPhongKhu_(
+    params,
+    "⏳ Đang tiếp tục cấp văn bản theo Phòng/Khu " + phongDangChon + "..."
+  );
+}
+
+function dongCanhBaoPhongKhu() {
+  const ketqua = document.getElementById("ketqua");
+  if (ketqua) {
+    ketqua.style.display = "none";
+    ketqua.innerHTML = "";
+  }
+
+  DU_LIEU_PHONG_KHU = null;
+  PARAMS_CANH_BAO_PHONG_KHU = null;
 }
 
 /* ================= CẢNH BÁO TRÙNG VĂN BẢN ================= */
@@ -392,14 +530,7 @@ function capVanBanMoiBoQuaTrung() {
   };
 
   goiApi("xuat", params, function(res) {
-    if (!res || !res.ok) {
-      ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Không cấp được văn bản mới.");
-      return;
-    }
-
-    hienKetQuaXuatThanhCong(res);
-    resetForm();
-    taiDashboard();
+    xuLyPhanHoiXuatVanBan_(res, params);
   });
 }
 
@@ -619,6 +750,9 @@ function resetForm() {
   document.getElementById("ngayCapGiay").value = "";
   document.getElementById("phongKhu").selectedIndex = 0;
   document.getElementById("nguoiCap").selectedIndex = 0;
+
+  DU_LIEU_PHONG_KHU = null;
+  PARAMS_CANH_BAO_PHONG_KHU = null;
 
   anLichSuCapLai();
 
