@@ -1,6 +1,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "153";
+const CURRENT_VERSION = "154";
 
 let DU_LIEU_NHAT_KY = [];
 let DU_LIEU_NHAT_KY_DANG_HIEN_THI = [];
@@ -8,12 +8,12 @@ let DU_LIEU_TRUNG_CL = null;
 let PARAMS_DANG_CAP = null;
 let DU_LIEU_PHONG_KHU = null;
 let PARAMS_CANH_BAO_PHONG_KHU = null;
+let DANG_XUAT_VAN_BAN = false;
 
 /* ================= API JSONP ================= */
 
-function goiApi(action, params, callback) {
+function goiApi(action, params, callback, timeoutMs) {
   const cbName = "cb_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
-
   params = params || {};
   params.action = action;
   params.token = API_TOKEN;
@@ -25,16 +25,16 @@ function goiApi(action, params, callback) {
 
   const script = document.createElement("script");
   script.src = API_URL + "?" + query;
-
   const timeout = setTimeout(function () {
     callback({
       ok: false,
-      message: "Hệ thống đang xử lý lâu hơn bình thường. Vui lòng chờ giây lát rồi thử lại."
+      _transportError: true,
+      _timeout: true,
+      message: "Hệ thống đang xử lý lâu hơn bình thường. Đang xác minh kết quả..."
     });
-
     delete window[cbName];
     if (script && script.parentNode) script.remove();
-  }, 180000);
+  }, Number(timeoutMs) || 180000);
 
   window[cbName] = function (res) {
     clearTimeout(timeout);
@@ -45,12 +45,11 @@ function goiApi(action, params, callback) {
 
   script.onerror = function () {
     clearTimeout(timeout);
-
     callback({
       ok: false,
-      message: "Không kết nối được hệ thống cấp văn bản. Vui lòng kiểm tra mạng hoặc thử lại sau."
+      _transportError: true,
+      message: "Kết nối phản hồi bị gián đoạn. Đang xác minh văn bản đã được cấp hay chưa..."
     });
-
     delete window[cbName];
     if (script && script.parentNode) script.remove();
   };
@@ -225,9 +224,10 @@ function layThongTinFormCapVanBan() {
 }
 
 function capCongLenh() {
+  if (DANG_XUAT_VAN_BAN) return;
+
   const params = layThongTinFormCapVanBan();
   const ketqua = document.getElementById("ketqua");
-
   if (!params.nguoiCap) {
     ketqua.style.display = "block";
     ketqua.innerHTML = "❌ Vui lòng chọn người cấp văn bản.";
@@ -235,12 +235,73 @@ function capCongLenh() {
     return;
   }
 
+  params.requestId = taoRequestIdVanBan_();
+  datTrangThaiNutXuat_(true);
   ketqua.style.display = "block";
-  ketqua.innerHTML = "⏳ Hệ thống đang kiểm tra và tạo file PDF. Vui lòng không bấm lại nhiều lần...";
+  ketqua.innerHTML = "⏳ Đang cấp văn bản. Hệ thống đã khóa nút để tránh tạo trùng, vui lòng chờ...";
 
-  goiApi("xuat", params, function (res) {
+  guiYeuCauCapAnToan_("xuat", params, function (res) {
     xuLyPhanHoiXuatVanBan_(res, params);
   });
+}
+
+
+/* ================= v154: CẤP VĂN BẢN AN TOÀN / CHỐNG BẤM LẶP ================= */
+
+function taoRequestIdVanBan_() {
+  const rand = (window.crypto && window.crypto.getRandomValues)
+    ? Array.from(window.crypto.getRandomValues(new Uint32Array(2))).map(x => x.toString(36)).join("")
+    : Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+  return "VB-" + Date.now().toString(36) + "-" + rand;
+}
+
+function datTrangThaiNutXuat_(dangXuLy) {
+  DANG_XUAT_VAN_BAN = !!dangXuLy;
+  const btn = document.getElementById("btnXuatVanBan");
+  if (!btn) return;
+  btn.disabled = !!dangXuLy;
+  btn.textContent = dangXuLy ? "⏳ Đang xử lý..." : "📄 Xuất PDF";
+}
+
+function guiYeuCauCapAnToan_(action, params, callback) {
+  goiApi(action, params, function(res) {
+    if (res && res._transportError && params && params.requestId) {
+      xacMinhKetQuaYeuCau_(params.requestId, callback, res, 0);
+      return;
+    }
+    callback(res);
+  });
+}
+
+function xacMinhKetQuaYeuCau_(requestId, callback, loiGoc, lan) {
+  const ketqua = document.getElementById("ketqua");
+  if (ketqua) {
+    ketqua.style.display = "block";
+    ketqua.innerHTML = "⏳ Kết nối phản hồi bị chậm. Hệ thống đang tự kiểm tra văn bản đã được cấp chưa; vui lòng không bấm lại...";
+  }
+
+  goiApi("trang_thai_yeu_cau", { requestId: requestId }, function(st) {
+    if (st && st.ok && st.done && st.result) {
+      callback(st.result);
+      return;
+    }
+    if (st && st.ok && (st.processing || st.found) && lan < 5) {
+      setTimeout(function() {
+        xacMinhKetQuaYeuCau_(requestId, callback, loiGoc, lan + 1);
+      }, 2500);
+      return;
+    }
+    if (lan < 2 && (!st || !st.ok)) {
+      setTimeout(function() {
+        xacMinhKetQuaYeuCau_(requestId, callback, loiGoc, lan + 1);
+      }, 2500);
+      return;
+    }
+    callback({
+      ok: false,
+      message: (loiGoc && loiGoc.message) || "Chưa xác minh được kết quả. Hãy mở Nhật ký kiểm tra trước khi cấp lại."
+    });
+  }, 15000);
 }
 
 /* ================= GỢI Ý PHÒNG/KHU NGƯỜI ĐƯỢC CẤP ================= */
@@ -252,13 +313,12 @@ function xuLyPhanHoiXuatVanBan_(res, params) {
     hienCanhBaoPhongKhu(res.data, params);
     return;
   }
-
   if (res && res.conflict) {
     hienCanhBaoTrungVanBan(res.data, params);
     return;
   }
-
   if (!res || !res.ok) {
+    datTrangThaiNutXuat_(false);
     ketqua.style.display = "block";
     ketqua.innerHTML = "❌ " + ((res && res.message) ? res.message : "Xuất PDF thất bại.");
     return;
@@ -266,7 +326,7 @@ function xuLyPhanHoiXuatVanBan_(res, params) {
 
   DU_LIEU_PHONG_KHU = null;
   PARAMS_CANH_BAO_PHONG_KHU = null;
-
+  datTrangThaiNutXuat_(false);
   hienKetQuaXuatThanhCong(res);
   resetForm();
   taiDashboard();
@@ -317,8 +377,7 @@ function guiLaiSauCanhBaoPhongKhu_(params, thongBao) {
   const ketqua = document.getElementById("ketqua");
   ketqua.style.display = "block";
   ketqua.innerHTML = thongBao || "⏳ Đang tiếp tục cấp văn bản...";
-
-  goiApi("xuat", params, function (res) {
+  guiYeuCauCapAnToan_("xuat", params, function (res) {
     xuLyPhanHoiXuatVanBan_(res, params);
   });
 }
@@ -382,13 +441,10 @@ function vanCapPhongKhuDangChon() {
 
 function dongCanhBaoPhongKhu() {
   const ketqua = document.getElementById("ketqua");
-  if (ketqua) {
-    ketqua.style.display = "none";
-    ketqua.innerHTML = "";
-  }
-
+  if (ketqua) { ketqua.style.display = "none"; ketqua.innerHTML = ""; }
   DU_LIEU_PHONG_KHU = null;
   PARAMS_CANH_BAO_PHONG_KHU = null;
+  datTrangThaiNutXuat_(false);
 }
 
 /* ================= CẢNH BÁO TRÙNG VĂN BẢN ================= */
@@ -490,13 +546,15 @@ function thuHoiVaCapLaiVanBan() {
     ghiChuHuy: ghiChuHuy.trim()
   };
 
-  goiApi(action, params, function(res) {
+  guiYeuCauCapAnToan_(action, params, function(res) {
     if (!res || !res.ok) {
       ketqua.innerHTML =
         "❌ " + ((res && res.message) ? res.message : "Không thu hồi/cấp lại được văn bản.");
+      datTrangThaiNutXuat_(false);
       return;
     }
 
+    datTrangThaiNutXuat_(false);
     hienKetQuaXuatThanhCong(res);
 
     DU_LIEU_TRUNG_CL = null;
@@ -512,36 +570,26 @@ function capVanBanMoiBoQuaTrung() {
     alert("Không có dữ liệu để cấp mới.");
     return;
   }
-
   const laGGT = PARAMS_DANG_CAP.loaiGiay === "GIAY_GIOI_THIEU";
   const tenLoai = laGGT ? "giấy giới thiệu" : "công lệnh";
-
-  if (!confirm("Xác nhận vẫn cấp " + tenLoai + " mới?\n\nVăn bản cũ sẽ được giữ nguyên.")) {
-    return;
-  }
+  if (!confirm("Xác nhận vẫn cấp " + tenLoai + " mới?\n\nVăn bản cũ sẽ được giữ nguyên.")) return;
 
   const ketqua = document.getElementById("ketqua");
   ketqua.style.display = "block";
   ketqua.innerHTML = "⏳ Đang cấp văn bản mới...";
-
-  const params = {
-    ...PARAMS_DANG_CAP,
-    boQuaTrung: "1"
-  };
-
-  goiApi("xuat", params, function(res) {
+  const params = { ...PARAMS_DANG_CAP, boQuaTrung: "1" };
+  guiYeuCauCapAnToan_("xuat", params, function(res) {
     xuLyPhanHoiXuatVanBan_(res, params);
   });
 }
 
 function dongCanhBaoTrung() {
   const ketqua = document.getElementById("ketqua");
-
   ketqua.style.display = "none";
   ketqua.innerHTML = "";
-
   DU_LIEU_TRUNG_CL = null;
   PARAMS_DANG_CAP = null;
+  datTrangThaiNutXuat_(false);
 }
 
 // Alias cũ để tránh lỗi nếu trình duyệt còn cache tên hàm cũ
