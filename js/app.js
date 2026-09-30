@@ -1,6 +1,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "154";
+const CURRENT_VERSION = "155";
 
 let DU_LIEU_NHAT_KY = [];
 let DU_LIEU_NHAT_KY_DANG_HIEN_THI = [];
@@ -9,6 +9,14 @@ let PARAMS_DANG_CAP = null;
 let DU_LIEU_PHONG_KHU = null;
 let PARAMS_CANH_BAO_PHONG_KHU = null;
 let DANG_XUAT_VAN_BAN = false;
+
+// v155 - cache + revision cho Nhật ký
+const NHAT_KY_CACHE_KEY = "nhatky_cache_v155";
+const NHAT_KY_FORCE_REFRESH_MS = 10 * 60 * 1000;
+let DANG_TAI_NHAT_KY = false;
+let NHAT_KY_CAN_LAM_MOI = false;
+let NHAT_KY_REVISION_HIEN_TAI = "";
+let NHAT_KY_CACHE_TIME = 0;
 
 /* ================= API JSONP ================= */
 
@@ -610,6 +618,7 @@ function capCongLenhMoiBoQuaTrung() {
 }
 
 function hienKetQuaXuatThanhCong(res) {
+  danhDauNhatKyCanLamMoi_();
   const ketqua = document.getElementById("ketqua");
   const data = res && res.data ? res.data : {};
 
@@ -828,22 +837,114 @@ function chiaSePdf(link, tenFile) {
 
 /* ================= NHẬT KÝ ================= */
 
-function taiBaoCao() {
+function taiBaoCao(options) {
   damBaoOCtimKiemNhatKy();
+  const opts = options || {};
+  const box = document.getElementById("baoCaoList");
+  if (!box) return;
+
+  // Hiển thị cache ngay lập tức nếu bộ nhớ hiện tại chưa có dữ liệu.
+  if (!DU_LIEU_NHAT_KY.length) {
+    napCacheNhatKy_();
+  }
+
+  if (DU_LIEU_NHAT_KY.length) {
+    DU_LIEU_NHAT_KY_DANG_HIEN_THI = DU_LIEU_NHAT_KY;
+    hienThiNhatKy(DU_LIEU_NHAT_KY_DANG_HIEN_THI);
+  } else {
+    box.innerHTML = "⏳ Đang tải Nhật ký lần đầu...";
+  }
+
+  if (DANG_TAI_NHAT_KY) return;
+
+  if (opts.force || NHAT_KY_CAN_LAM_MOI || !DU_LIEU_NHAT_KY.length) {
+    taiDuLieuNhatKyTuServer_();
+    return;
+  }
+
+  // Chỉ hỏi backend một revision rất nhỏ; không tải toàn bộ Nhật ký nếu chưa đổi.
+  DANG_TAI_NHAT_KY = true;
+  goiApi("nhatky_revision", {}, function (res) {
+    DANG_TAI_NHAT_KY = false;
+
+    if (!res || !res.ok) {
+      // Có cache thì tiếp tục cho người dùng xem; không thay bằng màn hình lỗi.
+      if (!DU_LIEU_NHAT_KY.length) taiDuLieuNhatKyTuServer_();
+      return;
+    }
+
+    const revisionMoi = String(res.revision || "");
+    const cacheQuaCu = !NHAT_KY_CACHE_TIME || (Date.now() - NHAT_KY_CACHE_TIME > NHAT_KY_FORCE_REFRESH_MS);
+
+    if (!NHAT_KY_REVISION_HIEN_TAI || revisionMoi !== NHAT_KY_REVISION_HIEN_TAI || cacheQuaCu) {
+      taiDuLieuNhatKyTuServer_();
+    }
+  }, 15000);
+}
+
+function taiDuLieuNhatKyTuServer_() {
+  if (DANG_TAI_NHAT_KY) return;
+  DANG_TAI_NHAT_KY = true;
 
   const box = document.getElementById("baoCaoList");
-  box.innerHTML = "⏳ Đang tải báo cáo...";
+  const coDuLieuCu = DU_LIEU_NHAT_KY.length > 0;
+  if (!coDuLieuCu && box) box.innerHTML = "⏳ Đang đồng bộ Nhật ký...";
 
   goiApi("baocao", {}, function (res) {
+    DANG_TAI_NHAT_KY = false;
+
     if (!res || !res.ok) {
-      box.innerHTML = "❌ Không tải được báo cáo.";
+      if (!coDuLieuCu && box) {
+        const message = res && res.message ? res.message : "Không nhận được phản hồi từ hệ thống.";
+        box.innerHTML = "❌ Không tải được Nhật ký.<br><small>" + escapeHtml(message) + "</small>";
+      }
       return;
     }
 
     DU_LIEU_NHAT_KY = gopNhatKyTrungTen(res.data || []);
     DU_LIEU_NHAT_KY_DANG_HIEN_THI = DU_LIEU_NHAT_KY;
+    NHAT_KY_REVISION_HIEN_TAI = String(res.revision || "");
+    NHAT_KY_CACHE_TIME = Date.now();
+    NHAT_KY_CAN_LAM_MOI = false;
+
+    luuCacheNhatKy_();
     hienThiNhatKy(DU_LIEU_NHAT_KY_DANG_HIEN_THI);
-  });
+  }, 60000);
+}
+
+function napCacheNhatKy_() {
+  try {
+    const raw = localStorage.getItem(NHAT_KY_CACHE_KEY);
+    if (!raw) return false;
+    const cache = JSON.parse(raw);
+    if (!cache || !Array.isArray(cache.data)) return false;
+
+    DU_LIEU_NHAT_KY = cache.data;
+    DU_LIEU_NHAT_KY_DANG_HIEN_THI = cache.data;
+    NHAT_KY_REVISION_HIEN_TAI = String(cache.revision || "");
+    NHAT_KY_CACHE_TIME = Number(cache.savedAt) || 0;
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function luuCacheNhatKy_() {
+  try {
+    localStorage.setItem(NHAT_KY_CACHE_KEY, JSON.stringify({
+      revision: NHAT_KY_REVISION_HIEN_TAI,
+      savedAt: NHAT_KY_CACHE_TIME || Date.now(),
+      data: DU_LIEU_NHAT_KY
+    }));
+  } catch (e) {
+    // Nếu trình duyệt hết dung lượng cache, hệ thống vẫn hoạt động bình thường bằng bộ nhớ phiên hiện tại.
+    console.warn("Không lưu được cache Nhật ký", e);
+  }
+}
+
+function danhDauNhatKyCanLamMoi_() {
+  NHAT_KY_CAN_LAM_MOI = true;
+  NHAT_KY_REVISION_HIEN_TAI = "";
 }
 
 function locNhatKy() {
@@ -1114,7 +1215,7 @@ function hienThiNhatKy(data) {
       <div class="report-group">
         <div class="report-title" onclick="toggleBox('${phongId}')">
           <div class="phong-left">
-            <b>📁 ${phong.phongKhu}</b>
+            <b>📁 ${escapeHtml(phong.phongKhu)}</b>
             <small>Nhấn để xem danh sách viên chức</small>
           </div>
 
@@ -1127,13 +1228,13 @@ function hienThiNhatKy(data) {
         <div id="${phongId}" class="report-body" style="display:none;">
     `;
 
-    phong.nhanSu.forEach(function (ns, j) {
+    (phong.nhanSu || []).forEach(function (ns, j) {
       const nsId = "ns_" + i + "_" + j;
 
       html += `
-        <div class="person-row" onclick="toggleBox('${nsId}')">
+        <div class="person-row" onclick="moNhanSuNhatKy('${nsId}', ${i}, ${j})">
           <div class="left">
-            <b>👤 ${ns.dongChi}</b>
+            <b>👤 ${escapeHtml(ns.dongChi)}</b>
             <small>Nhấn để xem văn bản đã cấp</small>
           </div>
 
@@ -1143,56 +1244,71 @@ function hienThiNhatKy(data) {
           </div>
         </div>
 
-        <div id="${nsId}" class="person-detail" style="display:none;">
+        <div id="${nsId}" class="person-detail" style="display:none;" data-rendered="0"></div>
       `;
-
-      ns.danhSach.forEach(function (vb, k) {
-        const vbId = "vb_" + i + "_" + j + "_" + k;
-        const badge = vb.loaiGiay === "GIAY_GIOI_THIEU" ? "GGT" : "CL";
-
-        html += `
-          <div class="vb-mini-row" onclick="toggleBox('${vbId}')">
-            <div>
-              <b>${badge} ${vb.so}</b>
-              <small>${vb.noiDung || ""}</small>
-            </div>
-
-            <span>${vb.cotJ || ""}</span>
-          </div>
-
-          <div id="${vbId}" class="cl-detail" style="display:none;">
-            <p><b>Loại:</b> ${vb.loaiTen || ""}</p>
-            <p><b>Người được cấp:</b> ${vb.dongChi || ""}</p>
-            <p><b>Chức vụ:</b> ${vb.chucVu || ""}</p>
-            <p><b>${vb.loaiGiay === "GIAY_GIOI_THIEU" ? "Kính gửi" : "Đi từ"}:</b> ${vb.cotG || ""}</p>
-            <p><b>${vb.loaiGiay === "GIAY_GIOI_THIEU" ? "Nơi đến" : "Đến"}:</b> ${vb.cotH || ""}</p>
-            <p><b>Nội dung:</b> ${vb.noiDung || ""}</p>
-            <p><b>${vb.loaiGiay === "GIAY_GIOI_THIEU" ? "Ngày hết hạn" : "Ngày đi"}:</b> ${vb.cotJ || ""}</p>
-            ${vb.ngayVe ? `<p><b>Ngày về:</b> ${vb.ngayVe}</p>` : ""}
-            ${vb.ngayCapGiay ? `<p><b>Ngày cấp trên giấy:</b> ${vb.ngayCapGiay}</p>` : ""}
-            ${vb.phuongTien ? `<p><b>Phương tiện:</b> ${vb.phuongTien}</p>` : ""}
-            ${vb.giayTo ? `<p><b>Giấy tờ:</b> ${vb.giayTo}</p>` : ""}
-            ${vb.trangThai ? `<p><b>Trạng thái cấp:</b> ${vb.trangThai}</p>` : ""}
-            ${vb.lyDoHuy ? `<p><b>Lý do hủy:</b> ${vb.lyDoHuy}</p>` : ""}
-            ${vb.ghiChuHuy ? `<p><b>Ghi chú hủy:</b> ${vb.ghiChuHuy}</p>` : ""}
-            ${vb.nguoiCap ? `<p><b>Người cấp:</b> ${vb.nguoiCap}</p>` : ""}
-
-            <p><a href="${vb.linkFile || "#"}" target="_blank">📄 Mở PDF</a></p>
-
-            <button class="danger-btn" onclick="huyVanBan('${vb.loaiGiay}', '${vb.so}')">
-              🗑️ Hủy số này
-            </button>
-          </div>
-        `;
-      });
-
-      html += `</div>`;
     });
 
     html += `</div></div>`;
   });
 
   box.innerHTML = html;
+}
+
+function moNhanSuNhatKy(id, phongIndex, nhanSuIndex) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  if (el.dataset.rendered !== "1") {
+    const phong = DU_LIEU_NHAT_KY_DANG_HIEN_THI[phongIndex];
+    const ns = phong && phong.nhanSu ? phong.nhanSu[nhanSuIndex] : null;
+    if (!ns) return;
+    el.innerHTML = taoHtmlVanBanNhanSu_(ns, phongIndex, nhanSuIndex);
+    el.dataset.rendered = "1";
+  }
+
+  el.style.display = el.style.display === "none" ? "block" : "none";
+}
+
+function taoHtmlVanBanNhanSu_(ns, i, j) {
+  return (ns.danhSach || []).map(function (vb, k) {
+    const vbId = "vb_" + i + "_" + j + "_" + k;
+    const badge = vb.loaiGiay === "GIAY_GIOI_THIEU" ? "GGT" : "CL";
+    const linkFile = vb.linkFile || "#";
+
+    return `
+      <div class="vb-mini-row" onclick="toggleBox('${vbId}')">
+        <div>
+          <b>${badge} ${escapeHtml(vb.so)}</b>
+          <small>${escapeHtml(vb.noiDung || "")}</small>
+        </div>
+        <span>${escapeHtml(vb.cotJ || "")}</span>
+      </div>
+
+      <div id="${vbId}" class="cl-detail" style="display:none;">
+        <p><b>Loại:</b> ${escapeHtml(vb.loaiTen || "")}</p>
+        <p><b>Người được cấp:</b> ${escapeHtml(vb.dongChi || "")}</p>
+        <p><b>Chức vụ:</b> ${escapeHtml(vb.chucVu || "")}</p>
+        <p><b>${vb.loaiGiay === "GIAY_GIOI_THIEU" ? "Kính gửi" : "Đi từ"}:</b> ${escapeHtml(vb.cotG || "")}</p>
+        <p><b>${vb.loaiGiay === "GIAY_GIOI_THIEU" ? "Nơi đến" : "Đến"}:</b> ${escapeHtml(vb.cotH || "")}</p>
+        <p><b>Nội dung:</b> ${escapeHtml(vb.noiDung || "")}</p>
+        <p><b>${vb.loaiGiay === "GIAY_GIOI_THIEU" ? "Ngày hết hạn" : "Ngày đi"}:</b> ${escapeHtml(vb.cotJ || "")}</p>
+        ${vb.ngayVe ? `<p><b>Ngày về:</b> ${escapeHtml(vb.ngayVe)}</p>` : ""}
+        ${vb.ngayCapGiay ? `<p><b>Ngày cấp trên giấy:</b> ${escapeHtml(vb.ngayCapGiay)}</p>` : ""}
+        ${vb.phuongTien ? `<p><b>Phương tiện:</b> ${escapeHtml(vb.phuongTien)}</p>` : ""}
+        ${vb.giayTo ? `<p><b>Giấy tờ:</b> ${escapeHtml(vb.giayTo)}</p>` : ""}
+        ${vb.trangThai ? `<p><b>Trạng thái cấp:</b> ${escapeHtml(vb.trangThai)}</p>` : ""}
+        ${vb.lyDoHuy ? `<p><b>Lý do hủy:</b> ${escapeHtml(vb.lyDoHuy)}</p>` : ""}
+        ${vb.ghiChuHuy ? `<p><b>Ghi chú hủy:</b> ${escapeHtml(vb.ghiChuHuy)}</p>` : ""}
+        ${vb.nguoiCap ? `<p><b>Người cấp:</b> ${escapeHtml(vb.nguoiCap)}</p>` : ""}
+
+        <p><a href="${escapeHtml(linkFile)}" target="_blank" rel="noopener">📄 Mở PDF</a></p>
+
+        <button class="danger-btn" onclick="huyVanBan('${vb.loaiGiay}', '${escapeHtml(vb.so)}')">
+          🗑️ Hủy số này
+        </button>
+      </div>
+    `;
+  }).join("");
 }
 
 function toggleBox(id) {
@@ -1229,8 +1345,9 @@ function huyVanBan(loaiGiay, so) {
     }
 
     alert("✅ " + res.message);
+    danhDauNhatKyCanLamMoi_();
     taiDashboard();
-    taiBaoCao();
+    taiBaoCao({ force: true });
   });
 }
 
