@@ -1,6 +1,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "158";
+const CURRENT_VERSION = "159";
 
 let DU_LIEU_NHAT_KY = [];
 let DU_LIEU_NHAT_KY_DANG_HIEN_THI = [];
@@ -301,7 +301,9 @@ function capNhatPhuongTienTheoTen_() {
   };
 
   const mappingNoiDen = {
-    [chuanHoaTextTimKiem("Đào Duy Khấn")]: "Đồng Nai, Tp. Hồ Chí Minh"
+    [chuanHoaTextTimKiem("Đào Duy Khấn")]: "Đồng Nai, Tp. Hồ Chí Minh",
+    [chuanHoaTextTimKiem("Nguyễn Minh Tuấn")]: "Đồng Nai, Tp. Hồ Chí Minh",
+    [chuanHoaTextTimKiem("Võ Văn Kiệt")]: "Đồng Nai, Tp. Hồ Chí Minh"
   };
 
   const phuongTien = mappingPhuongTien[ten];
@@ -326,7 +328,7 @@ function capNhatPhuongTienTheoTen_() {
     inputDenKhac.style.display = "none";
     NOI_DEN_TU_DONG_THEO_TEN = noiDenGoiY;
   } else if (selectDen && NOI_DEN_TU_DONG_THEO_TEN && selectDen.value === NOI_DEN_TU_DONG_THEO_TEN) {
-    // Khi đổi khỏi Đào Duy Khấn, chỉ trả nơi đến về mặc định nếu người dùng
+    // Khi đổi khỏi người có nơi đến tự động, chỉ trả nơi đến về mặc định nếu người dùng
     // chưa tự thay đổi lựa chọn được gợi ý trước đó.
     selectDen.selectedIndex = 0;
     if (inputDenKhac) {
