@@ -15,9 +15,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Giấy công lệnh, giấy giới thiệu">
 
-  <link rel="icon" type="image/png" href="icons/icon-192.png?v=155">
-  <link rel="apple-touch-icon" sizes="1024x1024" href="logo.png?v=155">
-  <link rel="manifest" href="manifest.json?v=155">
+  <link rel="icon" type="image/png" href="icons/icon-192.png?v=157">
+  <link rel="apple-touch-icon" sizes="1024x1024" href="logo.png?v=157">
+  <link rel="manifest" href="manifest.json?v=157">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,13 +26,13 @@
     rel="stylesheet"
   >
 
-  <link rel="stylesheet" href="css/style.css?v=155">
+  <link rel="stylesheet" href="css/style.css?v=157">
 </head>
 
 <body>
   <header class="header">
     <div class="brand">
-      <img class="brand-logo" src="logo.png?v=155" alt="Logo Trung tâm">
+      <img class="brand-logo" src="logo.png?v=157" alt="Logo Trung tâm">
       <div>
         <h1>Giấy công lệnh, giấy giới thiệu</h1>
         <p>Trung tâm Bảo trợ xã hội Tân Hiệp</p>
@@ -101,7 +101,13 @@
       <input id="tuoi" placeholder="Nhập tuổi nếu có">
 
       <label>Chức vụ</label>
-      <input id="chucVu" placeholder="Ví dụ: Nhân viên">
+      <select id="chucVu">
+        <option>Nhân viên</option>
+        <option>Phó Trưởng phòng</option>
+        <option>Trưởng phòng</option>
+        <option>Giám đốc</option>
+        <option>Phó Giám đốc</option>
+      </select>
 
       <div id="formCL">
         <label>Đi từ</label>
@@ -113,13 +119,20 @@
           <option>Bệnh viện ĐK Bình Phước</option>
           <option>Bệnh viện ĐK Bình Dương</option>
           <option>Bệnh viện Chợ Rẫy</option>
+          <option>Đồng Nai. Tp. Hồ Chí Minh</option>
           <option>Khác...</option>
         </select>
 
         <input id="denKhac" style="display:none" placeholder="Nhập nơi đến khác">
 
         <label>Nội dung công tác</label>
-        <textarea id="noiDung" placeholder="Nhập nội dung công tác"></textarea>
+        <input id="noiDung" list="noiDungGoiY" value="Nuôi bệnh" placeholder="Chọn hoặc nhập nội dung công tác thực tế">
+        <datalist id="noiDungGoiY">
+          <option value="Nuôi bệnh"></option>
+          <option value="Chuyển viện, rước bệnh"></option>
+          <option value="Đưa rước viên chức, người lao động đi công tác"></option>
+          <option value="Đưa rước Ban Giám đốc đi công tác"></option>
+        </datalist>
 
         <label>Ngày đi</label>
         <input type="date" id="ngayDi">
@@ -128,7 +141,13 @@
         <input type="date" id="ngayVe">
 
         <label>Phương tiện</label>
-        <input id="phuongTien" placeholder="Ví dụ: Tự túc">
+        <select id="phuongTien">
+          <option>Tự túc</option>
+          <option>51A-018.37</option>
+          <option>51A-1896</option>
+          <option>51B-0268</option>
+          <option>51A-0701</option>
+        </select>
 
         <label>Giấy tờ kèm theo</label>
         <input id="giayTo" placeholder="Nếu có">
@@ -325,6 +344,6 @@
     </button>
   </nav>
 
-  <script src="js/app.js?v=155"></script>
+  <script src="js/app.js?v=157"></script>
 </body>
 </html>

@@ -1,0 +1,9 @@
+CÔNG LỆNH TÂN HIỆP - v157
+
+Bổ sung từ v156:
+- Nguyễn Minh Tuấn: tự chọn phương tiện 51A-1896 và gợi ý nội dung "Đưa rước viên chức, người lao động đi công tác".
+- Võ Văn Kiệt: tự chọn phương tiện 51B-0268 và gợi ý nội dung "Đưa rước Ban Giám đốc đi công tác".
+- Đào Duy Khấn: tiếp tục tự chọn phương tiện 51A-018.37; không ép nội dung công tác.
+- Nội dung công tác chuyển sang ô có danh sách gợi ý nhưng vẫn được phép nhập/chỉnh sửa tự do theo thực tế.
+- Giữ nguyên toàn bộ chức năng và tối ưu Nhật ký của v155/v156.
+- Không cần thay Apps Script.

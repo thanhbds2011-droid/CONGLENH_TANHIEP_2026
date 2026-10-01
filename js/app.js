@@ -1,6 +1,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "155";
+const CURRENT_VERSION = "157";
 
 let DU_LIEU_NHAT_KY = [];
 let DU_LIEU_NHAT_KY_DANG_HIEN_THI = [];
@@ -9,6 +9,7 @@ let PARAMS_DANG_CAP = null;
 let DU_LIEU_PHONG_KHU = null;
 let PARAMS_CANH_BAO_PHONG_KHU = null;
 let DANG_XUAT_VAN_BAN = false;
+let NOI_DUNG_TU_DONG_THEO_TEN = "";
 
 // v155 - cache + revision cho Nhật ký
 const NHAT_KY_CACHE_KEY = "nhatky_cache_v155";
@@ -200,6 +201,72 @@ document.addEventListener("change", function (e) {
   }
 });
 
+function layChucVuDayDu_() {
+  const chucVuCoBan = String(document.getElementById("chucVu")?.value || "").trim();
+  const phongKhu = String(document.getElementById("phongKhu")?.value || "").trim();
+
+  if (!chucVuCoBan) return "";
+
+  // Giám đốc/Phó Giám đốc là chức danh Ban Giám đốc, không ghép thêm tên Phòng/Khu.
+  if (["Giám đốc", "Phó Giám đốc"].includes(chucVuCoBan)) {
+    return chucVuCoBan;
+  }
+
+  if (!phongKhu) return chucVuCoBan;
+
+  // Tránh lặp từ "Phòng":
+  // Phó Trưởng phòng + Phòng Tổ chức - Hành chính
+  // => Phó Trưởng phòng Tổ chức - Hành chính.
+  if (["Trưởng phòng", "Phó Trưởng phòng"].includes(chucVuCoBan) && /^Phòng\s+/i.test(phongKhu)) {
+    return `${chucVuCoBan} ${phongKhu.replace(/^Phòng\s+/i, "")}`;
+  }
+
+  return `${chucVuCoBan} ${phongKhu}`;
+}
+
+function capNhatPhuongTienTheoTen_() {
+  const inputTen = document.getElementById("dongChi");
+  const selectPhuongTien = document.getElementById("phuongTien");
+  const inputNoiDung = document.getElementById("noiDung");
+  if (!inputTen || !selectPhuongTien) return;
+
+  const ten = chuanHoaTextTimKiem(inputTen.value);
+
+  const mappingPhuongTien = {
+    [chuanHoaTextTimKiem("Đào Duy Khấn")]: "51A-018.37",
+    [chuanHoaTextTimKiem("Nguyễn Minh Tuấn")]: "51A-1896",
+    [chuanHoaTextTimKiem("Võ Văn Kiệt")]: "51B-0268"
+  };
+
+  const mappingNoiDung = {
+    [chuanHoaTextTimKiem("Nguyễn Minh Tuấn")]: "Đưa rước viên chức, người lao động đi công tác",
+    [chuanHoaTextTimKiem("Võ Văn Kiệt")]: "Đưa rước Ban Giám đốc đi công tác"
+  };
+
+  const phuongTien = mappingPhuongTien[ten];
+  selectPhuongTien.value = phuongTien || "Tự túc";
+
+  if (!inputNoiDung) return;
+
+  const noiDungGoiY = mappingNoiDung[ten] || "";
+
+  // Chỉ tự động thay khi nhận diện đúng người. Sau đó người dùng vẫn được sửa
+  // nội dung theo thực tế và hệ thống không khóa giá trị đã chỉnh.
+  if (noiDungGoiY) {
+    inputNoiDung.value = noiDungGoiY;
+    NOI_DUNG_TU_DONG_THEO_TEN = noiDungGoiY;
+    return;
+  }
+
+  // Nếu vừa chuyển từ một người có nội dung tự động sang người khác,
+  // chỉ trả về mặc định khi nội dung vẫn còn nguyên giá trị tự động cũ.
+  // Nếu người dùng đã tự sửa, giữ nguyên nội dung họ đã nhập.
+  if (NOI_DUNG_TU_DONG_THEO_TEN && inputNoiDung.value === NOI_DUNG_TU_DONG_THEO_TEN) {
+    inputNoiDung.value = "Nuôi bệnh";
+  }
+  NOI_DUNG_TU_DONG_THEO_TEN = "";
+}
+
 function layThongTinFormCapVanBan() {
   const loaiGiay = document.getElementById("loaiGiay").value;
 
@@ -207,7 +274,7 @@ function layThongTinFormCapVanBan() {
     loaiGiay: loaiGiay,
     dongChi: chuanHoaHoTenHienThi(document.getElementById("dongChi").value),
     tuoi: document.getElementById("tuoi").value.trim(),
-    chucVu: document.getElementById("chucVu").value.trim(),
+    chucVu: layChucVuDayDu_(),
     phongKhu: document.getElementById("phongKhu").value,
     nguoiCap: document.getElementById("nguoiCap").value,
     ngayCapGiay: document.getElementById("ngayCapGiay").value
@@ -712,7 +779,7 @@ function capLaiVanBan(loaiGiay, soCu, lyDoHuy, ghiChuHuy) {
     ghiChuHuy: ghiChuHuy,
     dongChi: document.getElementById("dongChi").value.trim(),
     tuoi: document.getElementById("tuoi").value.trim(),
-    chucVu: document.getElementById("chucVu").value.trim(),
+    chucVu: layChucVuDayDu_(),
     phongKhu: document.getElementById("phongKhu").value,
     nguoiCap: document.getElementById("nguoiCap").value,
     ngayCapGiay: document.getElementById("ngayCapGiay").value
@@ -763,19 +830,25 @@ function anLichSuCapLai() {
 }
 
 document.addEventListener("input", function (e) {
-  if (
-    e.target &&
-    ["dongChi", "tuoi", "chucVu", "noiDung", "noiDungGGT", "ngayDi", "ngayVe", "ngayHetHan"].includes(e.target.id)
-  ) {
+  if (!e.target) return;
+
+  if (e.target.id === "dongChi") {
+    capNhatPhuongTienTheoTen_();
+  }
+
+  if (["dongChi", "tuoi", "noiDungGGT", "ngayDi", "ngayVe", "ngayHetHan"].includes(e.target.id)) {
     anLichSuCapLai();
   }
 });
 
 document.addEventListener("change", function (e) {
-  if (
-    e.target &&
-    ["loaiGiay", "phongKhu", "den", "noiDen"].includes(e.target.id)
-  ) {
+  if (!e.target) return;
+
+  if (e.target.id === "dongChi") {
+    capNhatPhuongTienTheoTen_();
+  }
+
+  if (["loaiGiay", "phongKhu", "chucVu", "den", "noiDen", "noiDung", "phuongTien"].includes(e.target.id)) {
     anLichSuCapLai();
   }
 });
@@ -785,16 +858,17 @@ document.addEventListener("change", function (e) {
 function resetForm() {
   document.getElementById("dongChi").value = "";
   document.getElementById("tuoi").value = "";
-  document.getElementById("chucVu").value = "";
+  document.getElementById("chucVu").selectedIndex = 0;
 
   document.getElementById("diTu").value = "TTBTXH Tân Hiệp";
   document.getElementById("den").selectedIndex = 0;
   document.getElementById("denKhac").value = "";
   document.getElementById("denKhac").style.display = "none";
-  document.getElementById("noiDung").value = "";
+  document.getElementById("noiDung").value = "Nuôi bệnh";
+  NOI_DUNG_TU_DONG_THEO_TEN = "";
   document.getElementById("ngayDi").value = "";
   document.getElementById("ngayVe").value = "";
-  document.getElementById("phuongTien").value = "";
+  document.getElementById("phuongTien").selectedIndex = 0;
   document.getElementById("giayTo").value = "";
 
   document.getElementById("kinhGui").value = "";
