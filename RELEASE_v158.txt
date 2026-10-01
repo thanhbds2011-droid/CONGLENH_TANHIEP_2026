@@ -1,0 +1,13 @@
+CÔNG LỆNH TÂN HIỆP - v158
+
+1. Sửa địa điểm: "Đồng Nai, Tp. Hồ Chí Minh" (dấu phẩy).
+2. Đào Duy Khấn tự gợi ý:
+   - Đến: Đồng Nai, Tp. Hồ Chí Minh
+   - Nội dung: Chuyển viện, rước bệnh
+   - Phương tiện: 51A-018.37
+3. Nội dung công tác chuyển sang dropdown thật, luôn hiển thị đầy đủ lựa chọn.
+4. Có mục "Khác..." để nhập nội dung công tác theo thực tế.
+5. Giữ nguyên các tự động:
+   - Nguyễn Minh Tuấn -> 51A-1896; Đưa rước viên chức, người lao động đi công tác.
+   - Võ Văn Kiệt -> 51B-0268; Đưa rước Ban Giám đốc đi công tác.
+6. Không thay đổi Apps Script/backend.

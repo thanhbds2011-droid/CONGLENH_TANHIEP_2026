@@ -1,6 +1,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzsBlbmfyzecmKurNXbyz4oFCEvV9y472P4xbiba-gvE9a3yOSmzNHvF_aSe0HEMrt0/exec";
 const API_TOKEN = "CONGLENH_TANHIEP_2026";
-const CURRENT_VERSION = "157";
+const CURRENT_VERSION = "158";
 
 let DU_LIEU_NHAT_KY = [];
 let DU_LIEU_NHAT_KY_DANG_HIEN_THI = [];
@@ -10,6 +10,7 @@ let DU_LIEU_PHONG_KHU = null;
 let PARAMS_CANH_BAO_PHONG_KHU = null;
 let DANG_XUAT_VAN_BAN = false;
 let NOI_DUNG_TU_DONG_THEO_TEN = "";
+let NOI_DEN_TU_DONG_THEO_TEN = "";
 
 // v155 - cache + revision cho Nhật ký
 const NHAT_KY_CACHE_KEY = "nhatky_cache_v155";
@@ -187,6 +188,60 @@ function layNoiDenGGT() {
   return noiDen === "Khác..." ? noiDenKhac : noiDen;
 }
 
+function chonNoiDungCongTac() {
+  const select = document.getElementById("noiDung");
+  const inputKhac = document.getElementById("noiDungKhac");
+  if (!select || !inputKhac) return;
+
+  if (select.value === "Khác...") {
+    inputKhac.style.display = "block";
+    inputKhac.focus();
+  } else {
+    inputKhac.style.display = "none";
+    inputKhac.value = "";
+  }
+
+  // Người dùng chủ động đổi nội dung thì không coi đây là nội dung tự động nữa.
+  NOI_DUNG_TU_DONG_THEO_TEN = "";
+  anLichSuCapLai();
+}
+
+function layNoiDungCongTac() {
+  const select = document.getElementById("noiDung");
+  const inputKhac = document.getElementById("noiDungKhac");
+  if (!select) return "";
+  return select.value === "Khác..."
+    ? String(inputKhac?.value || "").trim()
+    : String(select.value || "").trim();
+}
+
+function datNoiDungCongTac_(value, tuDong) {
+  const select = document.getElementById("noiDung");
+  const inputKhac = document.getElementById("noiDungKhac");
+  if (!select || !inputKhac) return;
+
+  const giaTri = String(value || "").trim();
+  const coOption = Array.from(select.options).some(function(opt) {
+    return opt.value === giaTri;
+  });
+
+  if (coOption && giaTri !== "Khác...") {
+    select.value = giaTri;
+    inputKhac.value = "";
+    inputKhac.style.display = "none";
+  } else if (giaTri) {
+    select.value = "Khác...";
+    inputKhac.value = giaTri;
+    inputKhac.style.display = "block";
+  } else {
+    select.value = "Nuôi bệnh";
+    inputKhac.value = "";
+    inputKhac.style.display = "none";
+  }
+
+  NOI_DUNG_TU_DONG_THEO_TEN = tuDong ? giaTri : "";
+}
+
 document.addEventListener("change", function (e) {
   if (e.target && e.target.id === "noiDen") {
     const box = document.getElementById("noiDenKhac");
@@ -227,7 +282,8 @@ function layChucVuDayDu_() {
 function capNhatPhuongTienTheoTen_() {
   const inputTen = document.getElementById("dongChi");
   const selectPhuongTien = document.getElementById("phuongTien");
-  const inputNoiDung = document.getElementById("noiDung");
+  const selectDen = document.getElementById("den");
+  const inputDenKhac = document.getElementById("denKhac");
   if (!inputTen || !selectPhuongTien) return;
 
   const ten = chuanHoaTextTimKiem(inputTen.value);
@@ -239,32 +295,48 @@ function capNhatPhuongTienTheoTen_() {
   };
 
   const mappingNoiDung = {
+    [chuanHoaTextTimKiem("Đào Duy Khấn")]: "Chuyển viện, rước bệnh",
     [chuanHoaTextTimKiem("Nguyễn Minh Tuấn")]: "Đưa rước viên chức, người lao động đi công tác",
     [chuanHoaTextTimKiem("Võ Văn Kiệt")]: "Đưa rước Ban Giám đốc đi công tác"
+  };
+
+  const mappingNoiDen = {
+    [chuanHoaTextTimKiem("Đào Duy Khấn")]: "Đồng Nai, Tp. Hồ Chí Minh"
   };
 
   const phuongTien = mappingPhuongTien[ten];
   selectPhuongTien.value = phuongTien || "Tự túc";
 
-  if (!inputNoiDung) return;
-
   const noiDungGoiY = mappingNoiDung[ten] || "";
-
-  // Chỉ tự động thay khi nhận diện đúng người. Sau đó người dùng vẫn được sửa
-  // nội dung theo thực tế và hệ thống không khóa giá trị đã chỉnh.
   if (noiDungGoiY) {
-    inputNoiDung.value = noiDungGoiY;
-    NOI_DUNG_TU_DONG_THEO_TEN = noiDungGoiY;
-    return;
+    datNoiDungCongTac_(noiDungGoiY, true);
+  } else {
+    const noiDungHienTai = layNoiDungCongTac();
+    if (NOI_DUNG_TU_DONG_THEO_TEN && noiDungHienTai === NOI_DUNG_TU_DONG_THEO_TEN) {
+      datNoiDungCongTac_("Nuôi bệnh", false);
+    } else {
+      NOI_DUNG_TU_DONG_THEO_TEN = "";
+    }
   }
 
-  // Nếu vừa chuyển từ một người có nội dung tự động sang người khác,
-  // chỉ trả về mặc định khi nội dung vẫn còn nguyên giá trị tự động cũ.
-  // Nếu người dùng đã tự sửa, giữ nguyên nội dung họ đã nhập.
-  if (NOI_DUNG_TU_DONG_THEO_TEN && inputNoiDung.value === NOI_DUNG_TU_DONG_THEO_TEN) {
-    inputNoiDung.value = "Nuôi bệnh";
+  const noiDenGoiY = mappingNoiDen[ten] || "";
+  if (selectDen && inputDenKhac && noiDenGoiY) {
+    selectDen.value = noiDenGoiY;
+    inputDenKhac.value = "";
+    inputDenKhac.style.display = "none";
+    NOI_DEN_TU_DONG_THEO_TEN = noiDenGoiY;
+  } else if (selectDen && NOI_DEN_TU_DONG_THEO_TEN && selectDen.value === NOI_DEN_TU_DONG_THEO_TEN) {
+    // Khi đổi khỏi Đào Duy Khấn, chỉ trả nơi đến về mặc định nếu người dùng
+    // chưa tự thay đổi lựa chọn được gợi ý trước đó.
+    selectDen.selectedIndex = 0;
+    if (inputDenKhac) {
+      inputDenKhac.value = "";
+      inputDenKhac.style.display = "none";
+    }
+    NOI_DEN_TU_DONG_THEO_TEN = "";
+  } else if (!noiDenGoiY) {
+    NOI_DEN_TU_DONG_THEO_TEN = "";
   }
-  NOI_DUNG_TU_DONG_THEO_TEN = "";
 }
 
 function layThongTinFormCapVanBan() {
@@ -283,7 +355,7 @@ function layThongTinFormCapVanBan() {
   if (loaiGiay === "CONG_LENH") {
     params.diTu = document.getElementById("diTu").value.trim();
     params.den = layNoiDenCongLenh();
-    params.noiDung = document.getElementById("noiDung").value.trim();
+    params.noiDung = layNoiDungCongTac();
     params.ngayDi = document.getElementById("ngayDi").value;
     params.ngayVe = document.getElementById("ngayVe").value;
     params.phuongTien = document.getElementById("phuongTien").value.trim();
@@ -788,7 +860,7 @@ function capLaiVanBan(loaiGiay, soCu, lyDoHuy, ghiChuHuy) {
   if (loaiGiay === "CONG_LENH") {
     params.diTu = document.getElementById("diTu").value.trim();
     params.den = layNoiDenCongLenh();
-    params.noiDung = document.getElementById("noiDung").value.trim();
+    params.noiDung = layNoiDungCongTac();
     params.ngayDi = document.getElementById("ngayDi").value;
     params.ngayVe = document.getElementById("ngayVe").value;
     params.phuongTien = document.getElementById("phuongTien").value.trim();
@@ -836,7 +908,7 @@ document.addEventListener("input", function (e) {
     capNhatPhuongTienTheoTen_();
   }
 
-  if (["dongChi", "tuoi", "noiDungGGT", "ngayDi", "ngayVe", "ngayHetHan"].includes(e.target.id)) {
+  if (["dongChi", "tuoi", "noiDungGGT", "noiDungKhac", "ngayDi", "ngayVe", "ngayHetHan"].includes(e.target.id)) {
     anLichSuCapLai();
   }
 });
@@ -865,7 +937,10 @@ function resetForm() {
   document.getElementById("denKhac").value = "";
   document.getElementById("denKhac").style.display = "none";
   document.getElementById("noiDung").value = "Nuôi bệnh";
+  document.getElementById("noiDungKhac").value = "";
+  document.getElementById("noiDungKhac").style.display = "none";
   NOI_DUNG_TU_DONG_THEO_TEN = "";
+  NOI_DEN_TU_DONG_THEO_TEN = "";
   document.getElementById("ngayDi").value = "";
   document.getElementById("ngayVe").value = "";
   document.getElementById("phuongTien").selectedIndex = 0;

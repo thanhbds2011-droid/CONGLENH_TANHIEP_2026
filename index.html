@@ -15,9 +15,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Giấy công lệnh, giấy giới thiệu">
 
-  <link rel="icon" type="image/png" href="icons/icon-192.png?v=157">
-  <link rel="apple-touch-icon" sizes="1024x1024" href="logo.png?v=157">
-  <link rel="manifest" href="manifest.json?v=157">
+  <link rel="icon" type="image/png" href="icons/icon-192.png?v=158">
+  <link rel="apple-touch-icon" sizes="1024x1024" href="logo.png?v=158">
+  <link rel="manifest" href="manifest.json?v=158">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,13 +26,13 @@
     rel="stylesheet"
   >
 
-  <link rel="stylesheet" href="css/style.css?v=157">
+  <link rel="stylesheet" href="css/style.css?v=158">
 </head>
 
 <body>
   <header class="header">
     <div class="brand">
-      <img class="brand-logo" src="logo.png?v=157" alt="Logo Trung tâm">
+      <img class="brand-logo" src="logo.png?v=158" alt="Logo Trung tâm">
       <div>
         <h1>Giấy công lệnh, giấy giới thiệu</h1>
         <p>Trung tâm Bảo trợ xã hội Tân Hiệp</p>
@@ -119,20 +119,22 @@
           <option>Bệnh viện ĐK Bình Phước</option>
           <option>Bệnh viện ĐK Bình Dương</option>
           <option>Bệnh viện Chợ Rẫy</option>
-          <option>Đồng Nai. Tp. Hồ Chí Minh</option>
+          <option>Đồng Nai, Tp. Hồ Chí Minh</option>
           <option>Khác...</option>
         </select>
 
         <input id="denKhac" style="display:none" placeholder="Nhập nơi đến khác">
 
         <label>Nội dung công tác</label>
-        <input id="noiDung" list="noiDungGoiY" value="Nuôi bệnh" placeholder="Chọn hoặc nhập nội dung công tác thực tế">
-        <datalist id="noiDungGoiY">
-          <option value="Nuôi bệnh"></option>
-          <option value="Chuyển viện, rước bệnh"></option>
-          <option value="Đưa rước viên chức, người lao động đi công tác"></option>
-          <option value="Đưa rước Ban Giám đốc đi công tác"></option>
-        </datalist>
+        <select id="noiDung" onchange="chonNoiDungCongTac()">
+          <option>Nuôi bệnh</option>
+          <option>Chuyển viện, rước bệnh</option>
+          <option>Đưa rước viên chức, người lao động đi công tác</option>
+          <option>Đưa rước Ban Giám đốc đi công tác</option>
+          <option>Khác...</option>
+        </select>
+
+        <input id="noiDungKhac" style="display:none" placeholder="Nhập nội dung công tác thực tế">
 
         <label>Ngày đi</label>
         <input type="date" id="ngayDi">
@@ -344,6 +346,6 @@
     </button>
   </nav>
 
-  <script src="js/app.js?v=157"></script>
+  <script src="js/app.js?v=158"></script>
 </body>
 </html>
